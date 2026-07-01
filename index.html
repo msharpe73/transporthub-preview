@@ -607,34 +607,68 @@ const Badge = ({
   className: `text-xs px-2 py-0.5 rounded-full font-semibold ${BDGE[s] || BDGE.unassigned}`
 }, label || s), s === 'cancelled' && chargeStatus && /*#__PURE__*/React.createElement("span", {
   className: `text-xs px-2 py-0.5 rounded-full font-semibold ${chargeStatus === 'charged' ? 'bg-orange-100 text-orange-700 border border-orange-200' : 'bg-gray-100 text-gray-500 border border-gray-200'}`
-}, chargeStatus === 'charged' ? '💰 Charged' : '✓ No charge'));
+}, chargeStatus === 'charged' ? 'Billable' : 'Not billable'));
 function Modal({
   title,
   onClose,
   children,
-  size = 'md'
+  size = 'md',
+  tone = 'default'
 }) {
   const w = size === 'sm' ? 'sm:max-w-sm' : size === 'lg' ? 'sm:max-w-2xl' : 'sm:max-w-lg';
+  const modalTone = tone === 'passenger' || tone === 'job' ? {
+    shell: 'bg-orange-100',
+    header: 'bg-amber-500 border-b border-amber-500',
+    title: 'font-bold text-white',
+    close: 'w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 text-lg',
+    body: 'bg-orange-100'
+  } : tone === 'staff' ? {
+    shell: 'bg-violet-100',
+    header: 'bg-violet-600 border-b border-violet-600',
+    title: 'font-bold text-white',
+    close: 'w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/30 text-lg',
+    body: 'bg-violet-100'
+  } : {
+    shell: 'bg-white',
+    header: 'border-b border-gray-100',
+    title: 'font-bold text-gray-800',
+    close: 'w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 text-lg',
+    body: ''
+  };
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, []);
   return /*#__PURE__*/React.createElement("div", {
-    className: "fixed inset-0 z-50 flex items-end sm:items-center justify-center",
+    className: "fixed inset-0 z-50 flex items-end sm:items-center justify-center overscroll-none",
     style: {
       background: 'rgba(10,10,20,0.7)',
       backdropFilter: 'blur(6px)'
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: `bg-white w-full ${w} rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col`,
+    className: `${modalTone.shell} w-full ${w} rounded-t-2xl sm:rounded-2xl shadow-2xl flex flex-col min-h-0 overflow-hidden`,
     style: {
-      maxHeight: '92vh'
+      height: size === 'lg' ? '92dvh' : undefined,
+      maxHeight: '92dvh'
     }
   }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between px-5 pt-5 pb-3 border-b border-gray-100 shrink-0"
+    className: `flex items-center justify-between px-5 pt-5 pb-3 shrink-0 ${modalTone.header}`
   }, /*#__PURE__*/React.createElement("h2", {
-    className: "font-bold text-gray-800"
+    className: modalTone.title
   }, title), /*#__PURE__*/React.createElement("button", {
     onClick: onClose,
-    className: "w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200 text-lg"
+    className: modalTone.close
   }, "×")), /*#__PURE__*/React.createElement("div", {
-    className: "px-5 py-4 overflow-y-auto"
+    className: `px-5 py-4 overflow-y-auto overscroll-contain flex-1 min-h-0 ${modalTone.body}`,
+    style: {
+      WebkitOverflowScrolling: 'touch',
+      touchAction: 'pan-y',
+      height: 'calc(92dvh - 72px)',
+      maxHeight: 'calc(92dvh - 72px)'
+    }
   }, children)));
 }
 const inp = 'w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50';
@@ -777,7 +811,7 @@ function PinLogin({
   }, err), /*#__PURE__*/React.createElement("button", {
     onClick: handleLogin,
     disabled: pin.length !== 6,
-    className: "w-full py-3.5 rounded-2xl font-bold text-sm disabled:bg-[#B393DD] disabled:text-white disabled:opacity-100 text-white bg-[#B393DD] hover:bg-[#C3A8E5] active:bg-[#A683D4] shadow-md"
+    className: "w-full py-3.5 rounded-2xl font-bold text-sm disabled:bg-violet-600 disabled:text-white disabled:opacity-60 text-white bg-violet-600 hover:bg-violet-500 active:bg-violet-700 shadow-md"
   }, "Log In")));
 }
 
@@ -829,6 +863,7 @@ function EditTodayModal({
   const [dId, setDId] = useState(run.driverId || '');
   const [aId, setAId] = useState(run.assistantId || '');
   const [clashWarning, setClashWarning] = useState(null);
+  const [cancelNote, setCancelNote] = useState('');
   const availD = drivers.filter(d => isStaffAvailable(d, run.date));
   const doSave = () => {
     const dr = drivers.find(d => d.id === dId);
@@ -948,11 +983,20 @@ function EditTodayModal({
     value: a.id
   }, a.name)))), /*#__PURE__*/React.createElement("p", {
     className: "text-xs text-center text-gray-400 bg-gray-50 rounded-xl py-2"
-  }, "Changes apply to ", prettyDate(run.date), " only."), /*#__PURE__*/React.createElement("div", {
+  }, "Changes apply to ", prettyDate(run.date), " only."), /*#__PURE__*/React.createElement(Field, {
+    label: "Cancellation note",
+    hint: "Optional: e.g. parent cancelled, child absent, school closed, council change"
+  }, /*#__PURE__*/React.createElement("textarea", {
+    className: inp,
+    rows: 2,
+    value: cancelNote,
+    onChange: e => setCancelNote(e.target.value),
+    placeholder: "Reason for cancelling this run"
+  })), /*#__PURE__*/React.createElement("div", {
     className: "flex gap-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => {
-      onCancel(run);
+      onCancel(run, cancelNote.trim());
       onClose();
     },
     className: "flex-1 py-2.5 bg-red-50 text-red-600 rounded-xl text-sm font-semibold border border-red-100"
@@ -1066,7 +1110,7 @@ function ChargeModal({
   onClose
 }) {
   return /*#__PURE__*/React.createElement(Modal, {
-    title: "Set Charge Status",
+    title: "Set Billing Status",
     onClose: onClose,
     size: "sm"
   }, /*#__PURE__*/React.createElement("div", {
@@ -1079,15 +1123,15 @@ function ChargeModal({
     className: "text-sm text-gray-600 italic"
   }, "\"", run.cancelNote, "\"")), /*#__PURE__*/React.createElement("p", {
     className: "text-sm text-gray-600"
-  }, "Was this cancellation chargeable?"), /*#__PURE__*/React.createElement("div", {
+  }, "Should this cancelled run be included for billing?"), /*#__PURE__*/React.createElement("div", {
     className: "space-y-2"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => onSave('charged'),
     className: "w-full py-3.5 bg-orange-500 text-white rounded-xl font-bold text-sm hover:bg-orange-600"
-  }, "💰 Charged — driver attended, passenger didn't travel"), /*#__PURE__*/React.createElement("button", {
+  }, "Billable - include this cancelled run in billing"), /*#__PURE__*/React.createElement("button", {
     onClick: () => onSave('no-charge'),
     className: "w-full py-3.5 bg-gray-200 text-gray-700 rounded-xl font-bold text-sm hover:bg-gray-300"
-  }, "✓ No Charge — sufficient notice given"))));
+  }, "Not billable - do not include this run"))));
 }
 
 // ── DRIVER CANCEL MODAL ───────────────────────────────────────────────────────
@@ -1862,7 +1906,7 @@ function PassengerForm({
     className: "flex-1 py-2.5 border border-gray-200 rounded-xl text-sm text-gray-600"
   }, "Cancel"), /*#__PURE__*/React.createElement("button", {
     onClick: submit,
-    className: "flex-1 py-2.5 bg-sky-600 text-white rounded-xl text-sm font-bold"
+    className: "flex-1 py-2.5 bg-amber-500 text-white rounded-xl text-sm font-bold"
   }, "Save Passenger")), copyFrom && /*#__PURE__*/React.createElement(CopyToModal, {
     fromDay: copyFrom,
     allDays: DAYS,
@@ -1998,7 +2042,8 @@ function StaffForm({
   };
   return /*#__PURE__*/React.createElement(Modal, {
     title: existing ? isAsst ? 'Edit Assistant' : 'Edit Driver' : isAsst ? 'Add Assistant' : 'Add Driver',
-    onClose: onClose
+    onClose: onClose,
+    tone: "staff"
   }, /*#__PURE__*/React.createElement("div", {
     className: "space-y-4"
   }, /*#__PURE__*/React.createElement(Field, {
@@ -2141,7 +2186,7 @@ function StaffForm({
     className: "flex-1 py-2.5 border rounded-xl text-sm text-gray-600"
   }, "Cancel"), /*#__PURE__*/React.createElement("button", {
     onClick: submit,
-    className: "flex-1 py-2.5 bg-sky-600 text-white rounded-xl text-sm font-bold"
+    className: "flex-1 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold"
   }, "Save"))), copyFrom && /*#__PURE__*/React.createElement(CopyToModal, {
     fromDay: copyFrom,
     allDays: DAYS,
@@ -2154,7 +2199,8 @@ function StaffForm({
 function StaffView({
   items,
   drivers,
-  assistants
+  assistants,
+  onOpenStaff
 }) {
   const allStaff = [...drivers.map(d => ({
     ...d,
@@ -2225,8 +2271,9 @@ function StaffView({
       className: `${stripe} border-b border-gray-50 hover:bg-violet-50/20`
     }, /*#__PURE__*/React.createElement("td", {
       className: "px-3 py-3 text-center whitespace-nowrap sticky left-0 bg-violet-50 border-r border-violet-100"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "font-bold text-violet-900"
+    }, /*#__PURE__*/React.createElement("button", {
+      onClick: () => onOpenStaff && onOpenStaff(person),
+      className: "font-bold text-violet-900 hover:text-violet-700 underline-offset-2 hover:underline"
     }, person.name), /*#__PURE__*/React.createElement("div", {
       className: "text-xs text-violet-500 font-semibold mt-0.5"
     }, person.role === 'driver' ? 'Driver' : 'Assistant')), Array(cols).fill(0).map((_, i) => {
@@ -2256,12 +2303,14 @@ function ByDriverView({
   assistants,
   date,
   onDateChange,
-  accentColor
+  accentColor,
+  onOpenStaff
 }) {
   return /*#__PURE__*/React.createElement(StaffView, {
     items: items,
     drivers: drivers,
-    assistants: assistants
+    assistants: assistants,
+    onOpenStaff: onOpenStaff
   });
 }
 
@@ -2524,7 +2573,8 @@ function TableView({
   now,
   drivers,
   assistants,
-  onQuickAssign
+  onQuickAssign,
+  onOpenPassenger
 }) {
   if (!items.length) return /*#__PURE__*/React.createElement("div", {
     className: "text-center py-16 text-gray-400"
@@ -2592,7 +2642,10 @@ function TableView({
       className: "text-orange-500"
     }, "✈"), fmt(item.time))), /*#__PURE__*/React.createElement("td", {
       className: "px-3 py-3 font-semibold text-gray-800 whitespace-nowrap"
-    }, item.passengerName || item.customerName, item.wheelchair && /*#__PURE__*/React.createElement("span", {
+    }, item.passengerId ? /*#__PURE__*/React.createElement("button", {
+      onClick: () => onOpenPassenger && onOpenPassenger(item.passengerId),
+      className: "font-bold text-amber-700 underline underline-offset-2 hover:text-amber-800"
+    }, item.passengerName || item.customerName) : item.passengerName || item.customerName, item.wheelchair && /*#__PURE__*/React.createElement("span", {
       className: "ml-1 text-violet-500"
     }, "♿"), item.scheduleLabel && /*#__PURE__*/React.createElement("div", {
       className: "text-xs text-gray-400 font-normal"
@@ -2620,15 +2673,19 @@ function TableView({
     }, cancelled && !item.chargeStatus && /*#__PURE__*/React.createElement("button", {
       onClick: () => onCharge(item),
       className: "text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-lg font-semibold"
-    }, "Set charge"), cancelled && item.chargeStatus && /*#__PURE__*/React.createElement("button", {
+    }, "Set billing"), cancelled && item.chargeStatus && /*#__PURE__*/React.createElement("button", {
       onClick: () => onCharge(item),
       className: "text-xs text-gray-400 hover:text-orange-600 px-2 py-1"
-    }, "Edit charge"), cancelled && /*#__PURE__*/React.createElement("button", {
+    }, "Edit billing"), cancelled && /*#__PURE__*/React.createElement("button", {
       onClick: () => onReinstate(item),
       className: "text-xs bg-green-100 text-green-700 px-2 py-1 rounded-lg font-semibold"
     }, "Reinstate"), !cancelled && !holiday && /*#__PURE__*/React.createElement("button", {
-      onClick: () => onEdit(item),
-      className: "text-xs text-sky-600 font-semibold"
+      type: "button",
+      onClick: e => {
+        e.stopPropagation();
+        onEdit({ ...item });
+      },
+      className: "text-xs text-sky-600 font-bold underline underline-offset-2"
     }, "Edit"))));
   }))));
 }
@@ -2638,7 +2695,8 @@ function CardsView({
   onEdit,
   onCharge,
   onReinstate,
-  now
+  now,
+  onOpenPassenger
 }) {
   if (!items.length) return /*#__PURE__*/React.createElement("div", {
     className: "text-center py-16 text-gray-400"
@@ -2683,8 +2741,13 @@ function CardsView({
     }, /*#__PURE__*/React.createElement("div", {
       className: "flex justify-between items-center"
     }, /*#__PURE__*/React.createElement("div", {
-      className: "font-semibold text-gray-800 text-base"
-    }, main.passengerName || main.customerName), holiday ? /*#__PURE__*/React.createElement("span", {
+      className: "text-base"
+    }, main.passengerId ? /*#__PURE__*/React.createElement("button", {
+      onClick: () => onOpenPassenger && onOpenPassenger(main.passengerId),
+      className: "font-bold text-amber-700 underline underline-offset-2 hover:text-amber-800"
+    }, main.passengerName || main.customerName) : /*#__PURE__*/React.createElement("span", {
+      className: "font-semibold text-gray-800"
+    }, main.passengerName || main.customerName)), holiday ? /*#__PURE__*/React.createElement("span", {
       className: "text-xs px-2 py-0.5 rounded-full font-semibold bg-purple-100 text-purple-700"
     }, main.holidayName) : /*#__PURE__*/React.createElement(Badge, {
       s: main.status,
@@ -2748,10 +2811,10 @@ function CardsView({
     }, !main.chargeStatus && /*#__PURE__*/React.createElement("button", {
       onClick: () => onCharge(main),
       className: "flex-1 py-2 bg-orange-100 text-orange-700 rounded-xl text-xs font-bold"
-    }, "💰 Set charge"), main.chargeStatus && /*#__PURE__*/React.createElement("button", {
+    }, "Set billing"), main.chargeStatus && /*#__PURE__*/React.createElement("button", {
       onClick: () => onCharge(main),
       className: "flex-1 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-semibold"
-    }, "Edit charge"), /*#__PURE__*/React.createElement("button", {
+    }, "Edit billing"), /*#__PURE__*/React.createElement("button", {
       onClick: () => onReinstate(main),
       className: "flex-1 py-2 bg-green-100 text-green-700 rounded-xl text-xs font-bold"
     }, "✓ Reinstate")));
@@ -3112,8 +3175,8 @@ function ReportsTab({
   };
   const generateCancellationsReport = () => {
     const runs = getRunsInRange().filter(r => r.status === 'cancelled');
-    const rows = runs.map(r => [prettyDate(r.date), r.passengerName, r.type === 'pickup' ? 'Pickup' : 'Return', r.driverName, r.cancelNote || '', r.chargeStatus === 'charged' ? 'Charged' : r.chargeStatus === 'no-charge' ? 'No Charge' : 'Pending']);
-    const headers = ['Date', 'Passenger', 'Type', 'Driver', 'Reason', 'Charge Status'];
+    const rows = runs.map(r => [prettyDate(r.date), r.passengerName, r.type === 'pickup' ? 'Pickup' : 'Return', r.driverName, r.cancelNote || '', r.chargeStatus === 'charged' ? 'Billable' : r.chargeStatus === 'no-charge' ? 'Not billable' : 'Pending']);
+    const headers = ['Date', 'Passenger', 'Type', 'Driver', 'Reason', 'Billing Status'];
     setPreview({
       headers,
       rows,
@@ -3124,7 +3187,7 @@ function ReportsTab({
     const allRuns = getRunsInRange();
     const filtered = selPassenger === 'all' ? allRuns : allRuns.filter(r => r.passengerId === selPassenger);
     const rows = filtered.map(r => [prettyDate(r.date), r.passengerName, r.type === 'pickup' ? 'Pickup' : 'Return', r.driverName, r.assistantName || 'None', r.pickup, r.dropoff, r.status === 'cancelled' ? 'Cancelled' : 'Completed', r.chargeStatus || '']);
-    const headers = ['Date', 'Passenger', 'Type', 'Driver', 'Assistant', 'From', 'To', 'Status', 'Charge'];
+    const headers = ['Date', 'Passenger', 'Type', 'Driver', 'Assistant', 'From', 'To', 'Status', 'Billing'];
     setPreview({
       headers,
       rows,
@@ -3178,7 +3241,7 @@ function ReportsTab({
       pickup: 'From',
       dropoff: 'To',
       status: 'Status',
-      chargeStatus: 'Charge Status'
+      chargeStatus: 'Billing Status'
     };
     const activeFields = Object.keys(customFields).filter(f => customFields[f]);
     const headers = activeFields.map(f => fieldMap[f]);
@@ -3213,7 +3276,7 @@ function ReportsTab({
     id: 'cancellations',
     icon: '❌',
     label: 'Cancellations Report',
-    desc: 'All cancellations with charged/no charge status — useful for invoicing'
+    desc: 'All cancellations with billable/not billable status - useful for billing'
   }, {
     id: 'passenger',
     icon: '🎒',
@@ -3371,7 +3434,7 @@ function ReportsTab({
     l: 'Status'
   }, {
     k: 'chargeStatus',
-    l: 'Charge Status'
+    l: 'Billing Status'
   }].map(({
     k,
     l
@@ -3490,14 +3553,12 @@ function SettingsTab({
   onAddStaffHoliday,
   onRemoveStaffHoliday
 }) {
-  const [settingsTab, setSettingsTab] = useState('calendar');
+  const [settingsTab, setSettingsTab] = useState('school');
   const [showAddForm, setShowAddForm] = useState(false);
   const [viewMonth, setViewMonth] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
-
-  // School holiday form
   const [schoolForm, setSchoolForm] = useState({
     name: '',
     scope: 'all',
@@ -3509,8 +3570,6 @@ function SettingsTab({
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
   });
   const [schoolErr, setSchoolErr] = useState('');
-
-  // Staff holiday form
   const [staffForm, setStaffForm] = useState({
     staffId: '',
     type: 'holiday',
@@ -3530,25 +3589,45 @@ function SettingsTab({
     ...a,
     role: 'Assistant'
   }))];
-  const TYPE_COLOURS = {
-    holiday: 'bg-yellow-100 text-yellow-700',
-    sick: 'bg-red-100 text-red-700',
-    other: 'bg-orange-100 text-orange-700'
+  const typeMeta = {
+    holiday: {
+      label: 'Planned Holiday',
+      dot: 'bg-violet-500',
+      border: 'border-l-violet-400',
+      tint: 'bg-violet-50'
+    },
+    sick: {
+      label: 'Sick Day',
+      dot: 'bg-rose-500',
+      border: 'border-l-rose-400',
+      tint: 'bg-rose-50'
+    },
+    other: {
+      label: 'Other Absence',
+      dot: 'bg-amber-500',
+      border: 'border-l-amber-400',
+      tint: 'bg-amber-50'
+    }
   };
-  const TYPE_ICONS = {
-    holiday: '🟡',
-    sick: '🔴',
-    other: '🟠'
-  };
-  const TYPE_LABELS = {
-    holiday: 'Planned Holiday',
-    sick: 'Sick Day',
-    other: 'Other Absence'
-  };
-  const getInitials = name => (name || '').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 3);
   const toggleDate = (date, setDates) => setDates(v => v.includes(date) ? v.filter(d => d !== date) : [...v, date]);
-
-  // Calendar overview component
+  const groupByRange = (items, sameGroup) => {
+    const groups = [];
+    [...items].sort((a, b) => a.date.localeCompare(b.date)).forEach(item => {
+      const last = groups[groups.length - 1];
+      if (last && sameGroup(last, item) && addDays(last.endDate, 1) === item.date) {
+        last.endDate = item.date;
+        last.ids.push(item.id);
+      } else {
+        groups.push({
+          ...item,
+          startDate: item.date,
+          endDate: item.date,
+          ids: [item.id]
+        });
+      }
+    });
+    return groups;
+  };
   const CalendarOverview = () => {
     const days = getCalDays(viewMonth);
     const [yr, mo] = viewMonth.split('-').map(Number);
@@ -3563,12 +3642,12 @@ function SettingsTab({
     }, /*#__PURE__*/React.createElement("button", {
       onClick: () => setViewMonth(m => mo === 1 ? `${yr - 1}-12` : `${yr}-${String(mo - 1).padStart(2, '0')}`),
       className: "text-white/80 hover:text-white text-2xl font-bold w-8 text-center"
-    }, "‹"), /*#__PURE__*/React.createElement("div", {
+    }, "<"), /*#__PURE__*/React.createElement("div", {
       className: "font-bold text-sm"
     }, monthName), /*#__PURE__*/React.createElement("button", {
       onClick: () => setViewMonth(m => mo === 12 ? `${yr + 1}-01` : `${yr}-${String(mo + 1).padStart(2, '0')}`),
       className: "text-white/80 hover:text-white text-2xl font-bold w-8 text-center"
-    }, "›")), /*#__PURE__*/React.createElement("div", {
+    }, ">")), /*#__PURE__*/React.createElement("div", {
       className: "bg-white border border-sky-100 border-t-0 rounded-b-2xl overflow-hidden shadow-sm"
     }, /*#__PURE__*/React.createElement("div", {
       className: "grid grid-cols-7 border-b border-gray-100 bg-sky-50"
@@ -3583,7 +3662,7 @@ function SettingsTab({
         className: "bg-white min-h-[60px]"
       });
       const isToday = d === today();
-      const schoolHols = holidays.filter(h => h.date === d && h.scope === 'all');
+      const schoolHols = holidays.filter(h => h.date === d);
       const staffAbs = (staffHolidays || []).filter(sh => sh.date === d);
       const isSelected = selectedDay === d;
       return /*#__PURE__*/React.createElement("div", {
@@ -3592,18 +3671,20 @@ function SettingsTab({
         className: `bg-white min-h-[60px] p-1 cursor-pointer hover:bg-sky-50 transition-colors ${isToday ? 'ring-2 ring-inset ring-sky-400' : ''} ${isSelected ? 'bg-sky-50' : ''}`
       }, /*#__PURE__*/React.createElement("div", {
         className: `text-xs font-bold mb-1 ${isToday ? 'text-sky-600' : 'text-gray-700'}`
-      }, parseInt(d.split('-')[2])), schoolHols.map(h => /*#__PURE__*/React.createElement("div", {
-        key: h.id,
-        className: "text-xs bg-purple-100 text-purple-700 rounded px-0.5 mb-0.5 truncate font-semibold text-center"
-      }, "Holiday")), staffAbs.map(sh => {
-        const initials = getInitials(sh.staffName);
-        return /*#__PURE__*/React.createElement("div", {
-          key: sh.id,
-          className: `text-xs rounded px-0.5 mb-0.5 font-bold truncate text-center ${TYPE_COLOURS[sh.type] || TYPE_COLOURS.other}`
-        }, initials);
-      }));
+      }, parseInt(d.split('-')[2])), /*#__PURE__*/React.createElement("div", {
+        className: "flex flex-wrap gap-1"
+      }, schoolHols.length > 0 && /*#__PURE__*/React.createElement("span", {
+        className: "w-2 h-2 rounded-full bg-sky-500",
+        title: "School holiday"
+      }), staffAbs.slice(0, 4).map(sh => /*#__PURE__*/React.createElement("span", {
+        key: sh.id,
+        className: `w-2 h-2 rounded-full ${typeMeta[sh.type]?.dot || typeMeta.other.dot}`,
+        title: typeMeta[sh.type]?.label || 'Other Absence'
+      })), staffAbs.length > 4 && /*#__PURE__*/React.createElement("span", {
+        className: "text-[10px] text-slate-400 font-bold leading-none"
+      }, "+")));
     }))), selectedDay && (() => {
-      const schoolHols = holidays.filter(h => h.date === selectedDay && h.scope === 'all');
+      const schoolHols = holidays.filter(h => h.date === selectedDay);
       const staffAbs = (staffHolidays || []).filter(sh => sh.date === selectedDay);
       return /*#__PURE__*/React.createElement("div", {
         className: "bg-white rounded-2xl border border-gray-100 p-4 space-y-2 mt-3"
@@ -3613,32 +3694,33 @@ function SettingsTab({
         className: "text-xs text-gray-400"
       }, "No holidays or absences on this day."), schoolHols.map(h => /*#__PURE__*/React.createElement("div", {
         key: h.id,
-        className: "flex justify-between items-center bg-purple-50 rounded-xl px-3 py-2"
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "text-xs font-semibold text-purple-700"
-      }, h.name), /*#__PURE__*/React.createElement("button", {
+        className: "flex justify-between items-center bg-white border border-slate-100 border-l-4 border-l-sky-400 rounded-xl px-3 py-2"
+      }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+        className: "text-xs font-bold text-slate-800"
+      }, h.name), /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px] text-slate-400"
+      }, h.scope === 'all' ? 'All passengers' : h.schoolName)), /*#__PURE__*/React.createElement("button", {
         onClick: () => onRemoveHoliday(h.id),
         className: "text-xs text-red-400"
       }, "Remove"))), staffAbs.map(sh => /*#__PURE__*/React.createElement("div", {
         key: sh.id,
-        className: `flex justify-between items-center rounded-xl px-3 py-2 ${TYPE_COLOURS[sh.type] || TYPE_COLOURS.other}`
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "text-xs font-semibold"
-      }, TYPE_ICONS[sh.type], " ", sh.staffName, " , ", TYPE_LABELS[sh.type] || sh.type), /*#__PURE__*/React.createElement("button", {
+        className: `flex justify-between items-center bg-white border border-slate-100 border-l-4 ${typeMeta[sh.type]?.border || typeMeta.other.border} rounded-xl px-3 py-2`
+      }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+        className: "text-xs font-bold text-slate-800"
+      }, sh.staffName), /*#__PURE__*/React.createElement("div", {
+        className: "text-[11px] text-slate-400"
+      }, typeMeta[sh.type]?.label || 'Other Absence')), /*#__PURE__*/React.createElement("button", {
         onClick: () => onRemoveStaffHoliday(sh.id),
-        className: "text-xs opacity-60 hover:opacity-100"
+        className: "text-xs text-red-400"
       }, "Remove"))));
     })(), /*#__PURE__*/React.createElement("div", {
-      className: "flex flex-wrap gap-2 text-xs mt-3"
+      className: "flex flex-wrap gap-3 text-xs mt-3 text-slate-600"
+    }, [['bg-sky-500', 'School holiday'], ['bg-violet-500', 'Staff holiday'], ['bg-rose-500', 'Sick day'], ['bg-amber-500', 'Other absence']].map(([dot, label]) => /*#__PURE__*/React.createElement("span", {
+      key: label,
+      className: "inline-flex items-center gap-1.5"
     }, /*#__PURE__*/React.createElement("span", {
-      className: "bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-semibold"
-    }, "School Holiday"), /*#__PURE__*/React.createElement("span", {
-      className: "bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full font-semibold"
-    }, "🟡 Planned Holiday"), /*#__PURE__*/React.createElement("span", {
-      className: "bg-red-100 text-red-700 px-2 py-1 rounded-full font-semibold"
-    }, "🔴 Sick Day"), /*#__PURE__*/React.createElement("span", {
-      className: "bg-orange-100 text-orange-700 px-2 py-1 rounded-full font-semibold"
-    }, "🟠 Other Absence")));
+      className: `w-2 h-2 rounded-full ${dot}`
+    }), label))));
   };
   const submitSchoolHolidays = () => {
     if (!schoolForm.name.trim()) {
@@ -3653,14 +3735,13 @@ function SettingsTab({
       setSchoolErr('Please enter the school name.');
       return;
     }
-    const newHolidays = selectedDates.map(date => ({
+    onAddHoliday(selectedDates.map(date => ({
       id: genId(),
       name: schoolForm.name,
       date,
       scope: schoolForm.scope,
       schoolName: schoolForm.schoolName
-    }));
-    onAddHoliday(newHolidays);
+    })));
     setSchoolForm({
       name: '',
       scope: 'all',
@@ -3680,14 +3761,13 @@ function SettingsTab({
       return;
     }
     const person = allStaff.find(s => s.id === staffForm.staffId);
-    const newAbsences = staffDates.map(date => ({
+    onAddStaffHoliday(staffDates.map(date => ({
       id: genId(),
       staffId: staffForm.staffId,
       staffName: person?.name || '',
       type: staffForm.type,
       date
-    }));
-    onAddStaffHoliday(newAbsences);
+    })));
     setStaffForm({
       staffId: '',
       type: 'holiday',
@@ -3703,131 +3783,27 @@ function SettingsTab({
     if (!staffDateMap[sh.date]) staffDateMap[sh.date] = [];
     staffDateMap[sh.date].push(sh);
   });
+  const schoolGroups = groupByRange(holidays, (last, h) => last.name === h.name && last.scope === h.scope && last.schoolName === h.schoolName);
+  const staffGroups = groupByRange(staffHolidays || [], (last, h) => last.staffId === h.staffId && last.type === h.type);
+  const switchTab = next => {
+    setSettingsTab(next);
+    setShowAddForm(false);
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "space-y-4"
   }, /*#__PURE__*/React.createElement(CalendarOverview, null), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-2"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between px-1"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-xs font-bold text-gray-500 uppercase tracking-widest"
-  }, "👤 Staff Absences"), /*#__PURE__*/React.createElement("button", {
-    onClick: () => {
-      setSettingsTab('staff');
-      setShowAddForm(true);
-    },
-    className: "text-xs bg-violet-100 text-violet-700 px-3 py-1 rounded-full font-bold hover:bg-violet-200"
-  }, "+ Add")), (!staffHolidays || staffHolidays.length === 0) && /*#__PURE__*/React.createElement("div", {
-    className: "text-xs text-gray-400 text-center py-3 bg-white rounded-xl border border-gray-100"
-  }, "No staff absences recorded yet."), (staffHolidays || []).length > 0 && (() => {
-    const TYPE_COLOURS = {
-      holiday: 'bg-yellow-100 text-yellow-700',
-      sick: 'bg-red-100 text-red-700',
-      other: 'bg-orange-100 text-orange-700'
-    };
-    const TYPE_LABELS = {
-      holiday: '🟡 Planned Holiday',
-      sick: '🔴 Sick Day',
-      other: '🟠 Other Absence'
-    };
-    const sorted = [...(staffHolidays || [])].sort((a, b) => a.date.localeCompare(b.date));
-    const groups = [];
-    sorted.forEach(h => {
-      const last = groups[groups.length - 1];
-      if (last && last.staffId === h.staffId && last.type === h.type && addDays(last.endDate, 1) === h.date) {
-        last.endDate = h.date;
-        last.ids.push(h.id);
-      } else {
-        groups.push({
-          staffId: h.staffId,
-          staffName: h.staffName,
-          type: h.type,
-          startDate: h.date,
-          endDate: h.date,
-          ids: [h.id]
-        });
-      }
-    });
-    return groups.map((g, i) => /*#__PURE__*/React.createElement("div", {
-      key: i,
-      className: `rounded-xl p-3 flex justify-between items-center ${TYPE_COLOURS[g.type] || TYPE_COLOURS.other}`
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      className: "font-semibold text-sm"
-    }, TYPE_LABELS[g.type] || g.type, " — ", g.staffName), /*#__PURE__*/React.createElement("div", {
-      className: "text-xs opacity-70"
-    }, g.startDate === g.endDate ? prettyDate(g.startDate) : `${prettyDate(g.startDate)} – ${prettyDate(g.endDate)} (${g.ids.length} days)`)), /*#__PURE__*/React.createElement("button", {
-      onClick: () => g.ids.forEach(id => onRemoveStaffHoliday(id)),
-      className: "text-xs opacity-60 hover:opacity-100 font-semibold"
-    }, "Remove")));
-  })()), /*#__PURE__*/React.createElement("div", {
-    className: "space-y-2"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between px-1"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-xs font-bold text-gray-500 uppercase tracking-widest"
-  }, "School Holidays"), /*#__PURE__*/React.createElement("button", {
-    onClick: () => {
-      setSettingsTab('school');
-      setShowAddForm(true);
-    },
-    className: "text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-bold hover:bg-purple-200"
-  }, "+ Add")), holidays.length === 0 && /*#__PURE__*/React.createElement("div", {
-    className: "text-xs text-gray-400 text-center py-3 bg-white rounded-xl border border-gray-100"
-  }, "No school holidays added yet."), holidays.length > 0 && (() => {
-    const sorted = [...holidays].sort((a, b) => a.date.localeCompare(b.date));
-    const groups = [];
-    sorted.forEach(h => {
-      const last = groups[groups.length - 1];
-      if (last && last.name === h.name && last.scope === h.scope && addDays(last.endDate, 1) === h.date) {
-        last.endDate = h.date;
-        last.ids.push(h.id);
-      } else {
-        groups.push({
-          name: h.name,
-          scope: h.scope,
-          schoolName: h.schoolName,
-          startDate: h.date,
-          endDate: h.date,
-          ids: [h.id]
-        });
-      }
-    });
-    return groups.map((g, i) => /*#__PURE__*/React.createElement("div", {
-      key: i,
-      className: "bg-white rounded-xl border border-purple-100 p-3 flex justify-between items-center"
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      className: "font-semibold text-gray-800 text-sm"
-    }, g.name), /*#__PURE__*/React.createElement("div", {
-      className: "text-xs text-gray-500"
-    }, g.startDate === g.endDate ? prettyDate(g.startDate) : `${prettyDate(g.startDate)} – ${prettyDate(g.endDate)} (${g.ids.length} days)`, " · ", g.scope === 'all' ? 'All passengers' : g.schoolName)), /*#__PURE__*/React.createElement("button", {
-      onClick: () => g.ids.forEach(id => onRemoveHoliday(id)),
-      className: "text-xs text-red-400 hover:text-red-600 font-semibold"
-    }, "Remove")));
-  })()), /*#__PURE__*/React.createElement("div", {
-    className: "border-t border-gray-100 pt-4 space-y-3"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "text-xs font-bold text-gray-400 uppercase tracking-widest px-1"
-  }, "Coming Soon"), /*#__PURE__*/React.createElement("div", {
-    className: "bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-100 rounded-2xl p-4 space-y-3"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center gap-3"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "text-3xl"
-  }, "🏛️"), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    className: "font-bold text-indigo-800"
-  }, "Council Portal"), /*#__PURE__*/React.createElement("div", {
-    className: "text-xs text-indigo-600 mt-0.5"
-  }, "Phase 2 Feature"))), /*#__PURE__*/React.createElement("p", {
-    className: "text-sm text-indigo-700"
-  }, "Council transport coordinators will be able to securely log in, view their passengers and send notes directly to the manager."), /*#__PURE__*/React.createElement("div", {
-    className: "bg-white/60 rounded-xl p-3 text-xs text-indigo-600 font-medium"
-  }, "⚙️ Requires Supabase setup — available as part of Phase 2 upgrade"))), settingsTab === 'school' && /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-2 gap-0 bg-sky-200 border-2 border-sky-500 rounded-3xl p-2 shadow-inner max-w-xs mx-auto overflow-hidden"
+  }, [['school', 'School'], ['staff', 'Staff']].map(([id, label]) => /*#__PURE__*/React.createElement("button", {
+    key: id,
+    onClick: () => switchTab(id),
+    className: `py-2 text-sm font-bold transition-all ${settingsTab === id ? 'bg-sky-500 text-white shadow-sm rounded-2xl relative z-10' : 'text-sky-700 bg-white/70 hover:bg-white'} ${settingsTab === id ? id === 'school' ? '-mr-2' : '-ml-2' : id === 'school' ? 'rounded-l-2xl' : 'rounded-r-2xl'}`
+  }, label))), settingsTab === 'school' && /*#__PURE__*/React.createElement("div", {
     className: "space-y-3"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowAddForm(!showAddForm),
-    className: "w-full py-3 bg-purple-600 text-white rounded-2xl font-bold text-sm"
-  }, "Add Holiday / Inset Day"), showAddForm && /*#__PURE__*/React.createElement("div", {
-    className: "bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-4"
+    className: "block w-fit mx-auto px-5 py-2.5 bg-sky-500 text-white rounded-xl font-bold text-sm shadow-sm"
+  }, "+ Add School Holiday / Inset Day"), showAddForm && /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl border border-sky-100 shadow-sm p-4 space-y-4"
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Name"
   }, /*#__PURE__*/React.createElement("input", {
@@ -3875,53 +3851,26 @@ function SettingsTab({
     className: "text-xs text-red-500"
   }, schoolErr), /*#__PURE__*/React.createElement("button", {
     onClick: submitSchoolHolidays,
-    className: "w-full py-2.5 bg-purple-600 text-white rounded-xl text-sm font-bold"
-  }, "Save ", selectedDates.length, " Holiday Date", selectedDates.length !== 1 ? 's' : '')), holidays.length === 0 && !showAddForm && /*#__PURE__*/React.createElement("div", {
-    className: "text-center py-8 text-gray-400 text-sm"
-  }, "No holidays or inset days added yet."), [...new Set(holidays.map(h => h.date.split('-')[0]))].sort().reverse().map(yr => {
-    // Group consecutive days with same name and scope into blocks
-    const sorted = holidays.filter(h => h.date.startsWith(yr)).sort((a, b) => a.date.localeCompare(b.date));
-    const groups = [];
-    sorted.forEach(h => {
-      const last = groups[groups.length - 1];
-      if (last && last.name === h.name && last.scope === h.scope && last.schoolName === h.schoolName && addDays(last.endDate, 1) === h.date) {
-        last.endDate = h.date;
-        last.ids.push(h.id);
-      } else {
-        groups.push({
-          name: h.name,
-          scope: h.scope,
-          schoolName: h.schoolName,
-          startDate: h.date,
-          endDate: h.date,
-          ids: [h.id]
-        });
-      }
-    });
-    return /*#__PURE__*/React.createElement("div", {
-      key: yr
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "text-xs font-bold text-gray-400 uppercase px-1 mb-2"
-    }, yr), /*#__PURE__*/React.createElement("div", {
-      className: "space-y-2"
-    }, groups.map((g, i) => /*#__PURE__*/React.createElement("div", {
-      key: i,
-      className: "bg-white rounded-xl border border-gray-100 p-3 flex justify-between items-center"
-    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      className: "font-semibold text-gray-800 text-sm"
-    }, g.name), /*#__PURE__*/React.createElement("div", {
-      className: "text-xs text-gray-500"
-    }, g.startDate === g.endDate ? prettyDate(g.startDate) : `${prettyDate(g.startDate)} , ${prettyDate(g.endDate)} (${g.ids.length} days)`, ' , ', g.scope === 'all' ? 'All passengers' : `${g.schoolName} only`)), /*#__PURE__*/React.createElement("button", {
-      onClick: () => g.ids.forEach(id => onRemoveHoliday(id)),
-      className: "text-xs text-red-400 hover:text-red-600"
-    }, "Remove")))));
-  })), settingsTab === 'staff' && /*#__PURE__*/React.createElement("div", {
+    className: "w-full py-2.5 bg-sky-500 text-white rounded-xl text-sm font-bold"
+  }, "Save ", selectedDates.length, " Holiday Date", selectedDates.length !== 1 ? 's' : '')), !holidays.length && !showAddForm && /*#__PURE__*/React.createElement("div", {
+    className: "text-center py-8 text-gray-400 text-sm bg-white rounded-2xl border border-gray-100"
+  }, "No holidays or inset days added yet."), schoolGroups.map(g => /*#__PURE__*/React.createElement("div", {
+    key: g.ids.join('-'),
+    className: "bg-white rounded-xl border border-slate-100 border-l-4 border-l-sky-400 p-3 flex justify-between items-center"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-slate-800 text-sm"
+  }, g.name), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-slate-500"
+  }, g.startDate === g.endDate ? prettyDate(g.startDate) : `${prettyDate(g.startDate)} - ${prettyDate(g.endDate)} (${g.ids.length} days)`, " · ", g.scope === 'all' ? 'All passengers' : `${g.schoolName} only`)), /*#__PURE__*/React.createElement("button", {
+    onClick: () => g.ids.forEach(id => onRemoveHoliday(id)),
+    className: "text-xs text-red-400 hover:text-red-600 font-semibold"
+  }, "Remove")))), settingsTab === 'staff' && /*#__PURE__*/React.createElement("div", {
     className: "space-y-3"
   }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowAddForm(!showAddForm),
-    className: "w-full py-3 bg-amber-500 text-white rounded-2xl font-bold text-sm"
-  }, "➕ Add Staff Absence / Holiday"), showAddForm && /*#__PURE__*/React.createElement("div", {
-    className: "bg-white rounded-2xl border border-gray-100 shadow-sm p-4 space-y-4"
+    className: "block w-fit mx-auto px-5 py-2.5 bg-sky-500 text-white rounded-xl font-bold text-sm shadow-sm"
+  }, "+ Add Staff Absence"), showAddForm && /*#__PURE__*/React.createElement("div", {
+    className: "bg-white rounded-2xl border border-sky-100 shadow-sm p-4 space-y-4"
   }, /*#__PURE__*/React.createElement(Field, {
     label: "Staff Member"
   }, /*#__PURE__*/React.createElement("select", {
@@ -3936,7 +3885,7 @@ function SettingsTab({
   }, "Select staff member..."), allStaff.map(s => /*#__PURE__*/React.createElement("option", {
     key: s.id,
     value: s.id
-  }, s.name, " , ", s.role)))), /*#__PURE__*/React.createElement(Field, {
+  }, s.name, " · ", s.role)))), /*#__PURE__*/React.createElement(Field, {
     label: "Type of Absence"
   }, /*#__PURE__*/React.createElement("select", {
     className: inp,
@@ -3947,11 +3896,11 @@ function SettingsTab({
     }))
   }, /*#__PURE__*/React.createElement("option", {
     value: "holiday"
-  }, "🟡 Planned Holiday"), /*#__PURE__*/React.createElement("option", {
+  }, "Planned Holiday"), /*#__PURE__*/React.createElement("option", {
     value: "sick"
-  }, "🔴 Sick Day"), /*#__PURE__*/React.createElement("option", {
+  }, "Sick Day"), /*#__PURE__*/React.createElement("option", {
     value: "other"
-  }, "🟠 Other Absence"))), /*#__PURE__*/React.createElement("div", {
+  }, "Other Absence"))), /*#__PURE__*/React.createElement("div", {
     className: "border border-gray-100 rounded-xl p-3"
   }, /*#__PURE__*/React.createElement("div", {
     className: "text-xs font-bold text-gray-500 mb-3 uppercase"
@@ -3965,49 +3914,172 @@ function SettingsTab({
     className: "text-xs text-red-500"
   }, staffErr), /*#__PURE__*/React.createElement("button", {
     onClick: submitStaffHolidays,
-    className: "w-full py-2.5 bg-amber-500 text-white rounded-xl text-sm font-bold"
-  }, "Save ", staffDates.length, " Absence Date", staffDates.length !== 1 ? 's' : '')), (!staffHolidays || staffHolidays.length === 0) && !showAddForm && /*#__PURE__*/React.createElement("div", {
-    className: "text-center py-8 text-gray-400 text-sm"
-  }, "No staff absences recorded yet."), (staffHolidays || []).length > 0 && /*#__PURE__*/React.createElement("div", {
-    className: "space-y-2"
-  }, [...new Set((staffHolidays || []).map(h => h.date.split('-')[0]))].sort().reverse().map(yr => {
-    const sorted = (staffHolidays || []).filter(h => h.date.startsWith(yr)).sort((a, b) => a.date.localeCompare(b.date));
-    const groups = [];
-    sorted.forEach(h => {
-      const last = groups[groups.length - 1];
-      if (last && last.staffId === h.staffId && last.type === h.type && addDays(last.endDate, 1) === h.date) {
-        last.endDate = h.date;
-        last.ids.push(h.id);
-      } else {
-        groups.push({
-          staffId: h.staffId,
-          staffName: h.staffName,
-          type: h.type,
-          startDate: h.date,
-          endDate: h.date,
-          ids: [h.id]
-        });
-      }
-    });
+    className: "w-full py-2.5 bg-sky-500 text-white rounded-xl text-sm font-bold"
+  }, "Save ", staffDates.length, " Absence Date", staffDates.length !== 1 ? 's' : '')), !(staffHolidays || []).length && !showAddForm && /*#__PURE__*/React.createElement("div", {
+    className: "text-center py-8 text-gray-400 text-sm bg-white rounded-2xl border border-gray-100"
+  }, "No staff absences recorded yet."), staffGroups.map(g => {
+    const meta = typeMeta[g.type] || typeMeta.other;
     return /*#__PURE__*/React.createElement("div", {
-      key: yr
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "text-xs font-bold text-gray-400 uppercase px-1 mb-2"
-    }, yr), groups.map((g, i) => /*#__PURE__*/React.createElement("div", {
-      key: i,
-      className: `rounded-xl border p-3 flex justify-between items-center mb-2 ${TYPE_COLOURS[g.type] || TYPE_COLOURS.other}`
+      key: g.ids.join('-'),
+      className: `bg-white rounded-xl border border-slate-100 border-l-4 ${meta.border} p-3 flex justify-between items-center`
     }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-      className: "font-semibold text-sm"
-    }, TYPE_LABELS[g.type] || g.type, " , ", g.staffName), /*#__PURE__*/React.createElement("div", {
-      className: "text-xs opacity-70"
-    }, g.startDate === g.endDate ? prettyDate(g.startDate) : `${prettyDate(g.startDate)} , ${prettyDate(g.endDate)} (${g.ids.length} days)`)), /*#__PURE__*/React.createElement("button", {
+      className: "font-bold text-slate-800 text-sm"
+    }, g.staffName), /*#__PURE__*/React.createElement("div", {
+      className: "text-xs text-slate-500"
+    }, meta.label, " · ", g.startDate === g.endDate ? prettyDate(g.startDate) : `${prettyDate(g.startDate)} - ${prettyDate(g.endDate)} (${g.ids.length} days)`)), /*#__PURE__*/React.createElement("button", {
       onClick: () => g.ids.forEach(id => onRemoveStaffHoliday(id)),
-      className: "text-xs opacity-60 hover:opacity-100"
-    }, "Remove"))));
-  }))));
+      className: "text-xs text-red-400 hover:text-red-600 font-semibold"
+    }, "Remove"));
+  })));
 }
 
 // ── MAIN APP ──────────────────────────────────────────────────────────────────
+
+function InfoRow({ label, value }) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "rounded-xl bg-slate-50 border border-slate-100 px-3 py-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold uppercase tracking-wide text-slate-400 mb-0.5"
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: "text-sm font-semibold text-slate-800"
+  }, value || "Not added"));
+}
+function PassengerInfoModal({
+  passenger,
+  schedules,
+  onEdit,
+  onClose
+}) {
+  if (!passenger) return null;
+  const address = [passenger.address, passenger.town, passenger.postcode].filter(Boolean).join(', ');
+  return /*#__PURE__*/React.createElement(Modal, {
+    title: passenger.name,
+    onClose: onClose,
+    size: "lg"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-start gap-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold text-amber-600 uppercase tracking-wide"
+  }, "Passenger Information"), passenger.wheelchair && /*#__PURE__*/React.createElement("div", {
+    className: "mt-1 inline-flex text-xs font-bold bg-violet-50 text-violet-700 border border-violet-100 rounded-full px-2 py-1"
+  }, "Passenger assistance required")), /*#__PURE__*/React.createElement("button", {
+    onClick: onEdit,
+    className: "px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-bold shadow-sm"
+  }, "Edit")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 gap-2"
+  }, /*#__PURE__*/React.createElement(InfoRow, {
+    label: "Address",
+    value: address
+  }), /*#__PURE__*/React.createElement(InfoRow, {
+    label: "Notes",
+    value: passenger.notes
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "border border-amber-100 rounded-2xl overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-amber-50 text-amber-800 text-xs font-bold uppercase tracking-wide px-3 py-2"
+  }, "Schedules"), schedules.length ? schedules.map(s => /*#__PURE__*/React.createElement("div", {
+    key: s.id,
+    className: "px-3 py-2 border-t border-amber-100 text-sm"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-slate-800"
+  }, s.label || "Schedule"), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-slate-500 mt-0.5"
+  }, "Pickup ", fmt(s.pickup?.time), s.hasReturn ? " | Return " + fmt(s.return?.time) : " | No return"))) : /*#__PURE__*/React.createElement("div", {
+    className: "px-3 py-3 text-sm text-slate-400"
+  }, "No active schedules found."))));
+}
+function StaffInfoModal({
+  person,
+  runs,
+  onEdit,
+  onClose
+}) {
+  if (!person) return null;
+  const address = [person.address, person.town, person.postcode].filter(Boolean).join(', ');
+  const role = person.role === 'assistant' ? 'Passenger Assistant' : 'Driver';
+  return /*#__PURE__*/React.createElement(Modal, {
+    title: person.name,
+    onClose: onClose,
+    size: "lg"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "space-y-4"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between items-start gap-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "text-xs font-bold text-violet-600 uppercase tracking-wide"
+  }, role), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-slate-500 mt-1"
+  }, person.avail === false ? "Currently unavailable" : "Currently available")), /*#__PURE__*/React.createElement("button", {
+    onClick: onEdit,
+    className: "px-4 py-2 bg-violet-600 text-white rounded-xl text-sm font-bold shadow-sm"
+  }, "Edit")), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-1 gap-2"
+  }, /*#__PURE__*/React.createElement(InfoRow, {
+    label: "Phone",
+    value: person.phone
+  }), /*#__PURE__*/React.createElement(InfoRow, {
+    label: "Address",
+    value: address
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "border border-violet-100 rounded-2xl overflow-hidden"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "bg-violet-50 text-violet-800 text-xs font-bold uppercase tracking-wide px-3 py-2"
+  }, "Runs Today"), runs.length ? runs.map(r => /*#__PURE__*/React.createElement("div", {
+    key: r.id,
+    className: "px-3 py-2 border-t border-violet-100 text-sm"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-slate-800"
+  }, fmt(r.time), " - ", r.passengerName || r.customerName), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-slate-500 mt-0.5"
+  }, r.type === 'return' ? "Return" : "Pickup"))) : /*#__PURE__*/React.createElement("div", {
+    className: "px-3 py-3 text-sm text-slate-400"
+  }, "No runs assigned for the selected day."))));
+}
+function ManagerReviewModal({
+  items,
+  onCharge,
+  onView,
+  onClose
+}) {
+  return /*#__PURE__*/React.createElement(Modal, {
+    title: "Manager Review",
+    onClose: onClose,
+    size: "lg"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "space-y-3"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "text-sm text-slate-600"
+  }, "Items that need a manager decision will appear here."), items.length ? items.map(item => /*#__PURE__*/React.createElement("div", {
+    key: item.id,
+    className: "bg-white border border-orange-100 rounded-2xl p-3 shadow-sm space-y-2"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "flex justify-between gap-3"
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "font-bold text-slate-800"
+  }, item.passengerName || item.customerName), /*#__PURE__*/React.createElement("div", {
+    className: "text-xs text-slate-500"
+  }, prettyDate(item.date), " at ", fmt(item.time), " - ", item.type === 'return' ? "Return" : "Pickup")), /*#__PURE__*/React.createElement("span", {
+    className: "text-xs bg-orange-50 text-orange-700 border border-orange-100 rounded-full px-2 py-1 font-bold h-fit"
+  }, "Billing decision")), item.cancelNote && /*#__PURE__*/React.createElement("div", {
+    className: "text-xs bg-slate-50 text-slate-600 rounded-xl p-2"
+  }, item.cancelNote), /*#__PURE__*/React.createElement("div", {
+    className: "grid grid-cols-3 gap-2"
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => onCharge(item),
+    className: "py-2 bg-orange-500 text-white rounded-xl text-xs font-bold"
+  }, "Set billing"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => onView(item),
+    className: "py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-bold"
+  }, "View Run"), /*#__PURE__*/React.createElement("button", {
+    onClick: onClose,
+    className: "py-2 border border-slate-200 text-slate-500 rounded-xl text-xs font-bold"
+  }, "Close")))) : /*#__PURE__*/React.createElement("div", {
+    className: "text-center py-10 text-slate-400 text-sm bg-slate-50 rounded-2xl"
+  }, "Nothing needs review right now.")));
+}
+
 function App() {
   const [session, setSession] = useState(null);
   const [tab, setTab] = useState('runs');
@@ -4035,6 +4107,9 @@ function App() {
   const [reinstateItem, setReinstateItem] = useState(null);
   const [staffModal, setStaffModal] = useState(null);
   const [passengerModal, setPassengerModal] = useState(null);
+  const [passengerInfo, setPassengerInfo] = useState(null);
+  const [staffInfo, setStaffInfo] = useState(null);
+  const [showManagerReview, setShowManagerReview] = useState(false);
   const [jobModal, setJobModal] = useState(null);
   const [showArchived, setShowArchived] = useState(false);
   const [now, setNow] = useState(Date.now());
@@ -4261,7 +4336,8 @@ function App() {
     scheduled: allRuns.filter(x => x.status === 'scheduled').length,
     cancelled: allRuns.filter(x => x.status === 'cancelled').length
   };
-  const pendingCharge = allRuns.filter(r => r.status === 'cancelled' && !r.chargeStatus).length;
+  const managerReviewItems = allRuns.filter(r => r.status === 'cancelled' && !r.chargeStatus);
+  const pendingCharge = managerReviewItems.length;
   const allStaff = [...drivers, ...assistants];
   const openEdit = item => {
     setEditItem(item);
@@ -4340,12 +4416,17 @@ function App() {
       handleSaveTodayRun(run, ch);
     }
   };
-  const handleCancelTodayRun = run => {
+  const handleCancelTodayRun = (run, note = '') => {
+    const ts = new Date().toISOString();
     if (run.isRecurring) {
       const patch = run.type === 'pickup' ? {
-        pickupCancelled: true
+        pickupCancelled: true,
+        cancelNote: note,
+        cancelledAt: ts
       } : {
-        returnCancelled: true
+        returnCancelled: true,
+        returnCancelNote: note,
+        returnCancelledAt: ts
       };
       upS(schedules.map(s => s.id !== run.scheduleId ? s : {
         ...s,
@@ -4359,7 +4440,9 @@ function App() {
       }));
     } else upO(oneoffs.map(r => r.id !== run.id ? r : {
       ...r,
-      status: 'cancelled'
+      status: 'cancelled',
+      cancelNote: note,
+      cancelledAt: ts
     }));
   };
   const handleDriverCancel = (run, note, cancelReturn) => {
@@ -4559,6 +4642,20 @@ function App() {
   });
   const activePassengers = passengers.filter(p => !p.archived);
   const archivedPassengers = passengers.filter(p => p.archived);
+  const openPassengerInfo = passengerId => {
+    const passenger = passengers.find(p => p.id === passengerId);
+    if (!passenger) return;
+    setPassengerInfo(passenger);
+    setTab('passengers');
+    setShowMenu(false);
+  };
+  const openStaffInfo = person => {
+    if (!person) return;
+    setStaffSub(person.role === 'assistant' ? 'assistants' : 'drivers');
+    setStaffInfo(person);
+    setTab('staff');
+    setShowMenu(false);
+  };
   return /*#__PURE__*/React.createElement("div", {
     className: "min-h-screen bg-slate-50 relative overflow-hidden",
     style: {
@@ -4576,9 +4673,10 @@ function App() {
     className: "text-sky-200 text-xs mt-0.5"
   }, "Manager")), /*#__PURE__*/React.createElement("div", {
     className: "flex items-center gap-2"
-  }, pendingCharge > 0 && /*#__PURE__*/React.createElement("div", {
-    className: "bg-orange-400 text-white text-xs font-bold px-2 py-1 rounded-full"
-  }, "⚠️ ", pendingCharge), /*#__PURE__*/React.createElement("button", {
+  }, pendingCharge > 0 && /*#__PURE__*/React.createElement("button", {
+    onClick: () => setShowManagerReview(true),
+    className: "bg-orange-400 hover:bg-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-sm"
+  }, "Review ", pendingCharge), /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowMenu(v => !v),
     className: "bg-sky-700 hover:bg-sky-600 text-white w-9 h-9 rounded-xl flex items-center justify-center text-lg font-bold border border-sky-600"
   }, "☰"))), tab === 'runs' && /*#__PURE__*/React.createElement("div", {
@@ -4684,29 +4782,27 @@ function App() {
     className: "w-full py-2.5 bg-violet-600 text-white rounded-xl text-sm font-bold hover:bg-violet-500 active:bg-violet-700"
   }, "Log out")))), !showPlusMenu && /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowPlusMenu(true),
-    className: "fixed bottom-6 right-6 z-40 w-14 h-14 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full shadow-lg text-3xl flex items-center justify-center border-2 border-emerald-500"
+    className: "fixed bottom-6 right-6 z-40 w-14 h-14 bg-violet-600 hover:bg-violet-500 text-white rounded-full shadow-lg text-3xl flex items-center justify-center border-2 border-violet-500"
   }, "+"), showPlusMenu && /*#__PURE__*/React.createElement("div", {
     className: "fixed inset-0 z-50 flex items-end justify-center pb-6 px-4"
   }, /*#__PURE__*/React.createElement("div", {
     className: "absolute inset-0 bg-black/40",
     onClick: () => setShowPlusMenu(false)
   }), /*#__PURE__*/React.createElement("div", {
-    className: "relative bg-white rounded-3xl shadow-2xl p-5 w-full max-w-sm space-y-3 z-10"
+    className: "relative bg-gradient-to-r from-sky-800 to-indigo-800 rounded-3xl shadow-2xl p-5 w-full max-w-sm space-y-3 z-10"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "flex items-center justify-between mb-1"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "font-bold text-gray-800"
-  }, "What would you like to add?"), /*#__PURE__*/React.createElement("button", {
+    className: "flex items-center justify-end mb-1"
+  }, /*#__PURE__*/React.createElement("button", {
     onClick: () => setShowPlusMenu(false),
-    className: "text-gray-400 text-xl"
+    className: "text-white/80 text-xl"
   }, "✕")), /*#__PURE__*/React.createElement("div", {
     className: "grid grid-cols-2 gap-3"
   }, [{
-    label: 'Add Run',
+    label: 'Add Passenger',
     action: () => {
-      setTab('runs');
-      setViewMode('table');
+      setTab('passengers');
       setShowPlusMenu(false);
+      setPassengerModal({});
     }
   }, {
     label: 'Add Job',
@@ -4716,31 +4812,27 @@ function App() {
       setJobModal({});
     }
   }, {
-    label: 'Add Staff',
+    label: 'Add Driver',
     action: () => {
       setTab('staff');
+      setStaffSub('drivers');
       setShowPlusMenu(false);
+      setStaffModal({ type: 'driver' });
     }
   }, {
-    label: 'Add Passenger',
+    label: 'Add Assistant',
     action: () => {
-      setTab('passengers');
+      setTab('staff');
+      setStaffSub('assistants');
       setShowPlusMenu(false);
-      setPassengerModal({});
-    }
-  }, {
-    label: 'Add Holiday',
-    action: () => {
-      setTab('runs');
-      setViewMode('holidays');
-      setShowPlusMenu(false);
+      setStaffModal({ type: 'assistant' });
     }
   }].map(item => /*#__PURE__*/React.createElement("button", {
     key: item.label,
     onClick: item.action,
-    className: "flex flex-col items-center gap-1 p-4 bg-emerald-50 hover:bg-emerald-100 rounded-2xl border-2 border-emerald-100 transition-all"
+    className: "flex flex-col items-center justify-center gap-1 p-4 bg-violet-600 hover:bg-violet-500 rounded-2xl border border-violet-700 shadow-sm transition-all"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "text-xs font-bold text-emerald-700"
+    className: "text-xs font-bold text-white"
   }, item.label)))))), /*#__PURE__*/React.createElement("div", {
     className: "max-w-3xl mx-auto px-0 py-0 pb-24"
   }, tab === 'runs' && /*#__PURE__*/React.createElement("div", null, viewMode === 'table' && /*#__PURE__*/React.createElement("div", {
@@ -4831,30 +4923,41 @@ function App() {
     className: "px-4 pt-3"
   }, tableMode === 'daily' && /*#__PURE__*/React.createElement(TableView, {
     items: allRuns,
-    onEdit: openEdit,
+    onEdit: item => {
+      setEditItem(item);
+      setEditMode('choice');
+    },
     onCharge: setChargeItem,
     onReinstate: setReinstateItem,
     schedules: schedules,
     now: now,
     drivers: drivers,
     assistants: assistants,
-    onQuickAssign: handleQuickAssignRun
+    onQuickAssign: handleQuickAssignRun,
+    onOpenPassenger: openPassengerInfo
   }), tableMode === 'weekly' && /*#__PURE__*/React.createElement(WeeklyView, {
     schedules: schedules,
     oneoffs: oneoffs,
     jobs: jobs,
     holidays: holidays,
     staffHolidays: staffHolidays,
-    onEditRun: openEdit,
+    onEditRun: item => {
+      setEditItem(item);
+      setEditMode('choice');
+    },
     selectedDate: date
   }))), viewMode === 'cards' && /*#__PURE__*/React.createElement("div", {
     className: "px-4 py-3"
   }, /*#__PURE__*/React.createElement(CardsView, {
     items: allRuns,
-    onEdit: openEdit,
+    onEdit: item => {
+      setEditItem(item);
+      setEditMode('choice');
+    },
     onCharge: setChargeItem,
     onReinstate: setReinstateItem,
-    now: now
+    now: now,
+    onOpenPassenger: openPassengerInfo
   })), viewMode === 'bydriver' && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     className: "px-4 pt-3 pb-0"
   }, staffMode === 'daily' && (() => {
@@ -4862,7 +4965,8 @@ function App() {
     return /*#__PURE__*/React.createElement(StaffView, {
       items: staffRuns,
       drivers: drivers,
-      assistants: assistants
+      assistants: assistants,
+      onOpenStaff: openStaffInfo
     });
   })(), staffMode === 'weekly' && (() => {
     const getWS = d => {
@@ -4915,8 +5019,9 @@ function App() {
         className: `${stripe} border-b border-gray-50`
       }, /*#__PURE__*/React.createElement("td", {
         className: "px-3 py-2 text-center whitespace-nowrap sticky left-0 bg-violet-50 border-r border-violet-100"
-      }, /*#__PURE__*/React.createElement("div", {
-        className: "font-bold text-violet-900"
+      }, /*#__PURE__*/React.createElement("button", {
+        onClick: () => openStaffInfo(person),
+        className: "font-bold text-violet-900 hover:text-violet-700 underline-offset-2 hover:underline"
       }, person.name), /*#__PURE__*/React.createElement("div", {
         className: "text-xs text-violet-500 font-semibold mt-0.5"
       }, person.role === 'driver' ? 'Driver' : 'Assistant')), weekDays.map(d => {
@@ -5266,7 +5371,7 @@ function App() {
     drivers: drivers,
     assistants: assistants,
     passengers: passengers
-  })), editItem && editMode === 'choice' && /*#__PURE__*/React.createElement(EditChoiceModal, {
+  })), Boolean(editItem) && editMode === 'choice' && /*#__PURE__*/React.createElement(EditChoiceModal, {
     run: editItem,
     onEditToday: () => setEditMode('today'),
     onEditSchedule: () => openEditSchedule(editItem),
@@ -5274,7 +5379,7 @@ function App() {
       setEditItem(null);
       setEditMode(null);
     }
-  }), editItem && editMode === 'today' && /*#__PURE__*/React.createElement(EditTodayModal, {
+  }), Boolean(editItem) && editMode === 'today' && /*#__PURE__*/React.createElement(EditTodayModal, {
     run: editItem,
     drivers: drivers,
     allStaff: allStaff,
@@ -5285,6 +5390,18 @@ function App() {
       setEditItem(null);
       setEditMode(null);
     }
+  }), showManagerReview && /*#__PURE__*/React.createElement(ManagerReviewModal, {
+    items: managerReviewItems,
+    onCharge: item => {
+      setChargeItem(item);
+      setShowManagerReview(false);
+    },
+    onView: item => {
+      setEditItem(item);
+      setEditMode('choice');
+      setShowManagerReview(false);
+    },
+    onClose: () => setShowManagerReview(false)
   }), chargeItem && /*#__PURE__*/React.createElement(ChargeModal, {
     run: chargeItem,
     onSave: cs => handleSetCharge(chargeItem, cs),
@@ -5295,6 +5412,27 @@ function App() {
     allStaff: allStaff,
     onSave: (run, ch) => handleReinstate(run, ch),
     onClose: () => setReinstateItem(null)
+  }), passengerInfo && /*#__PURE__*/React.createElement(PassengerInfoModal, {
+    passenger: passengerInfo,
+    schedules: schedules.filter(s => s.passengerId === passengerInfo.id && !s.archived),
+    onEdit: () => {
+      setPassengerModal({
+        existing: passengerInfo
+      });
+      setPassengerInfo(null);
+    },
+    onClose: () => setPassengerInfo(null)
+  }), staffInfo && /*#__PURE__*/React.createElement(StaffInfoModal, {
+    person: staffInfo,
+    runs: allRuns.filter(r => r.driverId === staffInfo.id || r.assistantId === staffInfo.id),
+    onEdit: () => {
+      setStaffModal({
+        type: staffInfo.role === 'assistant' ? 'assistant' : 'driver',
+        existing: staffInfo
+      });
+      setStaffInfo(null);
+    },
+    onClose: () => setStaffInfo(null)
   }), staffModal && /*#__PURE__*/React.createElement(StaffForm, {
     existing: staffModal.existing,
     isAsst: staffModal.type === 'assistant',
@@ -5304,7 +5442,8 @@ function App() {
   }), passengerModal != null && /*#__PURE__*/React.createElement(Modal, {
     title: passengerModal.existing ? passengerModal.reinstating ? `Reinstate — ${passengerModal.existing.name}` : `Edit — ${passengerModal.existing.name}` : 'Add New Passenger',
     onClose: () => setPassengerModal(null),
-    size: "lg"
+    size: "lg",
+    tone: "passenger"
   }, /*#__PURE__*/React.createElement(PassengerForm, {
     existing: passengerModal.existing,
     existingScheds: passengerModal.existing ? schedules.filter(s => s.passengerId === passengerModal.existing.id) : [],
@@ -5326,7 +5465,8 @@ function App() {
     onClose: () => setPassengerModal(null)
   })), jobModal != null && /*#__PURE__*/React.createElement(Modal, {
     title: jobModal.existing ? 'Edit Job' : 'Add One-off Job',
-    onClose: () => setJobModal(null)
+    onClose: () => setJobModal(null),
+    tone: "job"
   }, /*#__PURE__*/React.createElement(JobForm, {
     existing: jobModal.existing,
     drivers: drivers,
