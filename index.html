@@ -220,6 +220,23 @@
             <sc-for list="{{ staffWeekCells }}" as="c" hint-placeholder-count="16"><div style="{{ c.style }}">{{ c.text }}</div></sc-for>
           </div></div>
         </sc-if>
+        <sc-if value="{{ showStaffWeeklyNarrow }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ staffWeekNarrow }}" as="s" hint-placeholder-count="3">
+              <div style="background:#eef1f4;border-radius:12px;padding:12px 14px">
+                <div style="font-size:14px;font-weight:700;color:#16232e;border-bottom:1px solid #dfe5ea;padding-bottom:7px;margin-bottom:8px">{{ s.name }}</div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <sc-for list="{{ s.days }}" as="dy" hint-placeholder-count="7">
+                    <div style="display:flex;gap:10px;align-items:flex-start">
+                      <span style="width:78px;flex:none;font-size:11.5px;font-weight:700;color:#31576e;padding-top:1px">{{ dy.label }}</span>
+                      <span style="{{ dy.style }}">{{ dy.text }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
         <sc-if value="{{ showStaffDaily }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:8px">
             <sc-for list="{{ staffRows }}" as="s" hint-placeholder-count="4">
@@ -1652,7 +1669,7 @@ class Component extends DCLogic {
     });
 
     // staff weekly grid
-    out.staffWeekHead = []; out.staffWeekCells = [];
+    out.staffWeekHead = []; out.staffWeekCells = []; out.staffWeekNarrow = [];
     if (ht === 'staff' && staffMode === 'weekly') {
       const mon = this.addD(sDate, -((this.dow(sDate) + 6) % 7));
       const wdays = Array(7).fill(0).map((_, i) => this.addD(mon, i));
@@ -1661,6 +1678,7 @@ class Component extends DCLogic {
       const cells = [];
       staffAll.forEach(s => {
         cells.push({ text: s.name, style: 'font-size:12.5px;font-weight:700;color:#16232e;background:#eef1f4;border-radius:8px;padding:8px 10px' });
+        const narrowDays = [];
         wdays.forEach((dd, i) => {
           const abs = this.staffAbsent(d, s.id, dd);
           const mine2 = dayRuns[i].filter(r => (r.driverId === s.id || r.assistantId === s.id) && r.status !== 'cancelled');
@@ -1668,10 +1686,20 @@ class Component extends DCLogic {
           cells.push(abs
             ? { text: 'Absent', style: 'font-size:11px;font-weight:700;color:#fff;background:#b3402f;border-radius:8px;padding:8px 6px;text-align:center' }
             : { text: detail || '—', style: 'font-size:11px;font-weight:600;line-height:1.5;color:' + (detail ? '#16232e' : '#8a97a1') + ';background:#eef1f4;border-radius:8px;padding:8px 8px;text-align:left;white-space:pre-line' });
+          narrowDays.push({
+            label: this.pretty(dd),
+            text: abs ? 'Absent' : (detail || '—'),
+            style: abs
+              ? 'font-size:11px;font-weight:700;color:#fff;background:#b3402f;border-radius:6px;padding:3px 9px;align-self:flex-start'
+              : 'flex:1;font-size:12px;font-weight:600;line-height:1.5;color:' + (detail ? '#16232e' : '#8a97a1') + ';white-space:pre-line'
+          });
         });
+        out.staffWeekNarrow.push({ name: s.name, days: narrowDays });
       });
       out.staffWeekCells = cells;
     }
+    out.showStaffWeeklyNarrow = out.showStaffWeekly && narrow;
+    if (out.showStaffWeeklyNarrow) out.showStaffWeekly = false;
 
     // staff page (sidebar)
     out.onAddDriver = () => this.openStaff(null, 'driver');
