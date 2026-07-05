@@ -33,7 +33,7 @@
 <sc-if value="{{ showAuth }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Company Login" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-    <img src="assets/logo-full.png" alt="TransportHub" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
     <div style="font-size:13px;color:#5d6f7d;font-weight:600">Sign in to your company account</div>
   </div>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22)">
@@ -60,7 +60,7 @@
 <sc-if value="{{ showVerify }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Verify Email" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-    <img src="assets/logo-full.png" alt="TransportHub" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
   </div>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
     <div style="font-size:14px;font-weight:700;color:#fff">Check your email</div>
@@ -77,7 +77,7 @@
 <sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
 <div data-screen-label="PIN Login" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-    <img src="assets/logo-full.png" alt="TransportHub" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
     <div style="font-size:13px;color:#5d6f7d;font-weight:600">{{ loginSub }}</div>
   </div>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:18px;box-shadow:0 10px 28px rgba(22,35,46,.22)">
@@ -103,7 +103,7 @@
     <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;gap:10px;padding:0 16px 16px;border-bottom:1px solid rgba(255,255,255,.12)">
         <img src="assets/logo-icon.png" alt="" style="width:36px;height:36px;border-radius:9px;flex:none;background:#fff">
-        <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:14px">TransportHub</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></div>
+        <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:14px">TransportHQ</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></div>
         <button onClick="{{ onMenuToggle }}" style="font-size:13px;font-weight:700;color:#fff;background:rgba(255,255,255,.16);border-radius:7px;width:26px;height:26px;flex:none">✕</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:2px;padding:12px 10px">
@@ -128,7 +128,7 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:12px">
           <img src="assets/logo-icon.png" alt="" style="width:46px;height:46px;border-radius:11px;background:#fff;box-shadow:0 2px 6px rgba(22,35,46,.15)">
-          <div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">Transport <span style="color:#1f8a8f">Hub</span></div><div style="font-size:12.5px;font-weight:600;color:#3d4f5d">{{ companyName }}</div></div>
+          <div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">Transport<span style="color:#149da8">HQ</span></div><div style="font-size:12.5px;font-weight:600;color:#3d4f5d">{{ companyName }}</div></div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;position:relative">
           <button onClick="{{ onPlus }}" style="font-size:16px;font-weight:800;color:#fff;background:#3d7ec9;border-radius:11px;padding:12px 26px;box-shadow:0 3px 8px rgba(22,35,46,.24)">+ Add</button>
@@ -520,7 +520,7 @@
     <sc-if value="{{ tabTutorial }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="Tutorial" style="max-width:760px">
       <div style="font-size:20px;font-weight:700;color:#16232e;margin-bottom:4px">Tutorial</div>
-      <div style="font-size:13px;color:#3d4f5d;margin-bottom:14px">A quick guide to everything in TransportHub. Load demo data from Settings to try things safely.</div>
+      <div style="font-size:13px;color:#3d4f5d;margin-bottom:14px">A quick guide to everything in TransportHQ. Load demo data from Settings to try things safely.</div>
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🔑 Logging in</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Everyone uses the same PIN screen. The manager PIN is set in Settings (default 000000 — change it!). Each driver and passenger assistant has their own 6-digit PIN, shown on the Staff page. Drivers and PAs see their own runs for today, plus as many days ahead as you allow in Settings → "Driver &amp; PA schedule visibility". Managers see everything.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🗂 The Home filing tabs</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6"><b>Runs</b> shows every journey for the chosen day (or week — use the Daily/Weekly switch). <b>Staff</b> shows who is working and exactly which runs each person has that day. <b>Holidays</b> is the calendar of school holidays, inset days and staff absences. Use ‹ Today › to change the date.</div></div>
@@ -605,7 +605,7 @@
 <div data-screen-label="Driver" style="min-height:100vh;background:#b6c2cc;display:flex;justify-content:center">
 <div style="width:100%;max-width:440px;background:#c9d3da;min-height:100vh;display:flex;flex-direction:column">
   <div style="background:#16232e;color:#fff;padding:16px 18px 14px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;color:#8da2b3;font-weight:600">TransportHub</span><button onClick="{{ onLogout }}" style="font-size:12px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:7px;padding:6px 12px">Log out</button></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;color:#8da2b3;font-weight:600">TransportHQ</span><button onClick="{{ onLogout }}" style="font-size:12px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:7px;padding:6px 12px">Log out</button></div>
     <div style="font-size:18px;font-weight:700">{{ drvHello }}</div>
     <div style="font-size:12px;color:#aebcc8;margin:2px 0 10px">{{ drvSub }}</div>
     <div style="height:6px;background:#22323f;border-radius:99px;overflow:hidden"><div style="{{ drvProgressStyle }}"></div></div>
@@ -727,7 +727,7 @@
   <div data-screen-label="Setup wizard" style="background:#dfe5ea;border-radius:18px;width:100%;max-width:540px;max-height:90vh;overflow:auto;padding:22px">
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
       <div style="width:34px;height:34px;border-radius:9px;background:#1f8a8f;display:grid;place-items:center"><svg width="19" height="19" viewBox="0 0 18 18"><circle cx="4.5" cy="13" r="2.4" fill="#fff"></circle><circle cx="13.5" cy="5" r="2.4" fill="#fff"></circle><path d="M6 11.5 L12 6.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"></path></svg></div>
-      <div style="font-size:17px;font-weight:700;color:#16232e">Welcome to TransportHub</div>
+      <div style="font-size:17px;font-weight:700;color:#16232e">Welcome to TransportHQ</div>
     </div>
     <div style="display:flex;gap:5px;margin:12px 0 16px"><sc-for list="{{ wizDots }}" as="d" hint-placeholder-count="4"><div style="{{ d.style }}"></div></sc-for></div>
 
@@ -1952,7 +1952,7 @@ class Component extends DCLogic {
       this.setState({ drvCsv: '' });
       this.showToast('Imported ' + res.drivers.length + ' drivers and ' + res.assistants.length + ' assistants');
     };
-    out.onBackup = () => { this.download('transporthub_backup_' + this.tISO() + '.json', JSON.stringify(d, null, 1), 'application/json'); this.showToast('Backup downloaded'); };
+    out.onBackup = () => { this.download('transporthq_backup_' + this.tISO() + '.json', JSON.stringify(d, null, 1), 'application/json'); this.showToast('Backup downloaded'); };
     out.onLoadDemo = () => { if (confirm('Load demo data? This replaces current passengers, staff and vehicles.')) this.loadDemo(); };
     out.onClearAll = () => { if (confirm('Delete ALL data? This cannot be undone.') && confirm('Really sure? Download a backup first if in doubt.')) { const blank = this.blankData(); this.persist(blank); this.setState({ data: blank, coName: '' }); this.showToast('All data deleted'); } };
     return out;
