@@ -52,6 +52,22 @@
 </div>
 </sc-if>
 
+<!-- ═══════ VERIFY EMAIL ═══════ -->
+<sc-if value="{{ showVerify }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Verify Email" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+    <img src="assets/logo-full.png" alt="TransportHub" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+  </div>
+  <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
+    <div style="font-size:14px;font-weight:700;color:#fff">Check your email</div>
+    <div style="font-size:13px;color:#e8edf1;line-height:1.5">We've sent a verification link to your email address. Click the link, then come back here and press the button below.</div>
+    <button onClick="{{ onRecheckVerify }}" style="font-size:14px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:10px;padding:12px;box-shadow:0 3px 8px rgba(22,35,46,.24)">I've verified — continue</button>
+    <button onClick="{{ onResendVerify }}" style="font-size:12.5px;font-weight:600;color:#e8edf1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px">Resend verification email</button>
+    <button onClick="{{ onSignOutCompany }}" style="font-size:12px;font-weight:600;color:#e8edf1;padding:6px">Sign out and use a different account</button>
+  </div>
+</div>
+</sc-if>
+
 <!-- ═══════ LOGIN ═══════ -->
 <sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
 <div data-screen-label="PIN Login" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
@@ -746,7 +762,7 @@ class Component extends DCLogic {
     coName: '', mgrPin: '', csvText: '',
     data: null,
     authUser: null, authChecked: false, authMode: 'login',
-    authCompany: '', authEmail: '', authPassword: '', authErr: ''
+    authCompany: '', authEmail: '', authPassword: '', authErr: '', authEmailVerified: false
   };
 
   // ── helpers ──
@@ -764,12 +780,26 @@ class Component extends DCLogic {
     this.setState({ date: t, calMonth: t.slice(0, 7), repFrom: this.addD(t, -13), repTo: t });
     window.__fbAuth.onAuthStateChanged(user => {
       if (user) {
-        this.setState({ authUser: user, authChecked: true });
-        this.loadFromCloud(user.uid);
+        this.setState({ authUser: user, authChecked: true, authEmailVerified: user.emailVerified });
+        if (user.emailVerified) this.loadFromCloud(user.uid);
       } else {
-        this.setState({ authUser: null, authChecked: true, data: null });
+        this.setState({ authUser: null, authChecked: true, authEmailVerified: false, data: null });
       }
     });
+  }
+  recheckVerification() {
+    const u = window.__fbAuth.currentUser;
+    if (!u) return;
+    u.reload().then(() => {
+      this.setState({ authEmailVerified: u.emailVerified });
+      if (u.emailVerified) this.loadFromCloud(u.uid);
+      else this.showToast('Still not verified — check your inbox and click the link');
+    });
+  }
+  resendVerification() {
+    const u = window.__fbAuth.currentUser;
+    if (!u) return;
+    u.sendEmailVerification().then(() => this.showToast('Verification email sent again')).catch(() => this.showToast('Could not send — try again shortly'));
   }
   loadFromCloud(uid) {
     window.__fbDb.collection('companies').doc(uid).collection('appdata').doc('main').get().then(snap => {
@@ -802,7 +832,9 @@ class Component extends DCLogic {
         const blank = this.blankData();
         blank.company = S.authCompany.trim();
         window.__fbDb.collection('companies').doc(cred.user.uid).collection('appdata').doc('main').set(blank).then(() => {
-          this.setState({ authErr: '', authPassword: '' });
+          return cred.user.sendEmailVerification();
+        }).then(() => {
+          this.setState({ authErr: '', authPassword: '', authEmailVerified: false });
         });
       }).catch(err => { this.setState({ authErr: err.message }); });
     } else {
@@ -1382,9 +1414,14 @@ class Component extends DCLogic {
       onAuthModeSignup: () => this.onAuthModeSignup(),
       authTabLoginStyle: 'flex:1;font-size:13px;font-weight:700;padding:9px;border-radius:8px;' + (S.authMode === 'login' ? 'background:#1f8a8f;color:#fff' : 'background:rgba(255,255,255,.25);color:#fff'),
       authTabSignupStyle: 'flex:1;font-size:13px;font-weight:700;padding:9px;border-radius:8px;' + (S.authMode === 'signup' ? 'background:#1f8a8f;color:#fff' : 'background:rgba(255,255,255,.25);color:#fff'),
-      authErr: S.authErr
+      authErr: S.authErr,
+      showVerify: S.authChecked && !!S.authUser && !S.authEmailVerified,
+      onRecheckVerify: () => this.recheckVerification(),
+      onResendVerify: () => this.resendVerification(),
+      onSignOutCompany: () => this.signOutCompany(),
     };
     if (authOut.showAuth) return authOut;
+    if (authOut.showVerify) return authOut;
     if (!d) return Object.assign({}, authOut, { showLogin: true, loginSub: 'Loading…', pinDots: [], keys: [], loginErr: '' });
     const sess = S.session;
     const isMgr = sess && sess.role === 'manager';
