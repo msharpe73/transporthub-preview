@@ -47,6 +47,10 @@
     <input value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="Email address" type="email" style="border:none;border-radius:8px;padding:11px 12px;font-size:13.5px;background:#eef1f4;color:#16232e">
     <input value="{{ authPassword }}" onChange="{{ onAuthPassword }}" placeholder="Password (min 6 characters)" type="password" style="border:none;border-radius:8px;padding:11px 12px;font-size:13.5px;background:#eef1f4;color:#16232e">
     <button onClick="{{ onAuthSubmit }}" style="font-size:14px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:10px;padding:12px;box-shadow:0 3px 8px rgba(22,35,46,.24)">{{ authSubmitLabel }}</button>
+    <sc-if value="{{ authIsLogin }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ onForgotPassword }}" style="font-size:12px;font-weight:600;color:#e8edf1;background:none;padding:4px;text-align:center">Forgot your password?</button>
+    </sc-if>
+    <sc-if value="{{ authResetSent }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#2f7d5c;font-weight:600">Password reset email sent — check your inbox (and spam/junk folder).</div></sc-if>
     <sc-if value="{{ authErr }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#b3402f;font-weight:600">{{ authErr }}</div></sc-if>
   </div>
 </div>
@@ -93,7 +97,7 @@
 
 <!-- ═══════ MANAGER ═══════ -->
 <sc-if value="{{ showManager }}" hint-placeholder-val="{{ false }}">
-<div data-screen-label="Manager" style="display:flex;min-height:100vh;align-items:flex-start">
+<div data-screen-label="Manager" style="{{ mgrRootStyle }}">
   <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ onMenuToggle }}" style="position:fixed;inset:0;z-index:40"></div></sc-if>
   <div style="{{ sideStyle }}">
     <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ true }}">
@@ -117,7 +121,7 @@
     </sc-if>
   </div>
 
-  <div style="flex:1;padding:20px 26px;min-width:0;max-width:1180px">
+  <div style="{{ mainStyle }}">
     <!-- HOME -->
     <sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
     <div data-screen-label="Home">
@@ -159,7 +163,7 @@
 
         <!-- RUNS daily -->
         <sc-if value="{{ showRunsDaily }}" hint-placeholder-val="{{ true }}">
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px">
             <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:#eef1f4;border-radius:10px;padding:11px 14px"><div style="{{ k.vStyle }}">{{ k.v }}</div><div style="font-size:11.5px;color:#5d6f7d">{{ k.l }}</div></div></sc-for>
           </div>
           <sc-if value="{{ holidayBanner }}" hint-placeholder-val="{{ false }}"><div style="background:#31576e;color:#fff;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;margin-bottom:12px">{{ holidayBanner }}</div></sc-if>
@@ -169,7 +173,7 @@
               <sc-for list="{{ runRows }}" as="r" hint-placeholder-count="4">
                 <div style="{{ r.rowStyle }}">
                   <div style="width:46px;flex:none;font-weight:700;font-size:13.5px;color:#16232e">{{ r.time }}</div>
-                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ r.title }}</div><sc-for list="{{ r.subLines }}" as="l" hint-placeholder-count="1"><div style="{{ l.style }}">{{ l.text }}</div></sc-for></div>
+                  <div style="flex:1 1 180px;min-width:180px"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ r.title }}</div><sc-for list="{{ r.subLines }}" as="l" hint-placeholder-count="1"><div style="{{ l.style }}">{{ l.text }}</div></sc-for></div>
                   <button onClick="{{ r.onChip }}" style="{{ r.chipStyle }}">{{ r.chip }}</button>
                   <button onClick="{{ r.onMenu }}" style="font-size:12px;font-weight:700;color:#31576e;background:#d5dde3;border-radius:7px;padding:6px 10px;flex:none">Manage</button>
                 </div>
@@ -197,7 +201,7 @@
 
         <!-- RUNS weekly -->
         <sc-if value="{{ showRunsWeekly }}" hint-placeholder-val="{{ false }}">
-          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px">
+          <div style="{{ weekGridStyle }}">
             <sc-for list="{{ weekCols }}" as="c" hint-placeholder-count="7">
               <div style="min-width:0">
                 <button onClick="{{ c.go }}" style="{{ c.hdStyle }}">{{ c.label }}</button>
@@ -763,7 +767,7 @@ class Component extends DCLogic {
     coName: '', mgrPin: '', csvText: '',
     data: null,
     authUser: null, authChecked: false, authMode: 'login',
-    authCompany: '', authEmail: '', authPassword: '', authErr: '', authEmailVerified: false
+    authCompany: '', authEmail: '', authPassword: '', authErr: '', authEmailVerified: false, authResetSent: false
   };
 
   // ── helpers ──
@@ -779,6 +783,9 @@ class Component extends DCLogic {
   componentDidMount() {
     const t = this.tISO();
     this.setState({ date: t, calMonth: t.slice(0, 7), repFrom: this.addD(t, -13), repTo: t });
+    this._onResize = () => { const n = window.innerWidth < 720; if (n !== this.state.narrow) this.setState({ narrow: n }); };
+    window.addEventListener('resize', this._onResize);
+    this.state.narrow = window.innerWidth < 720;
     window.__fbAuth.onAuthStateChanged(user => {
       if (user) {
         this.setState({ authUser: user, authChecked: true, authEmailVerified: user.emailVerified });
@@ -822,8 +829,15 @@ class Component extends DCLogic {
   onAuthCompany(e) { this.setState({ authCompany: e.target.value }); }
   onAuthEmail(e) { this.setState({ authEmail: e.target.value }); }
   onAuthPassword(e) { this.setState({ authPassword: e.target.value }); }
-  onAuthModeLogin() { this.setState({ authMode: 'login', authErr: '' }); }
-  onAuthModeSignup() { this.setState({ authMode: 'signup', authErr: '' }); }
+  onAuthModeLogin() { this.setState({ authMode: 'login', authErr: '', authResetSent: false }); }
+  onAuthModeSignup() { this.setState({ authMode: 'signup', authErr: '', authResetSent: false }); }
+  forgotPassword() {
+    const S = this.state;
+    if (!S.authEmail) { this.setState({ authErr: 'Enter your email address above first, then tap Forgot your password?', authResetSent: false }); return; }
+    window.__fbAuth.sendPasswordResetEmail(S.authEmail).then(() => {
+      this.setState({ authResetSent: true, authErr: '' });
+    }).catch(err => { this.setState({ authErr: err.message, authResetSent: false }); });
+  }
   authSubmit() {
     const S = this.state;
     if (!S.authEmail || !S.authPassword) { this.setState({ authErr: 'Enter your email and password' }); return; }
@@ -1416,6 +1430,9 @@ class Component extends DCLogic {
       authTabLoginStyle: 'flex:1;font-size:13px;font-weight:700;padding:9px;border-radius:8px;' + (S.authMode === 'login' ? 'background:#1f8a8f;color:#fff' : 'background:rgba(255,255,255,.25);color:#fff'),
       authTabSignupStyle: 'flex:1;font-size:13px;font-weight:700;padding:9px;border-radius:8px;' + (S.authMode === 'signup' ? 'background:#1f8a8f;color:#fff' : 'background:rgba(255,255,255,.25);color:#fff'),
       authErr: S.authErr,
+      authIsLogin: S.authMode === 'login',
+      authResetSent: S.authResetSent,
+      onForgotPassword: () => this.forgotPassword(),
       showVerify: S.authChecked && !!S.authUser && !S.authEmailVerified,
       onRecheckVerify: () => this.recheckVerification(),
       onResendVerify: () => this.resendVerification(),
@@ -1463,9 +1480,16 @@ class Component extends DCLogic {
     out.menuClosed = !S.menuOpen;
     out.onMenuToggle = () => this.setState({ menuOpen: !S.menuOpen });
     out.reviewDot = reviewCount > 0;
+    const narrow = !!S.narrow;
+    out.mgrRootStyle = narrow ? 'display:flex;flex-direction:column;min-height:100vh;align-items:stretch' : 'display:flex;min-height:100vh;align-items:flex-start';
+    out.mainStyle = narrow ? 'flex:1;padding:14px 12px;min-width:0;width:100%' : 'flex:1;padding:20px 26px;min-width:0;max-width:1180px';
     out.sideStyle = S.menuOpen
-      ? 'width:200px;flex:none;background:#2c4a5e;color:#e8edf1;display:flex;flex-direction:column;padding:18px 0 14px;border-radius:16px;margin:16px 0 16px 16px;box-shadow:0 4px 14px rgba(22,35,46,.28)'
-      : 'width:58px;flex:none;background:#2c4a5e;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0 14px;border-radius:16px;margin:16px 0 16px 16px;box-shadow:0 4px 14px rgba(22,35,46,.28)';
+      ? (narrow
+        ? 'background:#2c4a5e;color:#e8edf1;display:flex;flex-direction:column;padding:18px 0 14px;border-radius:16px;margin:12px 12px 0;box-shadow:0 4px 14px rgba(22,35,46,.28)'
+        : 'width:200px;flex:none;background:#2c4a5e;color:#e8edf1;display:flex;flex-direction:column;padding:18px 0 14px;border-radius:16px;margin:16px 0 16px 16px;box-shadow:0 4px 14px rgba(22,35,46,.28)')
+      : (narrow
+        ? 'align-self:flex-start;background:#2c4a5e;display:flex;align-items:center;padding:8px;border-radius:12px;margin:12px 0 0 12px;box-shadow:0 3px 10px rgba(22,35,46,.25)'
+        : 'width:58px;flex:none;background:#2c4a5e;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0 14px;border-radius:16px;margin:16px 0 16px 16px;box-shadow:0 4px 14px rgba(22,35,46,.28)');
     if (S.menuOpen) out.sideStyle += ';position:relative;z-index:45';
     ['home','passengers','staff','jobs','vehicles','review','reports','tutorial','settings'].forEach(t => out['tab' + t[0].toUpperCase() + t.slice(1)] = S.tab === t);
     out.reviewCount = String(reviewCount);
@@ -1522,6 +1546,7 @@ class Component extends DCLogic {
     out.showStaffWeekly = ht === 'staff' && staffMode === 'weekly';
     out.showRunsDaily = ht === 'runs' && S.runMode === 'daily';
     out.showRunsWeekly = ht === 'runs' && S.runMode === 'weekly';
+    out.weekGridStyle = narrow ? 'display:flex;flex-direction:column;gap:12px' : 'display:grid;grid-template-columns:repeat(7,1fr);gap:8px';
     out.showStaffTab = ht === 'staff';
     out.showHolTab = ht === 'holidays';
 
@@ -1561,7 +1586,7 @@ class Component extends DCLogic {
         time: this.fmtT(r.time),
         title: r.name + (r.wheelchair ? ' ♿' : '') + ' → ' + (r.leg === 'return' ? 'home' : r.to),
         subLines,
-        rowStyle: 'background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;gap:12px;align-items:center' + (attention ? ';border:1.5px solid #b3771f' : '') + (r.status === 'cancelled' ? ';opacity:.72' : ''),
+        rowStyle: 'background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap' + (attention ? ';border:1.5px solid #b3771f' : '') + (r.status === 'cancelled' ? ';opacity:.72' : ''),
         chip: sc.chip, chipStyle: sc.style + ';cursor:pointer',
         onChip: () => attention ? this.openEditToday(r) : this.openRunMenu(r),
         onMenu: () => this.openRunMenu(r)
