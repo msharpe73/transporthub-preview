@@ -224,12 +224,14 @@
           <div style="display:flex;flex-direction:column;gap:8px">
             <sc-for list="{{ staffRows }}" as="s" hint-placeholder-count="4">
               <div style="background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">
-                <div style="display:flex;gap:12px;align-items:center">
+                <div style="display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap">
                   <div style="width:34px;height:34px;border-radius:50%;background:#31576e;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:none">{{ s.initials }}</div>
-                  <div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ s.name }}</div><div style="font-size:11.5px;color:#5d6f7d">{{ s.sub }}</div></div>
+                  <div style="flex:1 1 140px;min-width:140px"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ s.name }}</div><div style="font-size:11.5px;color:#5d6f7d">{{ s.sub }}</div></div>
                   <span style="{{ s.chipStyle }}">{{ s.chip }}</span>
-                  <button onClick="{{ s.onAbsence }}" style="font-size:12px;font-weight:700;color:#31576e;background:#d5dde3;border-radius:7px;padding:6px 10px">Absence</button>
-                  <button onClick="{{ s.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:6px 12px">Edit</button>
+                  <div style="display:flex;gap:6px">
+                    <button onClick="{{ s.onAbsence }}" style="font-size:12px;font-weight:700;color:#31576e;background:#d5dde3;border-radius:7px;padding:6px 10px">Absence</button>
+                    <button onClick="{{ s.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:6px 12px">Edit</button>
+                  </div>
                 </div>
                 <sc-if value="{{ s.hasRuns }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #dfe5ea;padding-top:8px">
