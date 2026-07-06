@@ -1,0 +1,2298 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  var firebaseConfig = {
+    apiKey: "AIzaSyDGiusLFCha4BzdXJMiML03WL4BT_HUELU",
+    authDomain: "transporthub-app.firebaseapp.com",
+    projectId: "transporthub-app",
+    storageBucket: "transporthub-app.firebasestorage.app",
+    messagingSenderId: "707835972150",
+    appId: "1:707835972150:web:f665fb7b2f5bac065ee697"
+  };
+  firebase.initializeApp(firebaseConfig);
+  window.__fbAuth = firebase.auth();
+  window.__fbDb = firebase.firestore();
+</script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>body{margin:0;background:#b6c2cc;font-family:'IBM Plex Sans',system-ui,sans-serif;font-weight:500}input,select,textarea,button{font-family:inherit}button{cursor:pointer;border:none;background:none;padding:0}*{box-sizing:border-box;-webkit-text-stroke:.02em}</style>
+</helmet>
+
+<!-- ═══════ COMPANY AUTH ═══════ -->
+<sc-if value="{{ showAuth }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Company Login" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+    <div style="font-size:13px;color:#5d6f7d;font-weight:600">Sign in to your company account</div>
+  </div>
+  <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22)">
+    <div style="display:flex;gap:6px">
+      <button onClick="{{ onAuthModeLogin }}" style="{{ authTabLoginStyle }}">Log in</button>
+      <button onClick="{{ onAuthModeSignup }}" style="{{ authTabSignupStyle }}">Sign up</button>
+    </div>
+    <sc-if value="{{ authIsSignup }}" hint-placeholder-val="{{ false }}">
+      <input value="{{ authCompany }}" onChange="{{ onAuthCompany }}" placeholder="Company name" style="border:none;border-radius:8px;padding:11px 12px;font-size:13.5px;background:#eef1f4;color:#16232e">
+    </sc-if>
+    <input value="{{ authEmail }}" onChange="{{ onAuthEmail }}" placeholder="Email address" type="email" style="border:none;border-radius:8px;padding:11px 12px;font-size:13.5px;background:#eef1f4;color:#16232e">
+    <input value="{{ authPassword }}" onChange="{{ onAuthPassword }}" placeholder="Password (min 6 characters)" type="password" style="border:none;border-radius:8px;padding:11px 12px;font-size:13.5px;background:#eef1f4;color:#16232e">
+    <button onClick="{{ onAuthSubmit }}" style="font-size:14px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:10px;padding:12px;box-shadow:0 3px 8px rgba(22,35,46,.24)">{{ authSubmitLabel }}</button>
+    <sc-if value="{{ authIsLogin }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ onForgotPassword }}" style="font-size:12px;font-weight:600;color:#e8edf1;background:none;padding:4px;text-align:center">Forgot your password?</button>
+    </sc-if>
+    <sc-if value="{{ authResetSent }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#2f7d5c;font-weight:600">Password reset email sent — check your inbox (and spam/junk folder).</div></sc-if>
+    <sc-if value="{{ authErr }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#b3402f;font-weight:600">{{ authErr }}</div></sc-if>
+  </div>
+</div>
+</sc-if>
+
+<!-- ═══════ VERIFY EMAIL ═══════ -->
+<sc-if value="{{ showVerify }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Verify Email" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+  </div>
+  <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
+    <div style="font-size:14px;font-weight:700;color:#fff">Check your email</div>
+    <div style="font-size:13px;color:#e8edf1;line-height:1.5">We've sent a verification link to your email address. Click the link, then come back here and press the button below.</div>
+    <div style="font-size:11.5px;color:#c7d2e0;line-height:1.4">Can't see it? Check your spam or junk folder — verification emails sometimes land there.</div>
+    <button onClick="{{ onRecheckVerify }}" style="font-size:14px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:10px;padding:12px;box-shadow:0 3px 8px rgba(22,35,46,.24)">I've verified — continue</button>
+    <button onClick="{{ onResendVerify }}" style="font-size:12.5px;font-weight:600;color:#e8edf1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px">Resend verification email</button>
+    <button onClick="{{ onSignOutCompany }}" style="font-size:12px;font-weight:600;color:#e8edf1;padding:6px">Sign out and use a different account</button>
+  </div>
+</div>
+</sc-if>
+
+<!-- ═══════ LOGIN ═══════ -->
+<sc-if value="{{ showLogin }}" hint-placeholder-val="{{ true }}">
+<div data-screen-label="PIN Login" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+    <div style="font-size:13px;color:#5d6f7d;font-weight:600">{{ loginSub }}</div>
+  </div>
+  <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:18px;box-shadow:0 10px 28px rgba(22,35,46,.22)">
+    <div style="text-align:center;font-size:13.5px;font-weight:600;color:#fff">Enter your 6-digit PIN</div>
+    <div style="display:flex;justify-content:center;gap:12px">
+      <sc-for list="{{ pinDots }}" as="d" hint-placeholder-count="6"><div style="{{ d.style }}"></div></sc-for>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+      <sc-for list="{{ keys }}" as="k" hint-placeholder-count="12">
+        <button onClick="{{ k.press }}" style="{{ k.style }}">{{ k.label }}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{ loginErr }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#b3402f;font-weight:600">{{ loginErr }}</div></sc-if>
+  </div>
+</div>
+</sc-if>
+
+<!-- ═══════ MANAGER ═══════ -->
+<sc-if value="{{ showManager }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Manager" style="{{ mgrRootStyle }}">
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}"><div onClick="{{ onMenuToggle }}" style="position:fixed;inset:0;z-index:40"></div></sc-if>
+  <div style="{{ sideStyle }}">
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:center;gap:10px;padding:0 16px 16px;border-bottom:1px solid rgba(255,255,255,.12)">
+        <img src="assets/logo-icon.png" alt="" style="width:36px;height:36px;border-radius:9px;flex:none;background:#fff">
+        <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:14px">TransportHQ</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></div>
+        <button onClick="{{ onMenuToggle }}" style="font-size:13px;font-weight:700;color:#fff;background:rgba(255,255,255,.16);border-radius:7px;width:26px;height:26px;flex:none">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;padding:12px 10px">
+        <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="6">
+          <button onClick="{{ n.go }}" style="{{ n.style }}"><span>{{ n.label }}</span><sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="background:#c25438;color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px">{{ n.badge }}</span></sc-if></button>
+        </sc-for>
+      </div>
+      <div style="margin-top:auto;padding:12px 16px 0;border-top:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;color:#aec6d4">{{ userLabel }}</span>
+        <button onClick="{{ onLogout }}" style="font-size:12px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:7px;padding:6px 12px">Log out</button>
+      </div>
+    </sc-if>
+    <sc-if value="{{ menuClosed }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ onMenuToggle }}" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.16);color:#fff;font-size:17px;font-weight:700;position:relative">☰<sc-if value="{{ reviewDot }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:#c25438;border:2px solid #2c4a5e"></span></sc-if></button>
+    </sc-if>
+  </div>
+
+  <div style="{{ mainStyle }}">
+    <!-- HOME -->
+    <sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Home">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="assets/logo-icon.png" alt="" style="width:46px;height:46px;border-radius:11px;background:#fff;box-shadow:0 2px 6px rgba(22,35,46,.15)">
+          <div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">Transport<span style="color:#149da8">HQ</span></div><div style="font-size:12.5px;font-weight:600;color:#3d4f5d">{{ companyName }}</div></div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;position:relative">
+          <button onClick="{{ onPlus }}" style="font-size:16px;font-weight:800;color:#fff;background:#3d7ec9;border-radius:11px;padding:12px 26px;box-shadow:0 3px 8px rgba(22,35,46,.24)">+ Add</button>
+          <sc-if value="{{ plusOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute;right:0;top:42px;background:#16232e;border-radius:12px;padding:6px;z-index:40;box-shadow:0 8px 24px rgba(10,18,25,.4);display:flex;flex-direction:column;gap:2px;min-width:180px">
+              <sc-for list="{{ plusItems }}" as="p" hint-placeholder-count="4"><button onClick="{{ p.go }}" style="text-align:left;font-size:13px;font-weight:600;color:#dfe8ee;padding:9px 12px;border-radius:8px" style-hover="background:#22323f">{{ p.label }}</button></sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:flex-end">
+        <sc-for list="{{ fileTabs }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.go }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+      </div>
+      <div style="border-radius:0 14px 14px 14px;box-shadow:0 3px 10px rgba(22,35,46,.16);overflow:hidden;background:#d8e6f4">
+      <div style="{{ panelHeadStyle }}">
+        <sc-if value="{{ showPanelNav }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;gap:6px">
+            <button onClick="{{ onPanelPrev }}" style="width:29px;height:29px;border-radius:7px;background:rgba(255,255,255,.2);color:#fff;font-size:15px;font-weight:700">‹</button>
+            <button onClick="{{ onPanelToday }}" title="Jump to today" style="font-size:13.5px;font-weight:700;color:#fff;padding:5px 9px;border-radius:7px" style-hover="background:rgba(255,255,255,.15)">{{ panelDateLabel }}</button>
+            <button onClick="{{ onPanelNext }}" style="width:29px;height:29px;border-radius:7px;background:rgba(255,255,255,.2);color:#fff;font-size:15px;font-weight:700">›</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showPanelTitle }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;font-weight:700;color:#fff">{{ panelHeadTitle }}</span></sc-if>
+        <sc-if value="{{ showModeToggle }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:4px">
+          <button onClick="{{ onDaily }}" style="{{ dailyBtnStyle }}">Daily</button>
+          <button onClick="{{ onWeekly }}" style="{{ weeklyBtnStyle }}">Weekly</button>
+        </div>
+        </sc-if>
+      </div>
+      <div style="padding:14px">
+
+        <!-- RUNS daily -->
+        <sc-if value="{{ showRunsDaily }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:12px">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="background:#eef1f4;border-radius:10px;padding:11px 14px"><div style="{{ k.vStyle }}">{{ k.v }}</div><div style="font-size:11.5px;color:#5d6f7d">{{ k.l }}</div></div></sc-for>
+          </div>
+          <sc-if value="{{ holidayBanner }}" hint-placeholder-val="{{ false }}"><div style="background:#31576e;color:#fff;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;margin-bottom:12px">{{ holidayBanner }}</div></sc-if>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start">
+            <div style="flex:2 1 340px;display:flex;flex-direction:column;gap:8px;min-width:0">
+              <sc-if value="{{ noRuns }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:40px 0;color:#5d6f7d;font-size:13.5px">No runs for this date.<br><span style="font-size:12px">Add passengers with schedules, or a one-off job, using + Add.</span></div></sc-if>
+              <sc-for list="{{ runRows }}" as="r" hint-placeholder-count="4">
+                <div style="{{ r.rowStyle }}">
+                  <div style="width:46px;flex:none;font-weight:700;font-size:13.5px;color:#16232e">{{ r.time }}</div>
+                  <div style="flex:1 1 180px;min-width:180px"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ r.title }}</div><sc-for list="{{ r.subLines }}" as="l" hint-placeholder-count="1"><div style="{{ l.style }}">{{ l.text }}</div></sc-for></div>
+                  <button onClick="{{ r.onChip }}" style="{{ r.chipStyle }}">{{ r.chip }}</button>
+                  <button onClick="{{ r.onMenu }}" style="font-size:12px;font-weight:700;color:#31576e;background:#d5dde3;border-radius:7px;padding:6px 10px;flex:none">Manage</button>
+                </div>
+              </sc-for>
+            </div>
+            <div style="flex:1 1 260px;min-width:260px;display:flex;flex-direction:column;gap:10px">
+              <div style="background:#2c4a5e;border:2px solid #c25438;border-radius:12px;padding:14px;color:#e8edf1;box-shadow:0 4px 12px rgba(22,35,46,.22)">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px"><span style="font-size:12px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.07em">Needs review</span><span style="background:#c25438;color:#fff;font-size:11px;font-weight:800;padding:2px 9px;border-radius:99px">{{ reviewCount }}</span></div>
+                <sc-if value="{{ reviewPeekShow }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:12.5px;font-weight:600">{{ reviewPeekTitle }}</div>
+                  <div style="font-size:11px;color:#8da2b3;margin:2px 0 9px">{{ reviewPeekSub }}</div>
+                </sc-if>
+                <sc-if value="{{ reviewEmptyPeek }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;color:#8da2b3;margin-bottom:9px">Nothing waiting — all clear.</div></sc-if>
+                <button onClick="{{ goReview }}" style="width:100%;text-align:center;font-size:11.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:7px;padding:8px 0">Open review queue</button>
+              </div>
+              <div style="background:#1f8a8f;border-radius:12px;padding:12px 14px;box-shadow:0 4px 12px rgba(22,35,46,.2)"><div style="font-size:12px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Coming up</div><div style="background:#eef1f4;border-radius:9px;padding:10px 12px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;font-size:12px;color:#16232e;gap:8px"><span>{{ u.l }}</span><b style="{{ u.vStyle }}">{{ u.v }}</b></div></sc-for>
+                </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- RUNS weekly -->
+        <sc-if value="{{ showRunsWeekly }}" hint-placeholder-val="{{ false }}">
+          <div style="{{ weekGridStyle }}">
+            <sc-for list="{{ weekCols }}" as="c" hint-placeholder-count="7">
+              <div style="min-width:0">
+                <button onClick="{{ c.go }}" style="{{ c.hdStyle }}">{{ c.label }}</button>
+                <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+                  <sc-for list="{{ c.items }}" as="i" hint-placeholder-count="2"><div style="{{ i.style }}"><b>{{ i.time }}</b> {{ i.name }}<br><span style="opacity:.75">{{ i.sub }}</span></div></sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- STAFF -->
+        <sc-if value="{{ showStaffWeekly }}" hint-placeholder-val="{{ false }}">
+          <div style="overflow-x:auto"><div style="display:grid;grid-template-columns:150px repeat(7,1fr);gap:4px;min-width:680px">
+            <sc-for list="{{ staffWeekHead }}" as="h" hint-placeholder-count="8"><div style="font-size:11px;font-weight:700;color:#5d6f7d;padding:4px 6px">{{ h }}</div></sc-for>
+            <sc-for list="{{ staffWeekCells }}" as="c" hint-placeholder-count="16"><div style="{{ c.style }}">{{ c.text }}</div></sc-for>
+          </div></div>
+        </sc-if>
+        <sc-if value="{{ showStaffWeeklyNarrow }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ staffWeekNarrow }}" as="s" hint-placeholder-count="3">
+              <div style="background:#eef1f4;border-radius:12px;padding:12px 14px">
+                <div style="font-size:14px;font-weight:700;color:#16232e;border-bottom:1px solid #dfe5ea;padding-bottom:7px;margin-bottom:8px">{{ s.name }}</div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <sc-for list="{{ s.days }}" as="dy" hint-placeholder-count="7">
+                    <div style="display:flex;gap:10px;align-items:flex-start">
+                      <span style="width:78px;flex:none;font-size:11.5px;font-weight:700;color:#31576e;padding-top:1px">{{ dy.label }}</span>
+                      <span style="{{ dy.style }}">{{ dy.text }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showStaffDaily }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <sc-for list="{{ staffRows }}" as="s" hint-placeholder-count="4">
+              <div style="background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap">
+                  <div style="width:34px;height:34px;border-radius:50%;background:#31576e;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:none">{{ s.initials }}</div>
+                  <div style="flex:1 1 140px;min-width:140px"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ s.name }}</div><div style="font-size:11.5px;color:#5d6f7d">{{ s.sub }}</div></div>
+                  <span style="{{ s.chipStyle }}">{{ s.chip }}</span>
+                  <div style="display:flex;gap:6px">
+                    <button onClick="{{ s.onAbsence }}" style="font-size:12px;font-weight:700;color:#31576e;background:#d5dde3;border-radius:7px;padding:6px 10px">Absence</button>
+                    <button onClick="{{ s.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:6px 12px">Edit</button>
+                  </div>
+                </div>
+                <sc-if value="{{ s.hasRuns }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #dfe5ea;padding-top:8px">
+                    <sc-for list="{{ s.runsList }}" as="r" hint-placeholder-count="2"><div style="display:flex;gap:10px;align-items:center;font-size:12.5px;color:#16232e"><span style="font-weight:700;width:46px;flex:none">{{ r.time }}</span><span style="flex:1;min-width:0">{{ r.desc }}</span><span style="{{ r.chipStyle }}">{{ r.chip }}</span></div></sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ s.noRunsToday }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#5d6f7d;border-top:1px solid #dfe5ea;padding-top:8px">No runs on this day.</div></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- HOLIDAYS -->
+        <sc-if value="{{ showHolTab }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <button onClick="{{ onCalPrev }}" style="font-size:13px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:7px 13px">‹</button>
+            <div style="font-size:15px;font-weight:700;color:#16232e">{{ calTitle }}</div>
+            <button onClick="{{ onCalNext }}" style="font-size:13px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:7px 13px">›</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px;min-width:0">
+            <sc-for list="{{ dowHeads }}" as="h" hint-placeholder-count="7"><div style="text-align:center;font-size:11px;font-weight:700;color:#5d6f7d;padding:4px 0">{{ h }}</div></sc-for>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;min-width:0">
+            <sc-for list="{{ calCells }}" as="c" hint-placeholder-count="35"><button onClick="{{ c.onClick }}" style="{{ c.style }}"><span style="font-size:12px;font-weight:600">{{ c.day }}</span><span style="font-size:9.5px;font-weight:600;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;display:block">{{ c.tag }}</span></button></sc-for>
+          </div>
+          <div style="display:flex;gap:16px;margin:10px 2px 4px;font-size:11.5px;color:#3d4f5d;align-items:center;flex-wrap:wrap">
+            <span>Click a day to <b>edit</b></span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#1f8a8f;display:inline-block"></span>All schools</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#4a7fa5;display:inline-block"></span>One school / inset day</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#f59e2d;display:inline-block"></span>Staff absent</span>
+          </div>
+          <sc-if value="{{ hasAbs }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#eef1f4;border-radius:12px;padding:12px 14px;margin-top:8px">
+            <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Staff absences this month</div>
+            <div style="display:flex;flex-direction:column;gap:6px">
+            <sc-for list="{{ absRows }}" as="a" hint-placeholder-count="2"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;color:#16232e"><span><b>{{ a.name }}</b> — {{ a.date }} · {{ a.type }}</span><button onClick="{{ a.onDel }}" style="font-size:11px;font-weight:700;color:#b3402f">Remove</button></div></sc-for>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ hasStaff }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#eef1f4;border-radius:12px;padding:12px 14px;margin-top:8px">
+            <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Staff holidays — detail</div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+            <sc-for list="{{ staffHolRows }}" as="s" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;color:#16232e;flex-wrap:wrap"><span><button onClick="{{ s.onName }}" title="Add absence" style="font-size:12.5px;font-weight:700;color:#1f8a8f;text-decoration:underline;padding:0">{{ s.name }}</button> — {{ s.counts }}</span><span style="color:#31576e;font-weight:600">{{ s.next }}</span></div></sc-for>
+            </div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ hasSchoolHol }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#eef1f4;border-radius:12px;padding:12px 14px;margin-top:8px">
+            <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">School holidays &amp; inset days — by school</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ schoolHolGroups }}" as="g" hint-placeholder-count="2">
+              <div>
+                <div style="font-size:12.5px;font-weight:700;color:#31576e;margin-bottom:5px">{{ g.school }}</div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                <sc-for list="{{ g.ranges }}" as="r" hint-placeholder-count="2"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12.5px;color:#16232e;flex-wrap:wrap"><span><b>{{ r.label }}</b> — {{ r.sub }}</span><button onClick="{{ r.onDel }}" style="font-size:11px;font-weight:700;color:#b3402f">Remove</button></div></sc-for>
+                </div>
+              </div>
+            </sc-for>
+            </div>
+          </div>
+          </sc-if>
+        </sc-if>
+      </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- PASSENGERS -->
+    <sc-if value="{{ tabPassengers }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Passengers">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px">
+        <div style="font-size:20px;font-weight:700;color:#16232e">Passengers</div>
+        <div style="display:flex;gap:8px">
+          <input value="{{ search }}" onChange="{{ onSearch }}" placeholder="Search name or school…" style="border:none;border-radius:8px;padding:8px 12px;font-size:13px;background:#dfe5ea;color:#16232e;width:220px;outline:none">
+          <button onClick="{{ onAddPassenger }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:8px 14px">+ Passenger</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px">
+        <sc-for list="{{ passRows }}" as="p" hint-placeholder-count="4">
+          <div style="background:#dfe5ea;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-size:14.5px;font-weight:700;color:#16232e">{{ p.name }}</span><span style="font-size:11px;font-weight:700;color:#5d6f7d">{{ p.tags }}</span></div>
+            <div style="font-size:12px;color:#3d4f5d">{{ p.addr }}</div>
+            <div style="font-size:12px;color:#3d4f5d">→ {{ p.school }}</div>
+            <div style="font-size:12px;color:#16232e;background:#eef1f4;border-radius:7px;padding:6px 9px">{{ p.schedSummary }}</div>
+            <div style="display:flex;gap:6px;margin-top:2px">
+              <button onClick="{{ p.onEdit }}" style="flex:1;font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:7px 0">Edit</button>
+              <button onClick="{{ p.onArchive }}" style="font-size:12px;font-weight:700;color:#b3402f;background:#e9dedb;border-radius:7px;padding:7px 12px">Archive</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ noPassengers }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:50px 0;color:#3d4f5d;font-size:13.5px">No passengers yet. Use <b>+ Passenger</b> or import a spreadsheet in Settings.</div></sc-if>
+    </div>
+    </sc-if>
+
+    <!-- STAFF PAGE -->
+    <sc-if value="{{ tabStaff }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Staff">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap">
+        <div style="font-size:20px;font-weight:700;color:#16232e">Staff</div>
+        <div style="display:flex;gap:8px">
+          <button onClick="{{ onAddDriver }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:8px 14px">+ Driver</button>
+          <button onClick="{{ onAddAssistant }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:8px 14px">+ Passenger assistant</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ staffPageRows }}" as="s" hint-placeholder-count="4">
+          <div style="{{ s.rowStyle }}">
+            <div style="{{ s.topRowStyle }}">
+              <div style="width:36px;height:36px;border-radius:50%;background:#31576e;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:none">{{ s.initials }}</div>
+              <div style="flex:1;min-width:170px"><div style="font-size:14px;font-weight:700;color:#16232e">{{ s.name }}</div><div style="font-size:11.5px;color:#5d6f7d">{{ s.sub }}</div></div>
+              <span style="{{ s.chipStyle }}">{{ s.chip }}</span>
+            </div>
+            <div style="{{ s.detailsStyle }}">
+              <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.06em">Login PIN</div><div style="font-size:13px;font-weight:700;color:#16232e;font-family:ui-monospace,Menlo,monospace">{{ s.pin }}</div></div>
+              <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.06em">Works</div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ s.days }}</div></div>
+              <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.06em">Vehicle</div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ s.veh }}</div></div>
+            </div>
+            <div style="{{ s.actionsStyle }}">
+              <button onClick="{{ s.onAbsence }}" style="font-size:12px;font-weight:700;color:#31576e;background:#cdd6dd;border-radius:7px;padding:7px 11px">Absence</button>
+              <button onClick="{{ s.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:7px 14px">Edit</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ noStaff }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:50px 0;color:#3d4f5d;font-size:13.5px">No staff yet. Add drivers and passenger assistants — each gets a 6-digit PIN to log in.</div></sc-if>
+    </div>
+    </sc-if>
+
+    <!-- ONE-OFF JOBS PAGE -->
+    <sc-if value="{{ tabJobs }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="One-off jobs">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:20px;font-weight:700;color:#16232e">One-off jobs</div>
+        <button onClick="{{ onAddJob }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:8px 14px">+ One-off job</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ jobRows }}" as="j" hint-placeholder-count="3">
+          <div style="background:#dfe5ea;border-radius:12px;padding:13px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+            <div style="width:110px;flex:none"><div style="font-size:12px;font-weight:700;color:#31576e">{{ j.date }}</div><div style="font-size:14.5px;font-weight:700;color:#16232e">{{ j.time }}</div></div>
+            <div style="flex:1;min-width:200px"><div style="font-size:13.5px;font-weight:700;color:#16232e">{{ j.customer }}</div><div style="font-size:12px;color:#3d4f5d;margin-top:1px">{{ j.route }}</div><div style="font-size:11.5px;color:#5d6f7d;margin-top:1px">{{ j.who }}</div></div>
+            <span style="{{ j.chipStyle }}">{{ j.chip }}</span>
+            <div style="display:flex;gap:6px;flex:none">
+              <button onClick="{{ j.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:7px 14px">Edit</button>
+              <button onClick="{{ j.onDel }}" style="font-size:12px;font-weight:700;color:#b3402f;background:#e9dedb;border-radius:7px;padding:7px 11px">Delete</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ noJobs }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:50px 0;color:#3d4f5d;font-size:13.5px">No one-off jobs yet. These are single journeys outside the recurring school runs — airport trips, council jobs, hospital appointments.</div></sc-if>
+    </div>
+    </sc-if>
+
+    <!-- VEHICLES -->
+    <sc-if value="{{ tabVehicles }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Vehicles">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="font-size:20px;font-weight:700;color:#16232e">Vehicles</div>
+        <button onClick="{{ onAddVehicle }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:8px 14px">+ Vehicle</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px">
+        <sc-for list="{{ vehCards }}" as="v" hint-placeholder-count="3">
+          <div style="background:#dfe5ea;border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:15px;font-weight:700;color:#16232e;background:#f7d54c;border:1.5px solid #16232e;border-radius:6px;padding:2px 10px;letter-spacing:.04em">{{ v.reg }}</span><span style="font-size:11.5px;font-weight:700;color:#5d6f7d">{{ v.tags }}</span></div>
+            <div style="font-size:12.5px;color:#3d4f5d">{{ v.desc }}</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+              <sc-for list="{{ v.expiries }}" as="e" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#16232e"><span>{{ e.l }}</span><span style="{{ e.style }}">{{ e.v }}</span></div></sc-for>
+            </div>
+            <sc-if value="{{ v.hasFaults }}" hint-placeholder-val="{{ false }}">
+              <div style="background:#eee3da;border-radius:8px;padding:8px 10px;display:flex;flex-direction:column;gap:5px">
+                <sc-for list="{{ v.faults }}" as="f" hint-placeholder-count="1"><div style="display:flex;justify-content:space-between;gap:8px;font-size:12px;color:#16232e"><span>⚠ {{ f.text }} <span style="color:#5d6f7d">— {{ f.by }}</span></span><button onClick="{{ f.onResolve }}" style="font-size:11px;font-weight:700;color:#2f7d5c;flex:none">Resolve</button></div></sc-for>
+              </div>
+            </sc-if>
+            <div style="display:flex;gap:6px">
+              <button onClick="{{ v.onEdit }}" style="flex:1;font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:7px 0">Edit</button>
+              <button onClick="{{ v.onFault }}" style="font-size:12px;font-weight:700;color:#8a5a12;background:#eadfcd;border-radius:7px;padding:7px 12px">+ Fault</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ noVehicles }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:50px 0;color:#3d4f5d;font-size:13.5px">No vehicles yet.</div></sc-if>
+    </div>
+    </sc-if>
+
+    <!-- REVIEW -->
+    <sc-if value="{{ tabReview }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Review">
+      <div style="font-size:20px;font-weight:700;color:#16232e;margin-bottom:14px">Manager review</div>
+      <sc-if value="{{ reviewEmpty }}" hint-placeholder-val="{{ false }}"><div style="background:#dfe5ea;border-radius:12px;padding:30px;text-align:center;color:#3d4f5d;font-size:13.5px;margin-bottom:14px">Nothing waiting for review.</div></sc-if>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+        <sc-for list="{{ reviewRows }}" as="r" hint-placeholder-count="2">
+          <div style="background:#dfe5ea;border-radius:12px;padding:14px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+            <sc-if value="{{ r.photo }}" hint-placeholder-val="{{ false }}"><div style="{{ r.photoStyle }}"></div></sc-if>
+            <div style="flex:1;min-width:220px">
+              <div style="font-size:14px;font-weight:700;color:#16232e">{{ r.title }}</div>
+              <div style="font-size:12px;color:#3d4f5d;margin:3px 0">{{ r.sub }}</div>
+              <sc-if value="{{ r.note }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;color:#16232e;background:#eef1f4;border-radius:7px;padding:7px 10px;margin-top:4px">“{{ r.note }}”</div></sc-if>
+            </div>
+            <div style="display:flex;gap:7px;flex:none;align-items:center">
+              <button onClick="{{ r.onBillable }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 16px">Billable</button>
+              <button onClick="{{ r.onNotBillable }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:9px 16px">Not billable</button>
+            </div>
+          </div>
+        </sc-for>
+        <sc-for list="{{ faultRows }}" as="f" hint-placeholder-count="1">
+          <div style="background:#dfe5ea;border-radius:12px;padding:14px;display:flex;gap:14px;align-items:center">
+            <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#16232e">⚠ Vehicle fault — {{ f.reg }}</div><div style="font-size:12px;color:#3d4f5d;margin-top:3px">{{ f.sub }}</div></div>
+            <button onClick="{{ f.onResolve }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#2f7d5c;border-radius:8px;padding:9px 16px">Mark resolved</button>
+          </div>
+        </sc-for>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#3d4f5d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">History (audit trail)</div>
+      <div style="background:#dfe5ea;border-radius:12px;padding:8px 14px;max-height:420px;overflow:auto">
+        <sc-for list="{{ histRows }}" as="h" hint-placeholder-count="6">
+          <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid #cdd6dd;font-size:12.5px;align-items:baseline">
+            <span style="color:#5d6f7d;flex:none;width:118px">{{ h.ts }}</span>
+            <span style="font-weight:700;color:#31576e;flex:none;width:92px">{{ h.user }}</span>
+            <span style="color:#16232e"><b>{{ h.action }}</b> — {{ h.detail }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ histEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:16px 0;color:#5d6f7d;font-size:12.5px">No history yet.</div></sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- REPORTS -->
+    <sc-if value="{{ tabReports }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Reports">
+      <div style="font-size:20px;font-weight:700;color:#16232e;margin-bottom:14px">Reports</div>
+      <div style="background:#dfe5ea;border-radius:12px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap">
+        <div><div style="font-size:11px;font-weight:700;color:#5d6f7d;margin-bottom:4px">FROM</div><input type="date" value="{{ repFrom }}" onChange="{{ onRepFrom }}" style="border:none;border-radius:8px;padding:8px 10px;font-size:13px;background:#eef1f4;color:#16232e"></div>
+        <div><div style="font-size:11px;font-weight:700;color:#5d6f7d;margin-bottom:4px">TO</div><input type="date" value="{{ repTo }}" onChange="{{ onRepTo }}" style="border:none;border-radius:8px;padding:8px 10px;font-size:13px;background:#eef1f4;color:#16232e"></div>
+        <button onClick="{{ onExportRuns }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">Export runs CSV</button>
+        <button onClick="{{ onExportCanc }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:9px 14px">Export cancellations CSV</button>
+      </div>
+      <div style="border-top:1px solid #cdd6dd;margin-top:14px;padding-top:12px">
+        <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Custom report — pick exactly what to include</div>
+        <div style="font-size:12px;color:#3d4f5d;margin-bottom:8px">Uses the date range above. Tap fields to include them, choose which runs, then download.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+          <sc-for list="{{ repFieldChips }}" as="c" hint-placeholder-count="8"><button onClick="{{ c.onToggle }}" style="{{ c.style }}">{{ c.l }}</button></sc-for>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <select value="{{ repFilter }}" onChange="{{ onRepFilter }}" style="border:none;border-radius:8px;padding:9px 12px;font-size:13px;background:#eef1f4;color:#16232e"><sc-for list="{{ repFilterOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+          <span style="font-size:12.5px;font-weight:700;color:#31576e">{{ repCount }}</span>
+          <button onClick="{{ onExportCustom }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#fff;background:#2f7d5c;border-radius:8px;padding:9px 16px">Download custom CSV</button>
+        </div>
+      </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px">
+        <sc-for list="{{ repStats }}" as="s" hint-placeholder-count="5"><div style="background:#dfe5ea;border-radius:10px;padding:11px 14px"><div style="{{ s.vStyle }}">{{ s.v }}</div><div style="font-size:11.5px;color:#5d6f7d">{{ s.l }}</div></div></sc-for>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:#3d4f5d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Cancellations in range</div>
+      <div style="background:#dfe5ea;border-radius:12px;padding:6px 14px">
+        <sc-for list="{{ repRows }}" as="r" hint-placeholder-count="3">
+          <div style="display:flex;gap:12px;padding:9px 0;border-bottom:1px solid #cdd6dd;font-size:12.5px;align-items:center">
+            <span style="color:#5d6f7d;flex:none;width:80px">{{ r.date }}</span>
+            <span style="font-weight:700;color:#16232e;flex:1">{{ r.name }}</span>
+            <span style="color:#3d4f5d;flex:1">{{ r.reason }}</span>
+            <span style="{{ r.chipStyle }}">{{ r.chip }}</span>
+          </div>
+        </sc-for>
+        <sc-if value="{{ repEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:16px 0;color:#5d6f7d;font-size:12.5px">No cancellations in this range.</div></sc-if>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- TUTORIAL -->
+    <sc-if value="{{ tabTutorial }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Tutorial" style="max-width:760px">
+      <div style="font-size:20px;font-weight:700;color:#16232e;margin-bottom:4px">Tutorial</div>
+      <div style="font-size:13px;color:#3d4f5d;margin-bottom:14px">A quick guide to everything in TransportHQ. Load demo data from Settings to try things safely.</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🔑 Logging in</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Everyone uses the same PIN screen. The manager PIN is set in Settings (default 000000 — change it!). Each driver and passenger assistant has their own 6-digit PIN, shown on the Staff page. Drivers and PAs see their own runs for today, plus as many days ahead as you allow in Settings → "Driver &amp; PA schedule visibility". Managers see everything.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🗂 The Home filing tabs</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6"><b>Runs</b> shows every journey for the chosen day (or week — use the Daily/Weekly switch). <b>Staff</b> shows who is working and exactly which runs each person has that day. <b>Holidays</b> is the calendar of school holidays, inset days and staff absences. Use ‹ Today › to change the date.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🚐 Managing runs</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Each run row shows the time, passenger, destination, then driver, PA and vehicle. An amber border means it needs attention (no driver, or the driver is absent). Press <b>Manage</b> to: edit <b>today only</b> (the recurring schedule is untouched), edit the whole schedule, mark picked up / dropped off, cancel with a reason, or reinstate.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🧒 Passengers &amp; schedules</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">A passenger's profile holds their address, school, wheelchair and PA needs, and their weekly journey pattern. For each day, switch the <b>Pickup</b> and <b>Return</b> journeys on or off — so a one-way trip on one day is fine. Times, driver, PA and vehicle can differ per day, and <b>Copy to all days</b> fills the week in one tap.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🧾 One-off jobs</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Single journeys outside the school runs — airport trips, council jobs, hospital appointments. Turn on <b>Add a return journey</b> to book the way back, on the same or a different day, with its own driver, PA and vehicle.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">📱 The driver's phone view</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Drivers and passenger assistants log in with their PIN and see today's runs in order, with any notes (gate codes, ramps). They can also see upcoming days — how many is up to you, in Settings → "Driver &amp; PA schedule visibility". Two taps do the work: <b>Picked up</b>, then <b>Dropped off</b> — each is time-stamped. <b>Cancel</b> asks for a reason; "No answer at door" asks for a photo of the door as evidence, and "Other" needs a note. Drivers can also report vehicle faults.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">✅ Manager review &amp; audit trail</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Every cancellation lands in <b>Review</b> with its reason, photo and note, where you decide <b>Billable</b> or <b>Not billable</b> — your evidence for council invoicing. Vehicle faults wait there too. Below is the full history: every important action, time-stamped with who did it.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🚗 Vehicles</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Keep MOT, insurance and tax dates — countdowns turn amber at 14 days. Log faults and quirks, and give a vehicle a nickname (e.g. "Silver bus") to show on the runs page instead of the reg.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🏖 Holidays, inset days &amp; absences</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Click any calendar day to add a school holiday, an inset day, or a staff absence. Holidays can apply to all schools or just one — only the affected school's runs are paused. Below the calendar: this month's absences, each staff member's holiday totals, and a by-school breakdown of all dates.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">📊 Reports</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Pick a date range for totals and the cancellation list. The <b>custom report builder</b> lets you choose exactly which fields to include and which runs (all, cancellations, jobs…), then downloads a CSV that opens in Excel — ideal for council billing evidence.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">📥 Imports &amp; backups (Settings)</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.6">Paste passengers, staff, and school holidays straight from your spreadsheets — the <b>?</b> button on each import box walks you through it step by step. Download a backup regularly; data lives on this device until the app moves to a shared online database.</div></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- SETTINGS -->
+    <sc-if value="{{ tabSettings }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Settings" style="max-width:640px">
+      <div style="font-size:20px;font-weight:700;color:#16232e;margin-bottom:14px">Settings</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Company</div>
+          <sc-if value="{{ companySet }}" hint-placeholder-val="{{ true }}">
+            <div style="font-size:15px;font-weight:700;color:#16232e;margin-bottom:10px">{{ companyName }}</div>
+          </sc-if>
+          <sc-if value="{{ canSetCompany }}" hint-placeholder-val="{{ false }}">
+            <div style="display:flex;gap:8px"><input value="{{ coName }}" onChange="{{ onCoName }}" placeholder="Company name" style="flex:1;border:none;border-radius:8px;padding:9px 12px;font-size:13px;background:#eef1f4;color:#16232e"><button onClick="{{ onSaveCo }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">Save</button></div>
+            <div style="font-size:11.5px;color:#5d6f7d;margin:4px 0 8px">Set once — the company name can't be changed afterwards.</div>
+          </sc-if>
+          <div style="display:flex;gap:8px"><input value="{{ mgrPin }}" onChange="{{ onMgrPin }}" placeholder="Manager PIN (6 digits)" maxLength="6" style="flex:1;border:none;border-radius:8px;padding:9px 12px;font-size:13px;background:#eef1f4;color:#16232e"><button onClick="{{ onSavePin }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:9px 14px">Change PIN</button></div>
+        </div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Driver &amp; PA schedule visibility</div>
+          <div style="font-size:12.5px;color:#3d4f5d;margin-bottom:10px">Choose how far ahead drivers and passenger assistants can see their runs on their phone. Today's runs are always shown.</div>
+          <div style="position:relative;display:inline-block">
+            <select value="{{ lookahead }}" onChange="{{ onLookahead }}" style="appearance:none;WebkitAppearance:none;border:none;border-radius:8px;padding:10px 46px 10px 14px;font-size:13.5px;font-weight:600;background:#eef1f4;color:#16232e;cursor:pointer"><sc-for list="{{ lookaheadOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+            <div style="position:absolute;top:0;right:0;bottom:0;width:32px;background:#1f8a8f;border-radius:0 8px 8px 0;display:grid;place-items:center;pointer-events:none;color:#fff;font-size:11px">▼</div>
+          </div>
+        </div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em">Import passengers from spreadsheet</div><button onClick="{{ onHelpPassengers }}" style="width:24px;height:24px;border-radius:50%;background:#31576e;color:#fff;font-size:13px;font-weight:700;flex:none">?</button></div>
+          <div style="font-size:12px;color:#3d4f5d;margin-bottom:8px">Paste rows copied from Excel/Sheets (or CSV). Columns: <b>name, address, town, postcode, school</b>, wheelchair (yes/no), assistant (yes/no)</div>
+          <textarea value="{{ csvText }}" onChange="{{ onCsvText }}" rows="5" placeholder="Emma Thompson, 23 Rose Street, Pembroke, SA71 4LN, St Mary's Primary, no, yes" style="width:100%;border:none;border-radius:8px;padding:9px 12px;font-size:12.5px;background:#eef1f4;color:#16232e;resize:vertical"></textarea>
+          <button onClick="{{ onImport }}" style="margin-top:8px;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">Import passengers</button>
+        </div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em">Import drivers &amp; assistants from spreadsheet</div><button onClick="{{ onHelpStaff }}" style="width:24px;height:24px;border-radius:50%;background:#31576e;color:#fff;font-size:13px;font-weight:700;flex:none">?</button></div>
+          <div style="font-size:12px;color:#3d4f5d;margin-bottom:8px">Paste rows copied from Excel/Sheets (or CSV). Columns: <b>name, pin (6 digits), phone, role</b> (driver / assistant). Missing PINs are generated automatically.</div>
+          <textarea value="{{ drvCsvText }}" onChange="{{ onDrvCsvText }}" rows="4" placeholder="John Smith, 123456, 07700 900001, driver" style="width:100%;border:none;border-radius:8px;padding:9px 12px;font-size:12.5px;background:#eef1f4;color:#16232e;resize:vertical"></textarea>
+          <button onClick="{{ onImportStaff }}" style="margin-top:8px;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">Import staff</button>
+        </div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em">Import school holidays &amp; inset days</div><button onClick="{{ onHelpHolidays }}" style="width:24px;height:24px;border-radius:50%;background:#31576e;color:#fff;font-size:13px;font-weight:700;flex:none">?</button></div>
+          <div style="font-size:12px;color:#3d4f5d;margin-bottom:8px">Columns: <b>from date, to date</b> (blank for one day), <b>description, school</b> (blank = all schools), <b>type</b> (holiday / inset). Dates as DD/MM/YYYY or YYYY-MM-DD.</div>
+          <textarea value="{{ holCsvText }}" onChange="{{ onHolCsvText }}" rows="4" placeholder="20/07/2026, 31/08/2026, Summer holidays&#10;01/09/2026, , Inset day — staff training, St Mary's Primary, inset" style="width:100%;border:none;border-radius:8px;padding:9px 12px;font-size:12.5px;background:#eef1f4;color:#16232e;resize:vertical"></textarea>
+          <button onClick="{{ onImportHolidays }}" style="margin-top:8px;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">Import holidays</button>
+        </div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Data</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onClick="{{ onBackup }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:9px 14px">Download backup</button>
+            <button onClick="{{ onLoadDemo }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#2f7d5c;border-radius:8px;padding:9px 14px">Load demo data</button>
+            <button onClick="{{ onClearAll }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#b3402f;border-radius:8px;padding:9px 14px">Delete all data</button>
+          </div>
+          <div style="font-size:11.5px;color:#5d6f7d;margin-top:8px">Data is stored in the cloud and synced across devices for your company. Deleting cannot be undone — download a backup first.</div>
+        </div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Company account</div>
+          <button onClick="{{ onSignOutCompany }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#b3402f;border-radius:8px;padding:9px 14px">Sign out of company account</button>
+          <div style="font-size:11.5px;color:#5d6f7d;margin-top:8px">This signs the whole device out of {{ companyName }}. You'll need your company email and password to sign back in.</div>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<!-- ═══════ DRIVER ═══════ -->
+<sc-if value="{{ showDriver }}" hint-placeholder-val="{{ false }}">
+<div data-screen-label="Driver" style="min-height:100vh;background:#b6c2cc;display:flex;justify-content:center">
+<div style="width:100%;max-width:440px;background:#c9d3da;min-height:100vh;display:flex;flex-direction:column">
+  <div style="background:#16232e;color:#fff;padding:16px 18px 14px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-size:12px;color:#8da2b3;font-weight:600">TransportHQ</span><button onClick="{{ onLogout }}" style="font-size:12px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:7px;padding:6px 12px">Log out</button></div>
+    <div style="font-size:18px;font-weight:700">{{ drvHello }}</div>
+    <div style="font-size:12px;color:#aebcc8;margin:2px 0 10px">{{ drvSub }}</div>
+    <div style="height:6px;background:#22323f;border-radius:99px;overflow:hidden"><div style="{{ drvProgressStyle }}"></div></div>
+  </div>
+  <div style="padding:14px;display:flex;flex-direction:column;gap:10px">
+    <sc-if value="{{ drvEmpty }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:40px 0;color:#3d4f5d;font-size:13.5px">No runs assigned today.</div></sc-if>
+    <sc-for list="{{ drvRuns }}" as="r" hint-placeholder-count="3">
+      <div style="{{ r.cardStyle }}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span style="font-size:15px;font-weight:700;color:#16232e">{{ r.time }} · {{ r.name }}</span><span style="{{ r.chipStyle }}">{{ r.chip }}</span></div>
+        <div style="font-size:12.5px;color:#3d4f5d;margin:4px 0 2px">{{ r.route }}</div>
+        <sc-if value="{{ r.flags }}" hint-placeholder-val="{{ false }}"><div style="font-size:11.5px;color:#8a5a12;font-weight:600;margin-top:2px">{{ r.flags }}</div></sc-if>
+        <sc-if value="{{ r.hasButtons }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <sc-for list="{{ r.buttons }}" as="b" hint-placeholder-count="2"><button onClick="{{ b.onClick }}" style="{{ b.style }}">{{ b.label }}</button></sc-for>
+          </div>
+        </sc-if>
+        <a href="{{ r.maps }}" target="_blank" style="display:block;text-align:center;font-size:12px;color:#1f8a8f;font-weight:700;margin-top:10px;text-decoration:none">Open in Maps ↗</a>
+      </div>
+    </sc-for>
+    <sc-if value="{{ hasUpcoming }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.07em;margin-top:4px;padding-left:2px">Coming up</div>
+      <sc-for list="{{ drvUpcoming }}" as="g" hint-placeholder-count="1">
+        <div style="background:#e3e8ec;border-radius:14px;padding:12px 14px">
+          <div style="font-size:12.5px;font-weight:700;color:#31576e;margin-bottom:6px">{{ g.label }}</div>
+          <div style="display:flex;flex-direction:column;gap:5px">
+            <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="2"><div style="font-size:12.5px;color:#16232e"><b>{{ i.time }}</b> · {{ i.name }}<br><span style="color:#5d6f7d;font-size:11.5px">{{ i.route }}</span></div></sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </sc-if>
+    <button onClick="{{ onDrvFault }}" style="text-align:center;font-size:12.5px;color:#3d4f5d;font-weight:700;padding:10px 0">⚠ Report a vehicle fault</button>
+  </div>
+</div>
+</div>
+</sc-if>
+
+<!-- ═══════ MODAL ═══════ -->
+<sc-if value="{{ modalOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(10,18,25,.55);display:flex;align-items:center;justify-content:center;padding:18px;z-index:100" onClick="{{ onOverlay }}">
+  <div style="background:#dfe5ea;border-radius:16px;width:100%;max-width:560px;max-height:88vh;overflow:auto;padding:18px" onClick="{{ stop }}">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:700;color:#16232e">{{ modalTitle }}</div>
+      <button onClick="{{ onModalClose }}" style="font-size:15px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;width:30px;height:30px">✕</button>
+    </div>
+
+    <sc-if value="{{ isChoice }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ choices }}" as="c" hint-placeholder-count="3">
+          <button onClick="{{ c.onClick }}" style="{{ c.style }}"><span style="font-size:13.5px;font-weight:700">{{ c.label }}</span><span style="font-size:11.5px;opacity:.8">{{ c.desc }}</span></button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isForm }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:11px">
+        <sc-for list="{{ formFields }}" as="f" hint-placeholder-count="4">
+          <div>
+            <sc-if value="{{ f.label }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">{{ f.label }}</div></sc-if>
+            <sc-if value="{{ f.isText }}" hint-placeholder-val="{{ false }}"><input value="{{ f.value }}" onChange="{{ f.onChange }}" placeholder="{{ f.ph }}" style="width:100%;border:none;border-radius:8px;padding:9px 12px;font-size:13.5px;background:#eef1f4;color:#16232e"></sc-if>
+            <sc-if value="{{ f.isTime }}" hint-placeholder-val="{{ false }}"><input type="time" value="{{ f.value }}" onChange="{{ f.onChange }}" style="border:none;border-radius:8px;padding:9px 12px;font-size:13.5px;background:#eef1f4;color:#16232e"></sc-if>
+            <sc-if value="{{ f.isDate }}" hint-placeholder-val="{{ false }}"><input type="date" value="{{ f.value }}" onChange="{{ f.onChange }}" style="border:none;border-radius:8px;padding:9px 12px;font-size:13.5px;background:#eef1f4;color:#16232e"></sc-if>
+            <sc-if value="{{ f.isTextarea }}" hint-placeholder-val="{{ false }}"><textarea value="{{ f.value }}" onChange="{{ f.onChange }}" rows="3" placeholder="{{ f.ph }}" style="width:100%;border:none;border-radius:8px;padding:9px 12px;font-size:13px;background:#eef1f4;color:#16232e;resize:vertical"></textarea></sc-if>
+            <sc-if value="{{ f.isSelect }}" hint-placeholder-val="{{ false }}"><select value="{{ f.value }}" onChange="{{ f.onChange }}" style="width:100%;border:none;border-radius:8px;padding:9px 12px;font-size:13.5px;background:#eef1f4;color:#16232e"><sc-for list="{{ f.options }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+            <sc-if value="{{ f.isCheck }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.onToggle }}" style="display:flex;align-items:center;gap:10px;background:none;padding:2px 0"><span style="{{ f.swTrackStyle }}"><span style="{{ f.swKnobStyle }}"></span></span><span style="{{ f.swTextStyle }}">{{ f.checkLabel }}</span></button></sc-if>
+            <sc-if value="{{ f.isDays }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:6px"><sc-for list="{{ f.days }}" as="d" hint-placeholder-count="7"><button onClick="{{ d.onToggle }}" style="{{ d.style }}">{{ d.l }}</button></sc-for></div></sc-if>
+            <sc-if value="{{ f.isRadio }}" hint-placeholder-val="{{ false }}"><div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ f.options }}" as="o" hint-placeholder-count="4"><button onClick="{{ o.onPick }}" style="{{ o.style }}">{{ o.l }}</button></sc-for></div></sc-if>
+            <sc-if value="{{ f.isFile }}" hint-placeholder-val="{{ false }}">
+              <input type="file" accept="image/*" capture="environment" onChange="{{ f.onFile }}" style="font-size:12.5px;color:#16232e">
+              <sc-if value="{{ f.photo }}" hint-placeholder-val="{{ false }}"><div style="{{ f.photoStyle }}"></div></sc-if>
+            </sc-if>
+            <sc-if value="{{ f.isPerday }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <sc-for list="{{ f.rows }}" as="r" hint-placeholder-count="3">
+                  <div style="background:#eef1f4;border-radius:10px;padding:10px 12px">
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap"><span style="font-size:12.5px;font-weight:700;color:#16232e">{{ r.label }}</span><sc-if value="{{ r.isEx }}" hint-placeholder-val="{{ false }}"><div style="display:flex;gap:8px;align-items:center"><input type="date" value="{{ r.exDate }}" onChange="{{ r.onExDate }}" style="border:none;border-radius:7px;padding:6px 9px;font-size:12px;background:#dfe5ea;color:#16232e"><button onClick="{{ r.onExRemove }}" style="font-size:11px;font-weight:700;color:#b3402f;border:1.5px solid #d8b9b2;border-radius:7px;padding:5px 10px;background:#fff">Remove</button></div></sc-if><sc-if value="{{ r.showCopy }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.onCopy }}" style="font-size:11px;font-weight:700;color:#fff;background:#1f8a8f;border:1.5px solid #187276;border-radius:7px;padding:6px 12px;box-shadow:0 1px 3px rgba(22,35,46,.18)">Copy to all days</button></sc-if></div>
+                    <div style="display:flex;flex-direction:column;gap:7px">
+                      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                        <button onClick="{{ r.onPtToggle }}" style="{{ r.ptOnStyle }}">{{ r.ptToggleLabel }}</button>
+                        <sc-if value="{{ r.ptOn }}" hint-placeholder-val="{{ false }}"><select value="{{ r.pt }}" onChange="{{ r.onPt }}" style="border:none;border-radius:7px;padding:7px 9px;font-size:12.5px;background:#dfe5ea;color:#16232e"><sc-for list="{{ r.ptOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+                        <button onClick="{{ r.onRtToggle }}" style="{{ r.rtOnStyle }}">{{ r.rtToggleLabel }}</button>
+                        <sc-if value="{{ r.rtOn }}" hint-placeholder-val="{{ false }}"><select value="{{ r.rt }}" onChange="{{ r.onRt }}" style="border:none;border-radius:7px;padding:7px 9px;font-size:12.5px;background:#dfe5ea;color:#16232e"><sc-for list="{{ r.rtOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select></sc-if>
+                      </div>
+                      <div style="display:flex;gap:8px;flex-wrap:wrap">
+                        <select value="{{ r.drv }}" onChange="{{ r.onDrv }}" style="border:none;border-radius:7px;padding:6px 8px;font-size:12px;background:#dfe5ea;color:#16232e"><sc-for list="{{ r.drvOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <select value="{{ r.asst }}" onChange="{{ r.onAsst }}" style="border:none;border-radius:7px;padding:6px 8px;font-size:12px;background:#dfe5ea;color:#16232e"><sc-for list="{{ r.asstOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                        <select value="{{ r.veh }}" onChange="{{ r.onVeh }}" style="border:none;border-radius:7px;padding:6px 8px;font-size:12px;background:#dfe5ea;color:#16232e"><sc-for list="{{ r.vehOpts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}">{{ o.l }}</option></sc-for></select>
+                      </div>
+                      <button onClick="{{ r.onDaToggle }}" style="{{ r.daStyle }}">Different address for this day?</button>
+                      <sc-if value="{{ r.daOn }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;gap:6px;flex-wrap:wrap">
+                          <input value="{{ r.daAddr }}" onChange="{{ r.onDaAddr }}" placeholder="Address (this day only)" style="flex:2 1 150px;border:none;border-radius:7px;padding:7px 9px;font-size:12px;background:#dfe5ea;color:#16232e">
+                          <input value="{{ r.daTown }}" onChange="{{ r.onDaTown }}" placeholder="Town" style="flex:1 1 90px;border:none;border-radius:7px;padding:7px 9px;font-size:12px;background:#dfe5ea;color:#16232e">
+                          <input value="{{ r.daPc }}" onChange="{{ r.onDaPc }}" placeholder="Postcode" style="flex:1 1 80px;border:none;border-radius:7px;padding:7px 9px;font-size:12px;background:#dfe5ea;color:#16232e">
+                        </div>
+                      </sc-if>
+                    </div>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ f.hasAddEx }}" hint-placeholder-val="{{ false }}"><button onClick="{{ f.onAddEx }}" style="align-self:flex-start;font-size:12px;font-weight:700;color:#1f8a8f;border:1.5px solid #1f8a8f;border-radius:8px;padding:8px 13px;background:#fff">+ Add exception date</button></sc-if>
+              </div>
+            </sc-if>
+            <sc-if value="{{ f.hint }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#5d6f7d;margin-top:4px">{{ f.hint }}</div></sc-if>
+          </div>
+        </sc-for>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <sc-if value="{{ modalDangerShow }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onModalDanger }}" style="font-size:12.5px;font-weight:700;color:#b3402f;background:#e9dedb;border-radius:9px;padding:11px 14px">{{ modalDangerLabel }}</button></sc-if>
+          <button onClick="{{ onModalClose }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#31576e;background:#cdd6dd;border-radius:9px;padding:11px 16px">Cancel</button>
+          <button onClick="{{ onModalSave }}" style="{{ modalSaveStyle }}">{{ modalSaveLabel }}</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isHelp }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <sc-for list="{{ helpParas }}" as="h" hint-placeholder-count="4">
+          <div><div style="font-size:13px;font-weight:700;color:#16232e;margin-bottom:3px">{{ h.t }}</div><div style="font-size:12.5px;color:#3d4f5d;line-height:1.55">{{ h.b }}</div></div>
+        </sc-for>
+        <div style="display:flex"><button onClick="{{ onModalClose }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:9px;padding:11px 20px">Got it</button></div>
+      </div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<!-- ═══════ WIZARD ═══════ -->
+<sc-if value="{{ wizOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;inset:0;background:rgba(10,18,25,.65);display:flex;align-items:center;justify-content:center;padding:18px;z-index:110">
+  <div data-screen-label="Setup wizard" style="background:#dfe5ea;border-radius:18px;width:100%;max-width:540px;max-height:90vh;overflow:auto;padding:22px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div style="width:34px;height:34px;border-radius:9px;background:#1f8a8f;display:grid;place-items:center"><svg width="19" height="19" viewBox="0 0 18 18"><circle cx="4.5" cy="13" r="2.4" fill="#fff"></circle><circle cx="13.5" cy="5" r="2.4" fill="#fff"></circle><path d="M6 11.5 L12 6.5" stroke="#fff" stroke-width="1.8" stroke-linecap="round"></path></svg></div>
+      <div style="font-size:17px;font-weight:700;color:#16232e">Welcome to TransportHQ</div>
+    </div>
+    <div style="display:flex;gap:5px;margin:12px 0 16px"><sc-for list="{{ wizDots }}" as="d" hint-placeholder-count="4"><div style="{{ d.style }}"></div></sc-for></div>
+
+    <sc-if value="{{ wizStep0 }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:13.5px;color:#3d4f5d;line-height:1.6;margin-bottom:14px">Let's get set up in 3 quick steps: your company, your drivers, then your passengers. You can also explore with sample data first.</div>
+      <div style="font-size:11px;font-weight:700;color:#5d6f7d;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Company name</div>
+      <input value="{{ wizCo }}" onChange="{{ onWizCo }}" placeholder="e.g. Pembroke Cars" style="width:100%;border:none;border-radius:8px;padding:10px 12px;font-size:13.5px;background:#eef1f4;color:#16232e">
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onClick="{{ onWizDemo }}" style="font-size:12.5px;font-weight:700;color:#31576e;background:#cdd6dd;border-radius:9px;padding:11px 14px">Load demo data instead</button>
+        <button onClick="{{ onWizNext }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:9px;padding:11px 22px">Start setup →</button>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ wizStep1 }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:14px;font-weight:700;color:#16232e;margin-bottom:4px">Add your drivers</div>
+      <div style="font-size:12.5px;color:#3d4f5d;margin-bottom:12px">Each driver gets a 6-digit PIN to log in on their phone.</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input value="{{ wizDName }}" onChange="{{ onWizDName }}" placeholder="Driver name" style="flex:1;border:none;border-radius:8px;padding:9px 12px;font-size:13px;background:#eef1f4;color:#16232e">
+        <input value="{{ wizDPin }}" onChange="{{ onWizDPin }}" placeholder="PIN (6 digits)" maxLength="6" style="width:120px;border:none;border-radius:8px;padding:9px 12px;font-size:13px;background:#eef1f4;color:#16232e">
+        <button onClick="{{ onWizAddDriver }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">Add</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+        <sc-for list="{{ wizDrivers }}" as="d" hint-placeholder-count="1"><div style="background:#eef1f4;border-radius:8px;padding:8px 12px;font-size:13px;color:#16232e;display:flex;justify-content:space-between"><b>{{ d.name }}</b><span style="color:#5d6f7d">PIN {{ d.pin }}</span></div></sc-for>
+      </div>
+      <div style="display:flex;gap:8px"><button onClick="{{ onWizBack }}" style="font-size:12.5px;font-weight:700;color:#31576e;background:#cdd6dd;border-radius:9px;padding:11px 14px">← Back</button><button onClick="{{ onWizNext }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:9px;padding:11px 22px">Next →</button></div>
+    </sc-if>
+
+    <sc-if value="{{ wizStep2 }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:14px;font-weight:700;color:#16232e;margin-bottom:4px">Import your passengers</div>
+      <div style="font-size:12.5px;color:#3d4f5d;margin-bottom:10px">Paste rows from your spreadsheet — columns: <b>name, address, town, postcode, school</b>, wheelchair (yes/no), assistant (yes/no). Or skip and add them one at a time later.</div>
+      <textarea value="{{ wizCsv }}" onChange="{{ onWizCsv }}" rows="6" placeholder="Emma Thompson, 23 Rose Street, Pembroke, SA71 4LN, St Mary's Primary, no, yes" style="width:100%;border:none;border-radius:8px;padding:9px 12px;font-size:12.5px;background:#eef1f4;color:#16232e;resize:vertical"></textarea>
+      <sc-if value="{{ wizImportMsg }}" hint-placeholder-val="{{ false }}"><div style="font-size:12.5px;font-weight:700;color:#2f7d5c;margin-top:6px">{{ wizImportMsg }}</div></sc-if>
+      <div style="display:flex;gap:8px;margin-top:14px"><button onClick="{{ onWizBack }}" style="font-size:12.5px;font-weight:700;color:#31576e;background:#cdd6dd;border-radius:9px;padding:11px 14px">← Back</button><button onClick="{{ onWizImport }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#2f7d5c;border-radius:9px;padding:11px 14px">Import</button><button onClick="{{ onWizNext }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:9px;padding:11px 22px">Next →</button></div>
+    </sc-if>
+
+    <sc-if value="{{ wizStep3 }}" hint-placeholder-val="{{ false }}">
+      <div style="font-size:14px;font-weight:700;color:#16232e;margin-bottom:8px">You're ready</div>
+      <div style="font-size:13px;color:#3d4f5d;line-height:1.8;margin-bottom:14px">{{ wizSummary }}<br>Next steps: open <b>Passengers</b> to give each passenger a school-run schedule, add your <b>Vehicles</b> with MOT/insurance dates, and give drivers their PINs.</div>
+      <div style="display:flex"><button onClick="{{ onWizFinish }}" style="margin-left:auto;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:9px;padding:11px 22px">Go to dashboard</button></div>
+    </sc-if>
+  </div>
+</div>
+</sc-if>
+
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1f8a8f"></rect><rect x="30" y="30" width="40" height="40" rx="10" fill="#16232e"></rect><rect x="47" y="38" width="6" height="6" fill="#fff"></rect><rect x="47" y="48" width="6" height="6" fill="#fff"></rect><rect x="47" y="58" width="6" height="6" fill="#fff"></rect></svg></template>
+
+<!-- toast -->
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#16232e;color:#fff;font-size:13px;font-weight:600;border-radius:10px;padding:11px 18px;z-index:200;box-shadow:0 8px 24px rgba(10,18,25,.4);max-width:90vw">{{ toast }}</div>
+</sc-if>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;use24hTime&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;clashWindowMins&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:30,&quot;min&quot;:5,&quot;max&quot;:120,&quot;unit&quot;:&quot;min&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Behaviour&quot;},&quot;requirePhotoNoAnswer&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behaviour&quot;}}">
+class Component extends DCLogic {
+  state = {
+    session: null, pin: '', err: '',
+    tab: 'home', homeTab: 'runs', runMode: 'daily',
+    date: '', calMonth: '', search: '',
+    repFrom: '', repTo: '',
+    modal: null, wizard: null, plus: false, toast: '',
+    coName: '', mgrPin: '', csvText: '',
+    data: null,
+    authUser: null, authChecked: false, authMode: 'login',
+    authCompany: '', authEmail: '', authPassword: '', authErr: '', authEmailVerified: false, authResetSent: false
+  };
+
+  // ── helpers ──
+  tISO() { return new Date().toISOString().split('T')[0]; }
+  addD(d, n) { const dt = new Date(d + 'T12:00:00'); dt.setDate(dt.getDate() + n); return dt.toISOString().split('T')[0]; }
+  dow(d) { return new Date(d + 'T12:00:00').getDay(); }
+  pretty(d) { const dt = new Date(d + 'T12:00:00'); return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()] + ' ' + dt.getDate() + ' ' + ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][dt.getMonth()]; }
+  fmtT(t) { if (!t) return '—'; if (this.props.use24hTime ?? true) return t; const [h, m] = t.split(':'); const hr = parseInt(h); return (hr % 12 || 12) + ':' + m + (hr >= 12 ? 'pm' : 'am'); }
+  clock(ts) { const d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+  gid() { return Math.random().toString(36).slice(2, 10); }
+  esc(s) { return String(s == null ? '' : s); }
+
+  componentDidMount() {
+    const t = this.tISO();
+    this.setState({ date: t, calMonth: t.slice(0, 7), repFrom: this.addD(t, -13), repTo: t });
+    this._onResize = () => { const n = window.innerWidth < 720; if (n !== this.state.narrow) this.setState({ narrow: n }); };
+    window.addEventListener('resize', this._onResize);
+    this.state.narrow = window.innerWidth < 720;
+    window.__fbAuth.onAuthStateChanged(user => {
+      if (user) {
+        this.setState({ authUser: user, authChecked: true, authEmailVerified: user.emailVerified });
+        if (user.emailVerified) this.loadFromCloud(user.uid);
+      } else {
+        this.setState({ authUser: null, authChecked: true, authEmailVerified: false, data: null });
+      }
+    });
+  }
+  recheckVerification() {
+    const u = window.__fbAuth.currentUser;
+    if (!u) return;
+    u.reload().then(() => {
+      this.setState({ authEmailVerified: u.emailVerified });
+      if (u.emailVerified) this.loadFromCloud(u.uid);
+      else this.showToast('Still not verified — check your inbox and click the link');
+    });
+  }
+  resendVerification() {
+    const u = window.__fbAuth.currentUser;
+    if (!u) return;
+    u.sendEmailVerification().then(() => this.showToast('Verification email sent again')).catch(() => this.showToast('Could not send — try again shortly'));
+  }
+  loadFromCloud(uid) {
+    window.__fbDb.collection('companies').doc(uid).collection('appdata').doc('main').get().then(snap => {
+      let data = snap.exists ? snap.data() : null;
+      if (!data) data = this.blankData();
+      this.setState({ data, coName: data.company || '', mgrPin: '' });
+    }).catch(() => { this.showToast('Could not load data — check your connection'); this.setState({ data: this.blankData() }); });
+  }
+  blankData() {
+    return { company: '', managerPin: '000000', setupDone: false, drivers: [], assistants: [], passengers: [], jobs: [], holidays: [], staffHolidays: [], vehicles: [], runStates: {}, history: [] };
+  }
+  persist(d) {
+    const uid = this.state.authUser && this.state.authUser.uid;
+    if (!uid) return;
+    const clean = JSON.parse(JSON.stringify(d));
+    window.__fbDb.collection('companies').doc(uid).collection('appdata').doc('main').set(clean)
+      .catch(() => { this.showToast('Could not save — check your connection'); });
+  }
+  onAuthCompany(e) { this.setState({ authCompany: e.target.value }); }
+  onAuthEmail(e) { this.setState({ authEmail: e.target.value }); }
+  onAuthPassword(e) { this.setState({ authPassword: e.target.value }); }
+  onAuthModeLogin() { this.setState({ authMode: 'login', authErr: '', authResetSent: false }); }
+  onAuthModeSignup() { this.setState({ authMode: 'signup', authErr: '', authResetSent: false }); }
+  forgotPassword() {
+    const S = this.state;
+    if (!S.authEmail) { this.setState({ authErr: 'Enter your email address above first, then tap Forgot your password?', authResetSent: false }); return; }
+    window.__fbAuth.sendPasswordResetEmail(S.authEmail).then(() => {
+      this.setState({ authResetSent: true, authErr: '' });
+    }).catch(err => { this.setState({ authErr: err.message, authResetSent: false }); });
+  }
+  authSubmit() {
+    const S = this.state;
+    if (!S.authEmail || !S.authPassword) { this.setState({ authErr: 'Enter your email and password' }); return; }
+    if (S.authMode === 'signup') {
+      if (!S.authCompany.trim()) { this.setState({ authErr: 'Enter your company name' }); return; }
+      window.__fbAuth.createUserWithEmailAndPassword(S.authEmail, S.authPassword).then(cred => {
+        const blank = this.blankData();
+        blank.company = S.authCompany.trim();
+        window.__fbDb.collection('companies').doc(cred.user.uid).collection('appdata').doc('main').set(blank).then(() => {
+          return cred.user.sendEmailVerification();
+        }).then(() => {
+          this.setState({ authErr: '', authPassword: '', authEmailVerified: false });
+        });
+      }).catch(err => { this.setState({ authErr: err.message }); });
+    } else {
+      window.__fbAuth.signInWithEmailAndPassword(S.authEmail, S.authPassword)
+        .catch(err => { this.setState({ authErr: err.message }); });
+    }
+  }
+  signOutCompany() {
+    window.__fbAuth.signOut();
+    this.setState({ session: null, pin: '', data: null, authEmail: '', authPassword: '' });
+  }
+  mut(fn) { const d = JSON.parse(JSON.stringify(this.state.data)); fn(d); this.persist(d); this.setState({ data: d }); }
+  log(d, action, detail) {
+    d.history.unshift({ ts: Date.now(), user: this.userName(), action, detail });
+    if (d.history.length > 600) d.history.length = 600;
+  }
+  userName() {
+    const s = this.state.session;
+    if (!s) return 'System';
+    if (s.role === 'manager') return 'Manager';
+    return s.name;
+  }
+  showToast(msg) { this.setState({ toast: msg }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 3200); }
+
+  // ── runs computation ──
+  cfgFor(p, dw) { const s = p.schedule; if (!s || !s.days.includes(dw)) return null; return s.perday[dw] || null; }
+  isHol(d, date) { return d.holidays.some(h => h.date === date); }
+  staffAbsent(d, staffId, date) { return d.staffHolidays.some(a => a.staffId === staffId && a.date === date); }
+  nameOf(list, id) { const x = list.find(i => i.id === id); return x ? x.name : ''; }
+  vLabel(d, vid) { const v = d.vehicles.find(x => x.id === vid); return v ? (v.useNickname && v.nickname ? v.nickname : v.reg) : ''; }
+
+  computeRuns(d, date) {
+    const dw = this.dow(date), out = [];
+    const holEntries = d.holidays.filter(h => h.date === date);
+    const hol = holEntries.some(h => !h.school);
+    {
+      for (const p of d.passengers) {
+        if (p.archived) continue;
+        const ex = (p.exceptions || []).find(x => x.date === date);
+        if (!ex && holEntries.some(h => !h.school || h.school === (p.school || ''))) continue;
+        const cfg = ex || this.cfgFor(p, dw);
+        if (!cfg) continue;
+        const homeAddr = (cfg.diffAddr && (cfg.addr || cfg.town)) ? [cfg.addr, cfg.town].filter(Boolean).join(', ') : (p.address + ', ' + p.town);
+        for (const leg of ['pickup', 'return']) {
+          const time = leg === 'pickup' ? cfg.pt : cfg.rt;
+          if (!time) continue;
+          const key = 'p' + p.id + '|' + date + '|' + leg;
+          const st = d.runStates[key] || {};
+          const ed = st.edit || {};
+          const driverId = ed.driverId !== undefined ? ed.driverId : cfg.driverId;
+          const asstId = ed.assistantId !== undefined ? ed.assistantId : cfg.assistantId;
+          out.push({
+            key, kind: 'sched', pid: p.id, leg, date,
+            time: ed.time || time,
+            name: p.name,
+            from: leg === 'pickup' ? homeAddr : (p.school || 'School'),
+            to: leg === 'pickup' ? (p.school || 'School') : homeAddr,
+            driverId, driverName: this.nameOf(d.drivers, driverId),
+            assistantId: asstId, assistantName: this.nameOf(d.assistants, asstId),
+            vehicleId: ed.vehicleId !== undefined ? ed.vehicleId : cfg.vehicleId,
+            wheelchair: !!p.wheelchair, needsPA: !!p.needsPA, notes: p.notes || '', school: p.school || '',
+            status: st.status || 'scheduled', st
+          });
+        }
+      }
+    }
+    for (const j of d.jobs) {
+      if (j.date !== date) continue;
+      const key = 'j' + j.id + '|' + date + '|job';
+      const st = d.runStates[key] || {};
+      out.push({
+        key, kind: 'job', jid: j.id, leg: 'job', date, time: j.time, name: j.customer,
+        from: j.pickup, to: j.dropoff,
+        driverId: j.driverId, driverName: this.nameOf(d.drivers, j.driverId),
+        assistantId: j.assistantId, assistantName: this.nameOf(d.assistants, j.assistantId),
+        vehicleId: j.vehicleId, wheelchair: false, needsPA: false, notes: j.notes || '', school: '',
+        status: st.status || 'scheduled', st
+      });
+    }
+    out.sort((a, b) => (a.time || '99') < (b.time || '99') ? -1 : 1);
+    return { runs: out, hol, holEntries };
+  }
+  pendingReviews(d) {
+    const out = [];
+    for (const [key, st] of Object.entries(d.runStates)) {
+      if (st.status === 'cancelled' && st.cancel && !st.cancel.decision) out.push({ key, st });
+    }
+    out.sort((a, b) => (b.st.cancel.at || 0) - (a.st.cancel.at || 0));
+    return out;
+  }
+  pendingFaults(d) {
+    const out = [];
+    for (const v of d.vehicles) for (const f of (v.faults || [])) if (!f.resolved) out.push({ v, f });
+    return out;
+  }
+  runFromKey(d, key) {
+    const [head, date] = key.split('|');
+    const { runs } = this.computeRuns(d, date);
+    return runs.find(r => r.key === key);
+  }
+  daysLeft(dateStr) { if (!dateStr) return null; return Math.round((new Date(dateStr + 'T12:00:00') - new Date(this.tISO() + 'T12:00:00')) / 86400000); }
+
+  // ── login ──
+  press(k) {
+    if (k === 'del') { this.setState({ pin: this.state.pin.slice(0, -1), err: '' }); return; }
+    if (k === 'clr') { this.setState({ pin: '', err: '' }); return; }
+    const pin = (this.state.pin + k).slice(0, 6);
+    if (pin.length < 6) { this.setState({ pin, err: '' }); return; }
+    const d = this.state.data;
+    if (pin === (d.managerPin || '000000')) {
+      const wiz = (!d.setupDone && d.drivers.length === 0 && d.passengers.length === 0) ? { step: 0, dName: '', dPin: '', csv: '', msg: '' } : null;
+      this.setState({ session: { role: 'manager' }, pin: '', tab: 'home', wizard: wiz });
+      this.mut(dd => this.logAs(dd, 'Manager', 'Logged in', 'Manager login')); return;
+    }
+    const drv = d.drivers.find(x => x.pin === pin);
+    if (drv) { this.setState({ session: { role: 'driver', id: drv.id, name: drv.name }, pin: '' }); this.mut(dd => this.logAs(dd, drv.name, 'Logged in', 'Driver login')); return; }
+    const ast = d.assistants.find(x => x.pin === pin);
+    if (ast) { this.setState({ session: { role: 'assistant', id: ast.id, name: ast.name }, pin: '' }); this.mut(dd => this.logAs(dd, ast.name, 'Logged in', 'Assistant login')); return; }
+    this.setState({ pin: '', err: 'PIN not recognised. Check with your manager.' });
+  }
+  logAs(d, user, action, detail) { d.history.unshift({ ts: Date.now(), user, action, detail }); if (d.history.length > 600) d.history.length = 600; }
+  logout() { this.setState({ session: null, pin: '', err: '', modal: null, wizard: null, tab: 'home' }); }
+
+  // ── modal plumbing ──
+  openForm(kind, title, values, meta) { this.setState({ modal: { kind, title, values, meta: meta || {} }, plus: false }); }
+  mv(k, val) { const m = { ...this.state.modal }; m.values = { ...m.values, [k]: val }; this.setState({ modal: m }); }
+  closeModal() { this.setState({ modal: null }); }
+
+  resizePhoto(file, cb) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 900, sc = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = img.width * sc; c.height = img.height * sc;
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        cb(c.toDataURL('image/jpeg', 0.65));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── clash check ──
+  mins(t) { if (!t) return -1; const [h, m] = t.split(':'); return h * 60 + +m; }
+  clashWarn(d, driverId, date, time, excludeKey) {
+    if (!driverId || !time) return null;
+    const win = this.props.clashWindowMins ?? 30;
+    const { runs } = this.computeRuns(d, date);
+    const c = runs.find(r => r.key !== excludeKey && r.driverId === driverId && r.status !== 'cancelled' && Math.abs(this.mins(r.time) - this.mins(time)) < win);
+    return c;
+  }
+
+  // ── saves ──
+  savePassenger() {
+    const m = this.state.modal, v = m.values;
+    if (!v.name.trim()) { this.showToast('Name is required'); return; }
+    this.mut(d => {
+      let p = m.meta.pid ? d.passengers.find(x => x.id === m.meta.pid) : null;
+      const isNew = !p;
+      if (!p) { p = { id: this.gid() }; d.passengers.push(p); }
+      Object.assign(p, { name: v.name.trim(), address: v.address, town: v.town, postcode: v.postcode, school: v.school, wheelchair: v.wheelchair, needsPA: v.needsPA, notes: v.notes, archived: false });
+      const perday = {};
+      for (const dw of v.days) perday[dw] = { ...(v.perday[dw] || { pt: '', rt: '', driverId: '', assistantId: '', vehicleId: '' }) };
+      p.schedule = { days: [...v.days], perday };
+      p.exceptions = (v.exceptions || []).filter(x => x.date).map(x => ({ ...x }));
+      this.log(d, isNew ? 'Passenger added' : 'Passenger updated', p.name);
+    });
+    this.closeModal(); this.showToast('Saved ' + v.name);
+  }
+  saveStaff() {
+    const m = this.state.modal, v = m.values;
+    if (!v.name.trim()) { this.showToast('Name is required'); return; }
+    if (v.pin && !/^\d{6}$/.test(v.pin)) { this.showToast('PIN must be 6 digits'); return; }
+    this.mut(d => {
+      const list = v.role === 'assistant' ? d.assistants : d.drivers;
+      let s = m.meta.sid ? (d.drivers.concat(d.assistants)).find(x => x.id === m.meta.sid) : null;
+      const isNew = !s;
+      if (!s) { s = { id: this.gid() }; list.push(s); }
+      Object.assign(s, { name: v.name.trim(), pin: v.pin, phone: v.phone, workDays: [...v.days], vehicleId: v.vehicleId, notes: v.notes || '' });
+      this.log(d, isNew ? 'Staff added' : 'Staff updated', v.name + ' (' + v.role + ')');
+    });
+    this.closeModal(); this.showToast('Saved ' + v.name);
+  }
+  saveVehicle() {
+    const m = this.state.modal, v = m.values;
+    if (!v.reg.trim()) { this.showToast('Registration is required'); return; }
+    this.mut(d => {
+      let x = m.meta.vid ? d.vehicles.find(i => i.id === m.meta.vid) : null;
+      const isNew = !x;
+      if (!x) { x = { id: this.gid(), faults: [] }; d.vehicles.push(x); }
+      Object.assign(x, { reg: v.reg.trim().toUpperCase(), nickname: (v.nickname || '').trim(), useNickname: !!v.useNickname, make: v.make, seats: v.seats, wheelchair: v.wheelchair, defaultDriverId: v.driverId, mot: v.mot, ins: v.ins, tax: v.tax, notes: v.notes });
+      this.log(d, isNew ? 'Vehicle added' : 'Vehicle updated', x.reg);
+    });
+    this.closeModal(); this.showToast('Saved vehicle');
+  }
+  saveJob() {
+    const m = this.state.modal, v = m.values;
+    if (!v.customer.trim() || !v.date) { this.showToast('Customer and date are required'); return; }
+    if (v.addReturn && !v.returnTime) { this.showToast('Set a time for the return journey'); return; }
+    this.mut(d => {
+      let j = m.meta.jid ? d.jobs.find(i => i.id === m.meta.jid) : null;
+      const isNew = !j;
+      if (!j) { j = { id: this.gid() }; d.jobs.push(j); }
+      Object.assign(j, { customer: v.customer.trim(), date: v.date, time: v.time, pickup: v.pickup, dropoff: v.dropoff, driverId: v.driverId, assistantId: v.assistantId, vehicleId: v.vehicleId, notes: v.notes });
+      this.log(d, isNew ? 'One-off job added' : 'Job updated', j.customer + ' on ' + j.date);
+      if (v.addReturn && v.returnTime) {
+        const rj = { id: this.gid(), customer: v.customer.trim(), date: v.returnDate || v.date, time: v.returnTime, pickup: v.dropoff, dropoff: v.pickup, driverId: v.returnDriverId === undefined ? v.driverId : v.returnDriverId, assistantId: v.returnAssistantId === undefined ? v.assistantId : v.returnAssistantId, vehicleId: v.returnVehicleId === undefined ? v.vehicleId : v.returnVehicleId, notes: (v.notes ? v.notes + ' · ' : '') + 'Return journey' };
+        d.jobs.push(rj);
+        this.log(d, 'One-off job added', rj.customer + ' return on ' + rj.date);
+      }
+    });
+    this.closeModal(); this.showToast('Job saved');
+  }
+  saveAbsence() {
+    const m = this.state.modal, v = m.values;
+    if (!v.staffId || !v.from || !v.to) { this.showToast('Pick staff and dates'); return; }
+    this.mut(d => {
+      let cur = v.from, n = 0;
+      while (cur <= v.to && n < 60) { d.staffHolidays.push({ id: this.gid(), staffId: v.staffId, date: cur, type: v.type }); cur = this.addD(cur, 1); n++; }
+      this.log(d, 'Absence added', this.nameOf(d.drivers.concat(d.assistants), v.staffId) + ' ' + v.from + ' → ' + v.to + ' (' + v.type + ')');
+    });
+    this.closeModal(); this.showToast('Absence recorded');
+  }
+  saveEditToday() {
+    const m = this.state.modal, v = m.values, run = m.meta.run;
+    this.mut(d => {
+      const st = d.runStates[run.key] || {};
+      st.edit = { time: v.time, driverId: v.driverId, assistantId: v.assistantId, vehicleId: v.vehicleId };
+      d.runStates[run.key] = st;
+      this.log(d, 'Run edited (today only)', run.name + ' ' + run.leg + ' on ' + run.date);
+      const cl = this.clashWarn(d, v.driverId, run.date, v.time, run.key);
+      if (cl) this._pendToast = 'Warning: ' + this.nameOf(d.drivers, v.driverId) + ' also has ' + cl.name + ' at ' + cl.time;
+    });
+    this.closeModal(); this.showToast(this._pendToast || 'Updated for today only'); this._pendToast = '';
+  }
+  saveCancel() {
+    const m = this.state.modal, v = m.values, run = m.meta.run;
+    if (!v.reason) { this.showToast('Choose a reason'); return; }
+    if (v.reason === 'other' && !v.note.trim()) { this.showToast('A note is required for “Other”'); return; }
+    if (v.reason === 'no_answer' && (this.props.requirePhotoNoAnswer ?? true) && !v.photo && this.state.session.role !== 'manager') { this.showToast('Please take a photo of the door as evidence'); return; }
+    const labels = { no_answer: 'No answer at door', guardian: 'Parent/guardian said not travelling', passenger: 'Passenger said not travelling', school: 'School/council advised not travelling', other: 'Other' };
+    this.mut(d => {
+      const st = d.runStates[run.key] || {};
+      st.status = 'cancelled';
+      st.cancel = { reason: v.reason, label: labels[v.reason], note: v.note, photo: v.photo || '', at: Date.now(), by: this.userName(), decision: null, name: run.name, date: run.date, leg: run.leg };
+      d.runStates[run.key] = st;
+      this.log(d, 'Run cancelled', run.name + ' (' + labels[v.reason] + ') → sent to review');
+    });
+    this.closeModal(); this.showToast('Cancelled — sent to manager review');
+  }
+  saveFault() {
+    const m = this.state.modal, v = m.values;
+    if (!v.vehicleId || !v.text.trim()) { this.showToast('Pick a vehicle and describe the fault'); return; }
+    this.mut(d => {
+      const veh = d.vehicles.find(x => x.id === v.vehicleId);
+      if (!veh.faults) veh.faults = [];
+      veh.faults.push({ id: this.gid(), text: v.text.trim(), by: this.userName(), at: Date.now(), resolved: false });
+      this.log(d, 'Fault reported', veh.reg + ': ' + v.text.trim());
+    });
+    this.closeModal(); this.showToast('Fault reported');
+  }
+
+  // ── run actions ──
+  markStatus(run, status) {
+    this.mut(d => {
+      const st = d.runStates[run.key] || {};
+      st.status = status;
+      if (status === 'pickedUp') st.pickedUpAt = Date.now();
+      if (status === 'droppedOff') st.droppedOffAt = Date.now();
+      d.runStates[run.key] = st;
+      this.log(d, status === 'pickedUp' ? 'Picked up' : 'Dropped off', run.name + ' at ' + this.clock(Date.now()));
+    });
+  }
+  reinstate(run) {
+    this.mut(d => { const st = d.runStates[run.key]; if (st) { delete st.status; delete st.cancel; } this.log(d, 'Run reinstated', run.name + ' ' + run.leg + ' on ' + run.date); });
+    this.closeModal(); this.showToast('Run reinstated');
+  }
+  decide(key, decision) {
+    this.mut(d => {
+      const st = d.runStates[key];
+      if (st && st.cancel) { st.cancel.decision = decision; st.cancel.decidedBy = this.userName(); st.cancel.decidedAt = Date.now(); this.log(d, decision === 'billable' ? 'Marked billable' : 'Marked not billable', st.cancel.name + ' — ' + st.cancel.label); }
+    });
+    this.showToast('Decision saved');
+  }
+  resolveFault(vid, fid) {
+    this.mut(d => { const v = d.vehicles.find(x => x.id === vid); const f = v.faults.find(x => x.id === fid); f.resolved = true; f.resolvedBy = this.userName(); f.resolvedAt = Date.now(); this.log(d, 'Fault resolved', v.reg + ': ' + f.text); });
+    this.showToast('Fault resolved');
+  }
+
+  // ── openers ──
+  openPassenger(p) {
+    const drs = this.state.data.drivers, days = p && p.schedule ? [...p.schedule.days] : [1, 2, 3, 4, 5];
+    const perday = {};
+    if (p && p.schedule) for (const [k, c] of Object.entries(p.schedule.perday)) perday[k] = { ...c };
+    this.openForm('passenger', p ? 'Edit passenger' : 'New passenger', {
+      name: p ? p.name : '', address: p ? p.address : '', town: p ? p.town : '', postcode: p ? p.postcode : '', school: p ? p.school : '',
+      wheelchair: p ? !!p.wheelchair : false, needsPA: p ? !!p.needsPA : false, notes: p ? p.notes || '' : '', days, perday,
+      exceptions: p && p.exceptions ? p.exceptions.map(x => ({ ...x })) : []
+    }, { pid: p ? p.id : null });
+  }
+  openStaff(s, role) {
+    this.openForm('staff', s ? 'Edit staff' : ('New ' + role), { name: s ? s.name : '', pin: s ? s.pin || '' : '', phone: s ? s.phone || '' : '', role, days: s && s.workDays ? [...s.workDays] : [1, 2, 3, 4, 5], vehicleId: s ? s.vehicleId || '' : '', notes: s ? s.notes || '' : '' }, { sid: s ? s.id : null });
+  }
+  openVehicle(v) {
+    this.openForm('vehicle', v ? 'Edit vehicle' : 'New vehicle', { reg: v ? v.reg : '', nickname: v ? v.nickname || '' : '', useNickname: v ? !!v.useNickname : false, make: v ? v.make || '' : '', seats: v ? v.seats || '' : '', wheelchair: v ? !!v.wheelchair : false, driverId: v ? v.defaultDriverId || '' : '', mot: v ? v.mot || '' : '', ins: v ? v.ins || '' : '', tax: v ? v.tax || '' : '', notes: v ? v.notes || '' : '' }, { vid: v ? v.id : null });
+  }
+  openJob(j) {
+    this.openForm('job', j ? 'Edit one-off job' : 'New one-off job', { customer: j ? j.customer : '', date: j ? j.date : this.state.date, time: j ? j.time : '', pickup: j ? j.pickup : '', dropoff: j ? j.dropoff : '', driverId: j ? j.driverId || '' : '', assistantId: j ? j.assistantId || '' : '', vehicleId: j ? j.vehicleId || '' : '', notes: j ? j.notes || '' : '' }, { jid: j ? j.id : null });
+  }
+  openAbsence(staffId) { this.openForm('absence', 'Record absence', { staffId: staffId || '', from: this.state.date, to: this.state.date, type: 'holiday' }, {}); }
+  openCancel(run) { this.openForm('cancel', 'Cancel run — ' + run.name, { reason: '', note: '', photo: '' }, { run }); }
+  openEditToday(run) { this.openForm('editToday', 'Edit today only — ' + run.name, { time: run.time, driverId: run.driverId || '', assistantId: run.assistantId || '', vehicleId: run.vehicleId || '' }, { run }); }
+  openFault(vid) { this.openForm('fault', 'Report vehicle fault', { vehicleId: vid || '', text: '' }, {}); }
+  openHoliday(date) { this.openForm('holiday', 'Add to ' + this.pretty(date), { kind: 'holiday', school: '', name: '', staffId: '', absType: 'holiday' }, { date }); }
+  openHelp(which) {
+    const paras = which === 'passengers' ? [
+      { t: '1 — Set up your spreadsheet', b: 'One row per passenger. Columns in this order: Name, Address, Town, Postcode, School, Wheelchair (yes/no), Needs assistant (yes/no). Only the name is essential — leave anything else blank and fill it in later.' },
+      { t: '2 — Copy the rows', b: 'In Excel or Google Sheets, click and drag to highlight the passenger rows. You can skip the header row — if you include it, it is ignored automatically. Press Ctrl+C (Cmd+C on Mac).' },
+      { t: '3 — Paste into the import box', b: 'Click into the import box and press Ctrl+V (Cmd+V on Mac). Each passenger appears on its own line. Copied cells arrive separated by tabs — commas also work, so a plain CSV list is fine too.' },
+      { t: '4 — Press Import', b: 'You will see how many passengers were recognised. They arrive without run times, so open each one in Passengers and set their journey days, times and driver.' },
+      { t: 'Columns in a different order?', b: 'Rearrange the columns in your spreadsheet before copying — the import always reads them in the order above. Any extra columns after the first seven are ignored.' }
+    ] : [
+      { t: '1 — Set up your spreadsheet', b: 'One row per staff member. Columns in this order: Name, PIN (6 digits), Phone, Role (driver or assistant). Only the name is essential.' },
+      { t: '2 — Copy and paste', b: 'Highlight the rows in Excel or Google Sheets, press Ctrl+C (Cmd+C on Mac), then click into the import box and press Ctrl+V. Tabs or commas both work, and a header row is ignored automatically.' },
+      { t: '3 — About PINs', b: 'If a PIN is missing or not exactly 6 digits, a random one is generated for you. Every PIN is visible on the Staff page afterwards — that is the number each person types on the login screen.' },
+      { t: '4 — About roles', b: 'Write "driver" or "assistant" in the role column. Anything else (or blank) is treated as a driver. Working days default to Mon–Fri — edit each person on the Staff page to change them.' }
+    ];
+    const holParas = [
+      { t: '1 — Set up your spreadsheet', b: 'One row per holiday or inset day. Columns in this order: From date, To date (leave blank for a single day), Description, School (leave blank for all schools), Type (holiday or inset).' },
+      { t: '2 — Dates', b: 'Use DD/MM/YYYY or YYYY-MM-DD. A from–to range fills in every day between, e.g. "20/07/2026, 31/08/2026, Summer holidays". A single inset day: "01/09/2026, , Inset day — staff training, St Mary\u2019s Primary, inset".' },
+      { t: '3 — Copy, paste, import', b: 'Highlight the rows, press Ctrl+C (Cmd+C on Mac), click into the import box and press Ctrl+V, then press Import. Everything appears on the Holidays calendar and in the by-school breakdown, and affected school runs pause automatically.' }
+    ];
+    const copyTip = { t: 'Don\u2019t want to change your original spreadsheet?', b: 'Save a copy first — File → Save As in Excel, or File → Make a copy in Google Sheets — and rearrange the columns in the copy. Your original file stays exactly as it is; you just copy and paste from the rearranged copy.' };
+    const finalParas = (which === 'passengers' ? paras : which === 'staff' ? paras : holParas).concat([copyTip]);
+    const titles = { passengers: 'How to import passengers', staff: 'How to import staff', holidays: 'How to import school holidays & inset days' };
+    this.setState({ modal: { kind: 'help', title: titles[which], meta: { paras: finalParas } } });
+  }
+  parseHolDate(s) {
+    s = (s || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+    const m = s.match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2,4})$/);
+    if (!m) return null;
+    let [, dd, mm, yy] = m;
+    if (yy.length === 2) yy = '20' + yy;
+    return yy + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+  }
+  parseHolCsv(text) {
+    const rows = text.split(/\r?\n/).map(r => r.trim()).filter(Boolean);
+    const out = [];
+    for (const row of rows) {
+      const cols = (row.includes('\t') ? row.split('\t') : row.split(',')).map(c => (c || '').trim());
+      const from = this.parseHolDate(cols[0]);
+      if (!from) continue;
+      let to = this.parseHolDate(cols[1]), rest = cols.slice(2);
+      if (!to) { to = from; if ((cols[1] || '').length) rest = cols.slice(1); }
+      const [desc, school, type] = rest;
+      const ty = /inset/i.test(type || '') || /inset/i.test(desc || '') ? 'inset' : 'holiday';
+      let cur = from, n = 0;
+      while (cur <= to && n < 90) {
+        out.push({ date: cur, name: (desc || '').trim() || (ty === 'inset' ? 'Inset day' : 'Holiday'), school: (school || '').trim(), type: ty });
+        cur = this.addD(cur, 1); n++;
+      }
+    }
+    return out;
+  }
+  saveHoliday() {
+    const m = this.state.modal, v = m.values, date = m.meta.date;
+    if (v.kind === 'staff') {
+      if (!v.staffId) { this.showToast('Choose a staff member'); return; }
+      this.mut(d => {
+        d.staffHolidays.push({ id: this.gid(), staffId: v.staffId, date, type: v.absType });
+        this.log(d, 'Absence added', this.nameOf(d.drivers.concat(d.assistants), v.staffId) + ' — ' + this.pretty(date) + ' (' + v.absType + ')');
+      });
+    } else {
+      if (!v.name.trim()) { this.showToast('Please describe it — e.g. Summer holidays, Inset day (staff training)'); return; }
+      this.mut(d => {
+        d.holidays.push({ date, school: v.school, type: v.kind, name: v.name.trim() });
+        this.log(d, v.kind === 'inset' ? 'Inset day added' : 'School holiday added', this.pretty(date) + ' — ' + v.name.trim() + ' (' + (v.school || 'All schools') + ')');
+      });
+    }
+    this.closeModal(); this.showToast('Added to ' + this.pretty(date));
+  }
+  parseStaffCsv(text) {
+    const rows = text.split(/\r?\n/).map(r => r.trim()).filter(Boolean);
+    const out = { drivers: [], assistants: [] };
+    for (const row of rows) {
+      const cols = row.includes('\t') ? row.split('\t') : row.split(',');
+      let [name, pin, phone, role] = cols.map(c => (c || '').trim());
+      if (!name || /^name$/i.test(name)) continue;
+      if (!/^\d{6}$/.test(pin || '')) pin = String(Math.floor(100000 + Math.random() * 900000));
+      const rec = { id: this.gid(), name, pin, phone: phone || '', workDays: [1, 2, 3, 4, 5], vehicleId: '' };
+      if (/^(assistant|pa|passenger assistant)$/i.test(role || '')) out.assistants.push(rec); else out.drivers.push(rec);
+    }
+    return out;
+  }
+  repFieldDefs() {
+    return [['date','Date'],['time','Time'],['type','Pickup / return / job'],['passenger','Passenger / customer'],['school','School'],['from','From address'],['to','To address'],['driver','Driver'],['assistant','Passenger assistant'],['vehicle','Vehicle'],['wheelchair','Wheelchair'],['needsPA','PA required'],['status','Status'],['pickedUpAt','Picked-up time'],['droppedOffAt','Dropped-off time'],['cancelReason','Cancellation reason'],['cancelNote','Cancellation note'],['cancelledBy','Cancelled by'],['billable','Billable decision'],['decidedBy','Decided by'],['notes','Passenger notes']];
+  }
+  defaultRepFields() {
+    return { date: true, time: true, type: true, passenger: true, school: true, driver: true, status: true, cancelReason: true, billable: true };
+  }
+  runPasses(r, f) {
+    if (f === 'cancelled') return r.status === 'cancelled';
+    if (f === 'completed') return r.status === 'pickedUp' || r.status === 'droppedOff';
+    if (f === 'unassigned') return !r.driverId && r.status !== 'cancelled';
+    if (f === 'jobs') return r.kind === 'job';
+    if (f === 'sched') return r.kind === 'sched';
+    return true;
+  }
+  runFieldVal(d, r, k) {
+    const c = r.st.cancel;
+    switch (k) {
+      case 'date': return r.date;
+      case 'time': return this.fmtT(r.time);
+      case 'type': return r.leg;
+      case 'passenger': return r.name;
+      case 'school': return r.school || '';
+      case 'from': return r.from;
+      case 'to': return r.to;
+      case 'driver': return r.driverName;
+      case 'assistant': return r.assistantName;
+      case 'vehicle': return this.nameOf(d.vehicles.map(v => ({ id: v.id, name: v.reg })), r.vehicleId);
+      case 'wheelchair': return r.wheelchair ? 'yes' : 'no';
+      case 'needsPA': return r.needsPA ? 'yes' : 'no';
+      case 'status': return r.status;
+      case 'pickedUpAt': return r.st.pickedUpAt ? this.clock(r.st.pickedUpAt) : '';
+      case 'droppedOffAt': return r.st.droppedOffAt ? this.clock(r.st.droppedOffAt) : '';
+      case 'cancelReason': return c ? c.label : '';
+      case 'cancelNote': return c ? c.note : '';
+      case 'cancelledBy': return c ? c.by : '';
+      case 'billable': return c ? (c.decision || 'pending') : '';
+      case 'decidedBy': return c ? (c.decidedBy || '') : '';
+      case 'notes': return r.notes || '';
+      default: return '';
+    }
+  }
+  exportCustom() {
+    const S = this.state, d = S.data, rf = S.repFields || this.defaultRepFields(), fil = S.repFilter || 'all';
+    const defs = this.repFieldDefs().filter(([k]) => rf[k]);
+    if (!defs.length) { this.showToast('Pick at least one field for the report'); return; }
+    const lines = [defs.map(x => this.csvEsc(x[1])).join(',')];
+    let cur = S.repFrom, n = 0, rows = 0;
+    while (cur && cur <= S.repTo && n < 120) {
+      const { runs } = this.computeRuns(d, cur);
+      for (const r of runs) if (this.runPasses(r, fil)) { lines.push(defs.map(([k]) => this.csvEsc(this.runFieldVal(d, r, k))).join(',')); rows++; }
+      cur = this.addD(cur, 1); n++;
+    }
+    this.download('custom_report_' + S.repFrom + '_' + S.repTo + '.csv', lines.join('\n'));
+    this.mut(dd => this.log(dd, 'Report exported', 'Custom CSV (' + defs.length + ' fields, ' + rows + ' rows)'));
+  }
+  openRunMenu(run) {
+    this.setState({ modal: { kind: 'choice', title: run.name + ' — ' + this.fmtT(run.time) + ' ' + (run.leg === 'return' ? '(return)' : run.leg === 'job' ? '(one-off job)' : '(pickup)'), meta: { run } } });
+  }
+
+  // ── demo data ──
+  loadDemo() {
+    const t = this.tISO(), g = () => this.gid();
+    const drs = [
+      { id: 'dr1', name: 'John Smith', pin: '123456', phone: '07700 900001', workDays: [1,2,3,4,5,6], vehicleId: 'v1' },
+      { id: 'dr2', name: 'Sarah Jones', pin: '234567', phone: '07700 900002', workDays: [1,2,3,4,5], vehicleId: 'v2' },
+      { id: 'dr3', name: 'Mike Brown', pin: '345678', phone: '07700 900003', workDays: [1,2,3,4,5], vehicleId: 'v3' },
+      { id: 'dr4', name: 'Lisa Green', pin: '456789', phone: '07700 900004', workDays: [1,2,3], vehicleId: '' }
+    ];
+    const asts = [
+      { id: 'a1', name: 'Gwen Rees', pin: '654321', phone: '07700 900011', workDays: [1,2,3,4,5] },
+      { id: 'a2', name: 'Karen Lloyd', pin: '765432', phone: '07700 900012', workDays: [1,2,3,4,5] }
+    ];
+    const mk = (days, pt, rt, driverId, assistantId, vehicleId) => { const pd = {}; for (const dw of days) pd[dw] = { pt, rt, driverId, assistantId: assistantId || '', vehicleId: vehicleId || '' }; return { days, perday: pd }; };
+    const ps = [
+      { id: 'p1', name: 'Emma Thompson', address: '23 Rose Street', town: 'Pembroke', postcode: 'SA71 4LN', school: "St Mary's Primary", wheelchair: false, needsPA: false, notes: '', archived: false, schedule: mk([1,2,3,4,5], '08:15', '15:15', 'dr1', '', 'v1') },
+      { id: 'p2', name: 'Jacob Williams', address: '4 Bush Hill', town: 'Pembroke Dock', postcode: 'SA72 6AB', school: 'Ysgol Harri Tudur', wheelchair: true, needsPA: true, notes: 'Ramp needed', archived: false, schedule: mk([1,2,3,4,5], '08:20', '15:30', 'dr2', 'a1', 'v2') },
+      { id: 'p3', name: 'Sophie Evans', address: '12 Upper Lamphey Rd', town: 'Pembroke', postcode: 'SA71 5JN', school: 'Greenhill School', wheelchair: false, needsPA: false, notes: '', archived: false, schedule: mk([1,2,3,4,5], '08:30', '15:45', '', '', '') },
+      { id: 'p4', name: 'Harry Price', address: '55 Monkton Road', town: 'Pembroke', postcode: 'SA71 4LZ', school: 'Pembroke Dock CP', wheelchair: false, needsPA: false, notes: '', archived: false, schedule: mk([1,2,3,4,5], '08:45', '15:20', 'dr3', '', 'v3') },
+      { id: 'p5', name: 'Callum Rees', address: '7 Waterloo Terrace', town: 'Pembroke Dock', postcode: 'SA72 6JJ', school: 'Ysgol Harri Tudur', wheelchair: true, needsPA: false, notes: 'Ramp needed · gate code 4471', archived: false, schedule: mk([1,3,5], '08:35', '15:30', 'dr1', '', 'v2') },
+      { id: 'p6', name: 'Mia Hughes', address: '3 Main Street', town: 'Pembroke', postcode: 'SA71 4JS', school: "St Mary's Primary", wheelchair: false, needsPA: false, notes: '', archived: false, schedule: mk([1,2,3], '08:10', '15:15', 'dr4', '', '') }
+    ];
+    const vs = [
+      { id: 'v1', reg: 'AB12 CDE', make: 'Ford Galaxy', seats: '7', wheelchair: false, defaultDriverId: 'dr1', mot: this.addD(t, 12), ins: this.addD(t, 45), tax: this.addD(t, 90), notes: '', faults: [] },
+      { id: 'v2', reg: 'XY21 FGH', make: 'VW Sharan (WAV)', seats: '6', wheelchair: true, defaultDriverId: 'dr2', mot: this.addD(t, 80), ins: this.addD(t, 29), tax: this.addD(t, 200), notes: 'Sliding door can stick', faults: [{ id: g(), text: 'Sliding door stiff to open', by: 'Sarah Jones', at: Date.now() - 3600000, resolved: false }] },
+      { id: 'v3', reg: 'MN70 PQR', make: 'Peugeot Rifter', seats: '4', wheelchair: false, defaultDriverId: 'dr3', mot: this.addD(t, 150), ins: this.addD(t, 60), tax: this.addD(t, 61), notes: '', faults: [] }
+    ];
+    const jobs = [
+      { id: 'j1', customer: 'Pembrokeshire Council', date: t, time: '09:30', pickup: 'Haverfordwest Council Offices', dropoff: 'Welsh Assembly, Cardiff Bay', driverId: 'dr1', assistantId: '', vehicleId: 'v1', notes: '' },
+      { id: 'j2', customer: 'Mrs Patricia Webb', date: t, time: '14:30', pickup: '22 Harbour Road, Pembroke', dropoff: 'Withybush Hospital', driverId: 'dr2', assistantId: '', vehicleId: 'v2', notes: '' }
+    ];
+    const holidays = [14, 15, 16, 17, 18].map(n => ({ date: this.addD(t, n), name: 'Summer holidays', school: '', type: 'holiday' }));
+    const nextMon = this.addD(t, ((8 - this.dow(t)) % 7) || 7);
+    holidays.push({ date: nextMon, name: 'Inset day', school: "St Mary's Primary", type: 'inset' });
+    // Seed sample statuses on the most recent SCHOOL day, so weekend loads stay consistent
+    const dwNow = this.dow(t);
+    const demoDay = dwNow === 0 ? this.addD(t, -2) : dwNow === 6 ? this.addD(t, -1) : t;
+    const at = hm => new Date(demoDay + 'T' + hm + ':00').getTime();
+    const runStates = {};
+    runStates['pp1|' + demoDay + '|pickup'] = { status: 'pickedUp', pickedUpAt: at('08:17') };
+    runStates['pp4|' + demoDay + '|pickup'] = { status: 'cancelled', cancel: { reason: 'no_answer', label: 'No answer at door', note: '', photo: '', at: at('08:47'), by: 'Mike Brown', decision: null, name: 'Harry Price', date: demoDay, leg: 'pickup' } };
+    const history = [
+      { ts: at('08:47'), user: 'Mike Brown', action: 'Run cancelled', detail: 'Harry Price (No answer at door) → sent to review' },
+      { ts: at('08:17'), user: 'John Smith', action: 'Picked up', detail: 'Emma Thompson at 08:17' },
+      { ts: at('07:40'), user: 'Sarah Jones', action: 'Fault reported', detail: 'XY21 FGH: Sliding door stiff to open' }
+    ];
+    this.mut(d => {
+      Object.assign(d, { company: d.company || 'Pembroke Cars (demo)', setupDone: true, drivers: drs, assistants: asts, passengers: ps, jobs, holidays, staffHolidays: [{ id: g(), staffId: 'dr4', date: this.addD(t, 1), type: 'sick' }], vehicles: vs, runStates, history });
+      this.log(d, 'Demo data loaded', 'Sample passengers, staff, vehicles and runs');
+    });
+    this.setState({ wizard: null, coName: 'Pembroke Cars (demo)' });
+    this.showToast('Demo data loaded');
+  }
+
+  // ── CSV ──
+  parseCsv(text) {
+    const rows = text.split(/\r?\n/).map(r => r.trim()).filter(Boolean);
+    const out = [];
+    for (const row of rows) {
+      const cols = row.includes('\t') ? row.split('\t') : row.split(',');
+      const [name, address, town, postcode, school, wc, pa] = cols.map(c => (c || '').trim());
+      if (!name || /^name$/i.test(name)) continue;
+      out.push({ id: this.gid(), name, address: address || '', town: town || '', postcode: postcode || '', school: school || '', wheelchair: /^(y|yes|true|1)$/i.test(wc || ''), needsPA: /^(y|yes|true|1)$/i.test(pa || ''), notes: '', archived: false, schedule: { days: [1, 2, 3, 4, 5], perday: { 1: {}, 2: {}, 3: {}, 4: {}, 5: {} } } });
+    }
+    return out;
+  }
+  doImport(text, after) {
+    const ps = this.parseCsv(text);
+    if (!ps.length) { this.showToast('No rows recognised — check the format'); return 0; }
+    this.mut(d => { d.passengers.push(...ps); this.log(d, 'Passengers imported', ps.length + ' from spreadsheet'); });
+    if (after) after(ps.length);
+    return ps.length;
+  }
+  download(name, content, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([content], { type: type || 'text/csv' }));
+    a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+  csvEsc(s) { s = String(s == null ? '' : s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+  exportRuns() {
+    const d = this.state.data; let cur = this.state.repFrom; const lines = ['date,time,type,passenger,from,to,driver,assistant,status,cancel_reason,billable'];
+    let n = 0;
+    while (cur <= this.state.repTo && n < 120) {
+      const { runs } = this.computeRuns(d, cur);
+      for (const r of runs) lines.push([r.date, r.time, r.leg, r.name, r.from, r.to, r.driverName, r.assistantName, r.status, r.st.cancel ? r.st.cancel.label : '', r.st.cancel ? (r.st.cancel.decision || 'pending') : ''].map(this.csvEsc).join(','));
+      cur = this.addD(cur, 1); n++;
+    }
+    this.download('runs_' + this.state.repFrom + '_' + this.state.repTo + '.csv', lines.join('\n'));
+    this.mut(dd => this.log(dd, 'Report exported', 'Runs CSV ' + this.state.repFrom + ' → ' + this.state.repTo));
+  }
+  exportCanc() {
+    const d = this.state.data; const lines = ['date,leg,passenger,reason,note,cancelled_by,time,billable,decided_by'];
+    for (const [key, st] of Object.entries(d.runStates)) {
+      if (st.status !== 'cancelled' || !st.cancel) continue;
+      const c = st.cancel;
+      if (c.date < this.state.repFrom || c.date > this.state.repTo) continue;
+      lines.push([c.date, c.leg, c.name, c.label, c.note, c.by, this.clock(c.at), c.decision || 'pending', c.decidedBy || ''].map(this.csvEsc).join(','));
+    }
+    this.download('cancellations_' + this.state.repFrom + '_' + this.state.repTo + '.csv', lines.join('\n'));
+    this.mut(dd => this.log(dd, 'Report exported', 'Cancellations CSV'));
+  }
+
+  // ── styles ──
+  chip(bg) { return 'font-size:11px;font-weight:700;color:#fff;background:' + bg + ';padding:5px 10px;border-radius:7px;flex:none;white-space:nowrap'; }
+  statusChip(r) {
+    if (r.status === 'pickedUp') return { chip: 'Picked up ' + (r.st.pickedUpAt ? this.clock(r.st.pickedUpAt) : ''), style: this.chip('#2f7d5c') };
+    if (r.status === 'droppedOff') return { chip: 'Done ' + (r.st.droppedOffAt ? this.clock(r.st.droppedOffAt) : ''), style: this.chip('#3d4f5d') };
+    if (r.status === 'cancelled') return { chip: 'Cancelled', style: this.chip('#b3402f') };
+    if (r.kind === 'job') return { chip: 'One-off job', style: this.chip('#7a5aa0') };
+    if (!r.driverId) return { chip: 'Assign', style: this.chip('#b3771f') };
+    return { chip: 'Scheduled', style: this.chip('#31576e') };
+  }
+
+  // ══ RENDER ══
+  renderVals() {
+    const S = this.state, d = S.data;
+    const authOut = {
+      showAuth: S.authChecked && !S.authUser,
+      authIsSignup: S.authMode === 'signup',
+      authCompany: S.authCompany, onAuthCompany: e => this.onAuthCompany(e),
+      authEmail: S.authEmail, onAuthEmail: e => this.onAuthEmail(e),
+      authPassword: S.authPassword, onAuthPassword: e => this.onAuthPassword(e),
+      authSubmitLabel: S.authMode === 'signup' ? 'Create company account' : 'Log in',
+      onAuthSubmit: () => this.authSubmit(),
+      onAuthModeLogin: () => this.onAuthModeLogin(),
+      onAuthModeSignup: () => this.onAuthModeSignup(),
+      authTabLoginStyle: 'flex:1;font-size:13px;font-weight:700;padding:9px;border-radius:8px;' + (S.authMode === 'login' ? 'background:#1f8a8f;color:#fff' : 'background:rgba(255,255,255,.25);color:#fff'),
+      authTabSignupStyle: 'flex:1;font-size:13px;font-weight:700;padding:9px;border-radius:8px;' + (S.authMode === 'signup' ? 'background:#1f8a8f;color:#fff' : 'background:rgba(255,255,255,.25);color:#fff'),
+      authErr: S.authErr,
+      authIsLogin: S.authMode === 'login',
+      authResetSent: S.authResetSent,
+      onForgotPassword: () => this.forgotPassword(),
+      showVerify: S.authChecked && !!S.authUser && !S.authEmailVerified,
+      onRecheckVerify: () => this.recheckVerification(),
+      onResendVerify: () => this.resendVerification(),
+      onSignOutCompany: () => this.signOutCompany(),
+    };
+    if (authOut.showAuth) return authOut;
+    if (authOut.showVerify) return authOut;
+    if (!d) return Object.assign({}, authOut, { showLogin: true, loginSub: 'Loading…', pinDots: [], keys: [], loginErr: '' });
+    const sess = S.session;
+    const isMgr = sess && sess.role === 'manager';
+    const isStaff = sess && !isMgr;
+    const out = Object.assign({}, authOut, {
+      showAuth: false,
+      showLogin: !sess, showManager: !!isMgr, showDriver: !!isStaff,
+      toast: S.toast, stop: e => e.stopPropagation(), onLogout: () => this.logout(),
+      onSignOutCompany: () => this.signOutCompany(),
+      companyName: d.company || 'School transport ops', userLabel: this.userName(),
+      loginSub: d.company || 'School transport operations hub', loginErr: S.err
+    });
+
+    // login
+    out.pinDots = Array(6).fill(0).map((_, i) => ({ style: 'width:15px;height:15px;border-radius:50%;' + (i < S.pin.length ? 'background:#fff' : 'border:2px solid rgba(255,255,255,.55)') }));
+    const keyStyle = 'height:54px;border-radius:12px;font-size:19px;font-weight:700;color:#fff;background:#1f8a8f;box-shadow:0 2px 5px rgba(22,35,46,.18)';
+    out.keys = ['1','2','3','4','5','6','7','8','9','clr','0','del'].map(k => ({
+      label: k === 'del' ? '⌫' : k === 'clr' ? 'C' : k,
+      style: keyStyle + (k === 'del' || k === 'clr' ? ';background:#b9d0ea;color:#31576e;font-size:15px' : ''),
+      press: () => this.press(k)
+    }));
+    if (!sess) { Object.assign(out, this.modalVals(d), { wizOpen: false, modalOpen: !!S.modal }); return out; }
+
+    if (isMgr) Object.assign(out, this.managerVals(d));
+    if (isStaff) Object.assign(out, this.driverVals(d));
+    Object.assign(out, this.modalVals(d), this.wizardVals(d));
+    return out;
+  }
+
+  managerVals(d) {
+    const S = this.state, out = {};
+    const reviews = this.pendingReviews(d), faults = this.pendingFaults(d);
+    const reviewCount = reviews.length + faults.length;
+    const navStyle = act => 'display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%;padding:9px 10px;border-radius:8px;font-size:13px;font-weight:600;' + (act ? 'background:#1f8a8f;color:#fff' : 'color:#aebcc8');
+    const tabs = [['home','Home'],['passengers','Passengers'],['staff','Staff'],['jobs','One-off jobs'],['vehicles','Vehicles'],['review','Review'],['reports','Reports'],['tutorial','Tutorial'],['settings','Settings']];
+    out.navItems = tabs.map(([id, label]) => ({ label, badge: id === 'review' && reviewCount ? String(reviewCount) : '', style: navStyle(S.tab === id), go: () => this.setState({ tab: id, plus: false, menuOpen: false }) }));
+    out.menuOpen = !!S.menuOpen;
+    out.menuClosed = !S.menuOpen;
+    out.onMenuToggle = () => this.setState({ menuOpen: !S.menuOpen });
+    out.reviewDot = reviewCount > 0;
+    const narrow = !!S.narrow;
+    out.mgrRootStyle = narrow ? 'display:flex;flex-direction:column;min-height:100vh;align-items:stretch' : 'display:flex;min-height:100vh;align-items:flex-start';
+    out.mainStyle = narrow ? 'flex:1;padding:14px 12px;min-width:0;width:100%' : 'flex:1;padding:20px 26px;min-width:0;max-width:1180px';
+    out.sideStyle = S.menuOpen
+      ? (narrow
+        ? 'background:#2c4a5e;color:#e8edf1;display:flex;flex-direction:column;padding:18px 0 14px;border-radius:16px;margin:12px 12px 0;box-shadow:0 4px 14px rgba(22,35,46,.28)'
+        : 'width:200px;flex:none;background:#2c4a5e;color:#e8edf1;display:flex;flex-direction:column;padding:18px 0 14px;border-radius:16px;margin:16px 0 16px 16px;box-shadow:0 4px 14px rgba(22,35,46,.28)')
+      : (narrow
+        ? 'align-self:flex-start;background:#2c4a5e;display:flex;align-items:center;padding:8px;border-radius:12px;margin:12px 0 0 12px;box-shadow:0 3px 10px rgba(22,35,46,.25)'
+        : 'width:58px;flex:none;background:#2c4a5e;display:flex;flex-direction:column;align-items:center;gap:12px;padding:12px 0 14px;border-radius:16px;margin:16px 0 16px 16px;box-shadow:0 4px 14px rgba(22,35,46,.28)');
+    if (S.menuOpen) out.sideStyle += ';position:relative;z-index:45';
+    ['home','passengers','staff','jobs','vehicles','review','reports','tutorial','settings'].forEach(t => out['tab' + t[0].toUpperCase() + t.slice(1)] = S.tab === t);
+    out.reviewCount = String(reviewCount);
+    out.goReview = () => this.setState({ tab: 'review' });
+
+    // home header
+    const ht = S.homeTab;
+    out.headerTitle = 'Home';
+    out.onPlus = () => this.setState({ plus: !S.plus });
+    out.plusOpen = S.plus;
+    out.plusItems = [
+      { label: '+ Passenger', go: () => this.openPassenger(null) },
+      { label: '+ One-off job', go: () => this.openJob(null) },
+      { label: '+ Driver', go: () => this.openStaff(null, 'driver') },
+      { label: '+ Passenger assistant', go: () => this.openStaff(null, 'assistant') },
+      { label: '+ Vehicle', go: () => this.openVehicle(null) },
+      { label: '+ Absence', go: () => this.openAbsence('') },
+      { label: '+ School holiday / Inset day', go: () => this.openHoliday(S.date) }
+    ];
+    const tabCols = { runs: '#527fae', staff: '#46719c', holidays: '#3a608a' };
+    const tabDim = { runs: '#41668d', staff: '#37587c', holidays: '#2c4b6d' };
+    out.fileTabs = [['runs','Runs'],['staff','Staff'],['holidays','Holidays']].map(([id, label]) => ({
+      label,
+      style: ht === id
+        ? 'background:' + tabCols[id] + ';color:#fff;font-size:13.5px;font-weight:700;padding:11px 26px 13px;border-radius:12px 12px 0 0'
+        : 'background:' + tabDim[id] + ';color:rgba(255,255,255,.78);font-size:13px;font-weight:600;padding:9px 20px 11px;border-radius:10px 10px 0 0',
+      go: () => this.setState({ homeTab: id })
+    }));
+    out.panelHeadStyle = 'display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px;background:' + tabCols[ht];
+    out.panelHeadTitle = 'Holidays & absences';
+    const staffMode = S.staffMode || 'daily';
+    const sDate = S.staffDate || this.tISO();
+    out.showPanelNav = ht !== 'holidays';
+    out.showPanelTitle = ht === 'holidays';
+    const weekLabel = dd => { const mon = this.addD(dd, -((this.dow(dd) + 6) % 7)); return this.pretty(mon) + ' – ' + this.pretty(this.addD(mon, 6)); };
+    if (ht === 'runs') {
+      out.panelDateLabel = S.runMode === 'weekly' ? weekLabel(S.date) : this.pretty(S.date);
+      out.onPanelPrev = () => this.setState({ date: this.addD(S.date, S.runMode === 'weekly' ? -7 : -1) });
+      out.onPanelNext = () => this.setState({ date: this.addD(S.date, S.runMode === 'weekly' ? 7 : 1) });
+      out.onPanelToday = () => this.setState({ date: this.tISO() });
+    } else {
+      out.panelDateLabel = staffMode === 'weekly' ? weekLabel(sDate) : this.pretty(sDate);
+      out.onPanelPrev = () => this.setState({ staffDate: this.addD(sDate, staffMode === 'weekly' ? -7 : -1) });
+      out.onPanelNext = () => this.setState({ staffDate: this.addD(sDate, staffMode === 'weekly' ? 7 : 1) });
+      out.onPanelToday = () => this.setState({ staffDate: this.tISO() });
+    }
+    out.showModeToggle = ht === 'runs' || ht === 'staff';
+    const curMode = ht === 'staff' ? staffMode : S.runMode;
+    out.onDaily = () => this.setState(ht === 'staff' ? { staffMode: 'daily' } : { runMode: 'daily' });
+    out.onWeekly = () => this.setState(ht === 'staff' ? { staffMode: 'weekly' } : { runMode: 'weekly' });
+    const mBtn = act => 'font-size:11.5px;font-weight:700;border-radius:6px;padding:5px 12px;' + (act ? 'color:' + tabCols[ht] + ';background:#fff' : 'color:#fff;background:rgba(255,255,255,.16)');
+    out.dailyBtnStyle = mBtn(curMode === 'daily'); out.weeklyBtnStyle = mBtn(curMode === 'weekly');
+    out.showStaffDaily = ht === 'staff' && staffMode === 'daily';
+    out.showStaffWeekly = ht === 'staff' && staffMode === 'weekly';
+    out.showRunsDaily = ht === 'runs' && S.runMode === 'daily';
+    out.showRunsWeekly = ht === 'runs' && S.runMode === 'weekly';
+    out.weekGridStyle = narrow ? 'display:flex;flex-direction:column;gap:12px' : 'display:grid;grid-template-columns:repeat(7,1fr);gap:8px';
+    out.showStaffTab = ht === 'staff';
+    out.showHolTab = ht === 'holidays';
+
+    // daily runs
+    const { runs, hol, holEntries } = this.computeRuns(d, S.date);
+    out.holidayBanner = hol ? '🏖 School holiday — recurring school runs are paused today. One-off jobs still show.'
+      : holEntries.length ? '🏫 ' + holEntries.map(h => (h.type === 'inset' ? 'Inset day' : (h.name || 'Holiday')) + ' — ' + (h.school || 'all schools')).join(' · ') + '. Affected school runs are paused today.' : '';
+    const unassigned = runs.filter(r => r.status !== 'cancelled' && (!r.driverId || this.staffAbsent(d, r.driverId, S.date))).length;
+    const expiring = [];
+    for (const v of d.vehicles) for (const [k, l] of [['mot','MOT'],['ins','Insurance'],['tax','Tax']]) { const dl = this.daysLeft(v[k]); if (dl !== null) expiring.push({ l: l + ' — ' + v.reg, dl }); }
+    expiring.sort((a, b) => a.dl - b.dl);
+    const nextExp = expiring[0];
+    out.headerSub = runs.length + ' runs · ' + new Set(runs.filter(r => r.driverId).map(r => r.driverId)).size + ' drivers out' + (hol ? ' · school holiday' : '');
+    const kv = (v, l, color) => ({ v: String(v), l, vStyle: 'font-size:22px;font-weight:700;color:' + (color || '#16232e') });
+    out.kpis = [
+      kv(runs.filter(r => r.status !== 'cancelled').length, 'runs today'),
+      kv(reviewCount, 'need review', reviewCount ? '#c25438' : '#2f7d5c'),
+      kv(unassigned, 'unassigned / driver absent', unassigned ? '#b3771f' : '#2f7d5c'),
+      nextExp ? kv(nextExp.dl + 'd', 'next expiry — ' + nextExp.l, nextExp.dl <= 14 ? '#b3771f' : '#16232e') : kv('—', 'no vehicle dates yet')
+    ];
+    out.noRuns = runs.length === 0;
+    out.runRows = runs.map(r => {
+      const absent = r.driverId && this.staffAbsent(d, r.driverId, S.date);
+      const attention = (!r.driverId || absent) && r.status !== 'cancelled';
+      const sc = this.statusChip(r);
+      const nls = 'font-size:11.5px;color:#5d6f7d';
+      let subLines;
+      if (!r.driverId && r.status !== 'cancelled') subLines = [{ text: 'No driver assigned', style: 'font-size:11.5px;color:#8a5a12;font-weight:600' }];
+      else if (absent) subLines = [{ text: r.driverName + ' is ABSENT today — reassign', style: 'font-size:11.5px;color:#a8402f;font-weight:600' }];
+      else {
+        subLines = [{ text: r.driverName || '—', style: nls }];
+        if (r.assistantName) subLines.push({ text: 'PA ' + r.assistantName, style: nls });
+        const vl = this.vLabel(d, r.vehicleId);
+        if (vl) subLines.push({ text: vl, style: nls });
+      }
+      return {
+        time: this.fmtT(r.time),
+        title: r.name + (r.wheelchair ? ' ♿' : '') + ' → ' + (r.leg === 'return' ? 'home' : r.to),
+        subLines,
+        rowStyle: 'background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap' + (attention ? ';border:1.5px solid #b3771f' : '') + (r.status === 'cancelled' ? ';opacity:.72' : ''),
+        chip: sc.chip, chipStyle: sc.style + ';cursor:pointer',
+        onChip: () => attention ? this.openEditToday(r) : this.openRunMenu(r),
+        onMenu: () => this.openRunMenu(r)
+      };
+    });
+    out.reviewPeekShow = reviews.length > 0;
+    out.reviewEmptyPeek = reviews.length === 0 && faults.length === 0;
+    if (reviews.length) {
+      const c = reviews[0].st.cancel;
+      out.reviewPeekTitle = c.name + ' — ' + c.label;
+      out.reviewPeekSub = this.clock(c.at) + ' · ' + c.by + (c.photo ? ' · 📷 photo attached' : '');
+    } else { out.reviewPeekTitle = ''; out.reviewPeekSub = ''; }
+    out.upcoming = expiring.slice(0, 3).map(e => ({ l: e.l, v: e.dl + ' days', vStyle: 'color:' + (e.dl <= 14 ? '#b3771f' : '#16232e') }));
+    const nextHol = d.holidays.map(h => h.date).filter(x => x >= S.date).sort()[0];
+    if (nextHol) out.upcoming.push({ l: 'Next school holiday', v: this.pretty(nextHol), vStyle: 'color:#31576e' });
+    if (!out.upcoming.length) out.upcoming = [{ l: 'Add vehicle MOT/insurance dates to see reminders', v: '', vStyle: '' }];
+
+    // weekly
+    const monday = this.addD(S.date, -((this.dow(S.date) + 6) % 7));
+    out.weekCols = Array(7).fill(0).map((_, i) => {
+      const date = this.addD(monday, i);
+      const { runs: rr, hol: hh } = this.computeRuns(d, date);
+      const isToday = date === this.tISO();
+      return {
+        label: this.pretty(date), go: () => this.setState({ date, runMode: 'daily' }),
+        hdStyle: 'width:100%;text-align:center;font-size:11.5px;font-weight:700;border-radius:8px;padding:7px 2px;' + (isToday ? 'background:#1f8a8f;color:#fff' : 'background:#cdd6dd;color:#31576e'),
+        items: hh ? [{ time: '', name: 'School holiday', sub: '', style: 'background:#31576e;color:#fff;border-radius:8px;padding:7px 8px;font-size:10.5px;font-weight:600' }]
+          : rr.map(r => ({ time: this.fmtT(r.time), name: r.name, sub: r.driverName || '⚠ unassigned', style: 'background:#eef1f4;border-radius:8px;padding:6px 8px;font-size:10.5px;color:#16232e;overflow:hidden' + (r.status === 'cancelled' ? ';opacity:.55;text-decoration:line-through' : (!r.driverId ? ';border:1px solid #b3771f' : '')) }))
+      };
+    });
+
+    // staff
+    const staffAll = d.drivers.map(s => ({ ...s, role: 'Driver' })).concat(d.assistants.map(s => ({ ...s, role: 'Passenger assistant' })));
+    const staffRuns = sDate === S.date ? runs : this.computeRuns(d, sDate).runs;
+    out.staffRows = staffAll.map(s => {
+      const absent = this.staffAbsent(d, s.id, sDate);
+      const mine = staffRuns.filter(r => r.driverId === s.id || r.assistantId === s.id);
+      return {
+        initials: s.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+        name: s.name,
+        sub: s.role + ' · ' + mine.length + ' run' + (mine.length === 1 ? '' : 's') + ' on ' + this.pretty(sDate) + (s.pin ? ' · PIN set' : ' · no PIN'),
+        chip: absent ? 'Absent' : (s.workDays || []).includes(this.dow(sDate)) ? 'Available' : 'Not working today',
+        chipStyle: this.chip(absent ? '#b3402f' : (s.workDays || []).includes(this.dow(sDate)) ? '#2f7d5c' : '#5d6f7d'),
+        hasRuns: mine.length > 0,
+        noRunsToday: mine.length === 0,
+        runsList: mine.map(r => {
+          const sc = this.statusChip(r);
+          return {
+            time: this.fmtT(r.time),
+            desc: (r.assistantId === s.id && r.driverId !== s.id ? 'PA · ' : '') + r.name + ' — ' + r.from + ' → ' + (r.leg === 'return' ? 'home' : r.to) + (r.driverId === s.id && r.assistantName ? ' · with PA ' + r.assistantName : ''),
+            chip: sc.chip, chipStyle: sc.style
+          };
+        }),
+        onEdit: () => this.openStaff(s, s.role === 'Driver' ? 'driver' : 'assistant'),
+        onAbsence: () => this.openAbsence(s.id)
+      };
+    });
+
+    // staff weekly grid
+    out.staffWeekHead = []; out.staffWeekCells = []; out.staffWeekNarrow = [];
+    if (ht === 'staff' && staffMode === 'weekly') {
+      const mon = this.addD(sDate, -((this.dow(sDate) + 6) % 7));
+      const wdays = Array(7).fill(0).map((_, i) => this.addD(mon, i));
+      const dayRuns = wdays.map(dd => this.computeRuns(d, dd).runs);
+      out.staffWeekHead = ['Staff'].concat(wdays.map(dd => this.pretty(dd)));
+      const cells = [];
+      staffAll.forEach(s => {
+        cells.push({ text: s.name, style: 'font-size:12.5px;font-weight:700;color:#16232e;background:#eef1f4;border-radius:8px;padding:8px 10px' });
+        const narrowDays = [];
+        wdays.forEach((dd, i) => {
+          const abs = this.staffAbsent(d, s.id, dd);
+          const mine2 = dayRuns[i].filter(r => (r.driverId === s.id || r.assistantId === s.id) && r.status !== 'cancelled');
+          const detail = mine2.map(r => this.fmtT(r.time) + ' ' + r.name + (r.assistantId === s.id && r.driverId !== s.id ? ' (PA)' : '') + '\n   → ' + (r.leg === 'return' ? 'home' : r.to)).join('\n');
+          cells.push(abs
+            ? { text: 'Absent', style: 'font-size:11px;font-weight:700;color:#fff;background:#b3402f;border-radius:8px;padding:8px 6px;text-align:center' }
+            : { text: detail || '—', style: 'font-size:11px;font-weight:600;line-height:1.5;color:' + (detail ? '#16232e' : '#8a97a1') + ';background:#eef1f4;border-radius:8px;padding:8px 8px;text-align:left;white-space:pre-line' });
+          narrowDays.push({
+            label: this.pretty(dd),
+            text: abs ? 'Absent' : (detail || '—'),
+            style: abs
+              ? 'font-size:11px;font-weight:700;color:#fff;background:#b3402f;border-radius:6px;padding:3px 9px;align-self:flex-start'
+              : 'flex:1;font-size:12px;font-weight:600;line-height:1.5;color:' + (detail ? '#16232e' : '#8a97a1') + ';white-space:pre-line'
+          });
+        });
+        out.staffWeekNarrow.push({ name: s.name, days: narrowDays });
+      });
+      out.staffWeekCells = cells;
+    }
+    out.showStaffWeeklyNarrow = out.showStaffWeekly && narrow;
+    if (out.showStaffWeeklyNarrow) out.showStaffWeekly = false;
+
+    // staff page (sidebar)
+    out.onAddDriver = () => this.openStaff(null, 'driver');
+    out.onAddAssistant = () => this.openStaff(null, 'assistant');
+    out.noStaff = staffAll.length === 0;
+    const dn = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    out.staffPageRows = staffAll.map(s => {
+      const absent = this.staffAbsent(d, s.id, this.tISO());
+      return {
+        initials: s.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+        name: s.name,
+        sub: s.role + (s.phone ? ' · ' + s.phone : ' · no phone set'),
+        pin: s.pin || 'not set',
+        days: s.workDays && s.workDays.length ? [1, 2, 3, 4, 5, 6, 0].filter(x => s.workDays.includes(x)).map(x => dn[x]).join(' ') : '—',
+        veh: this.nameOf(d.vehicles.map(v => ({ id: v.id, name: v.reg })), s.vehicleId) || '—',
+        chip: absent ? 'Absent today' : 'Active',
+        chipStyle: this.chip(absent ? '#b3402f' : '#2f7d5c'),
+        rowStyle: narrow
+          ? 'background:#dfe5ea;border-radius:12px;padding:13px 16px;display:flex;flex-direction:column;align-items:stretch;gap:8px'
+          : 'background:#dfe5ea;border-radius:12px;padding:13px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap',
+        topRowStyle: narrow ? 'display:flex;gap:12px;align-items:center' : 'display:contents',
+        detailsStyle: narrow ? 'display:flex;gap:16px;flex-wrap:wrap;padding-left:50px' : 'display:contents',
+        actionsStyle: narrow ? 'display:flex;gap:6px;padding-left:50px' : 'display:flex;gap:6px;flex:none',
+        onEdit: () => this.openStaff(s, s.role === 'Driver' ? 'driver' : 'assistant'),
+        onAbsence: () => this.openAbsence(s.id)
+      };
+    });
+
+    // holidays calendar
+    const [yr, mo] = S.calMonth.split('-').map(Number);
+    out.calTitle = ['January','February','March','April','May','June','July','August','September','October','November','December'][mo - 1] + ' ' + yr;
+    out.onCalPrev = () => { const m = mo === 1 ? (yr - 1) + '-12' : yr + '-' + String(mo - 1).padStart(2, '0'); this.setState({ calMonth: m }); };
+    out.onCalNext = () => { const m = mo === 12 ? (yr + 1) + '-01' : yr + '-' + String(mo + 1).padStart(2, '0'); this.setState({ calMonth: m }); };
+    out.dowHeads = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    const first = new Date(yr, mo - 1, 1); const lead = (first.getDay() + 6) % 7; const dim = new Date(yr, mo, 0).getDate();
+    const cells = [];
+    for (let i = 0; i < lead; i++) cells.push({ day: '', tag: '', onClick: () => {}, style: 'min-height:52px;border-radius:8px;background:transparent' });
+    const allStaff = d.drivers.concat(d.assistants);
+    for (let day = 1; day <= dim; day++) {
+      const date = S.calMonth + '-' + String(day).padStart(2, '0');
+      const ents = d.holidays.filter(h => h.date === date);
+      const abs = d.staffHolidays.filter(a => a.date === date);
+      let bg = '#eef1f4', color = '#16232e', tag = '';
+      const holBg = ents.length ? (ents.some(h => !h.school) ? '#1f8a8f' : '#4a7fa5') : '';
+      const holTag = ents.map(h => (h.name || (h.type === 'inset' ? 'Inset day' : 'Holiday')) + (h.school ? ' — ' + h.school : '')).join(' · ');
+      const absTag = abs.map(a => (this.nameOf(allStaff, a.staffId) || '').split(' ')[0]).join(', ');
+      if (holBg && abs.length) { bg = 'linear-gradient(135deg,' + holBg + ' 0 50%,#f59e2d 50% 100%)'; color = '#fff'; tag = holTag + ' · ' + absTag; }
+      else if (holBg) { bg = holBg; color = '#fff'; tag = holTag; }
+      else if (abs.length) { bg = '#f59e2d'; color = '#16232e'; tag = absTag; }
+      if (date === this.tISO()) bg += ';outline:2px solid #16232e';
+      cells.push({
+        day: String(day), tag,
+        style: 'min-height:52px;min-width:0;overflow:hidden;border-radius:8px;background:' + bg + ';color:' + color + ';display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:5px 7px;text-align:left',
+        onClick: () => this.openHoliday(date)
+      });
+    }
+    out.calCells = cells;
+    const monthAbs = d.staffHolidays.filter(a => a.date.startsWith(S.calMonth)).sort((a, b) => a.date < b.date ? -1 : 1);
+    out.hasAbs = monthAbs.length > 0;
+    out.absRows = monthAbs.map(a => ({
+      name: this.nameOf(allStaff, a.staffId), date: this.pretty(a.date), type: a.type,
+      onDel: () => this.mut(dd => { dd.staffHolidays = dd.staffHolidays.filter(x => x.id !== a.id); this.log(dd, 'Absence removed', this.nameOf(allStaff, a.staffId) + ' ' + a.date); })
+    }));
+
+    // staff holiday totals (holidays tab)
+    out.hasStaff = allStaff.length > 0;
+    const yrStr = String(new Date().getFullYear());
+    out.staffHolRows = allStaff.map(s => {
+      const mine = d.staffHolidays.filter(a => a.staffId === s.id && a.date.startsWith(yrStr));
+      const cnt = ty => mine.filter(a => a.type === ty).length;
+      const next = d.staffHolidays.filter(a => a.staffId === s.id && a.date >= this.tISO()).map(a => a.date).sort()[0];
+      return { name: s.name, onName: () => this.openAbsence(s.id), counts: cnt('holiday') + ' holiday · ' + cnt('sick') + ' sick · ' + cnt('other') + ' other this year', next: next ? 'Next: ' + this.pretty(next) : 'Nothing booked' };
+    });
+
+    // school holidays & inset days breakdown
+    out.hasSchoolHol = d.holidays.length > 0;
+    const scopes = {};
+    for (const h of d.holidays) { const k = h.school || 'All schools'; (scopes[k] = scopes[k] || []).push(h); }
+    out.schoolHolGroups = Object.keys(scopes).sort((a, b) => a === 'All schools' ? -1 : b === 'All schools' ? 1 : (a < b ? -1 : 1)).map(school => {
+      const list = scopes[school].slice().sort((a, b) => a.date < b.date ? -1 : 1);
+      const ranges = [];
+      for (const h of list) {
+        const last = ranges[ranges.length - 1];
+        if (last && last.type === (h.type || 'holiday') && last.name === (h.name || '') && this.addD(last.end, 1) === h.date) { last.end = h.date; last.dates.push(h.date); }
+        else ranges.push({ start: h.date, end: h.date, dates: [h.date], type: h.type || 'holiday', name: h.name || '' });
+      }
+      return { school, ranges: ranges.map(rg => ({
+        label: rg.start === rg.end ? this.pretty(rg.start) : this.pretty(rg.start) + ' – ' + this.pretty(rg.end),
+        sub: (rg.type === 'inset' ? 'Inset day' : (rg.name || 'School holiday')) + ' · ' + rg.dates.length + ' day' + (rg.dates.length === 1 ? '' : 's'),
+        onDel: () => this.mut(dd => { dd.holidays = dd.holidays.filter(h => !(rg.dates.includes(h.date) && (h.school || '') === (school === 'All schools' ? '' : school))); this.log(dd, 'Holiday removed', school + ': ' + rg.start + (rg.end !== rg.start ? ' – ' + rg.end : '')); })
+      })) };
+    });
+
+    // one-off jobs page
+    out.onAddJob = () => this.openJob(null);
+    out.noJobs = d.jobs.length === 0;
+    const tNow = this.tISO();
+    const jSort = [...d.jobs].sort((a, b) => (a.date + (a.time || '')) < (b.date + (b.time || '')) ? -1 : 1);
+    const jList = jSort.filter(j => j.date >= tNow).concat(jSort.filter(j => j.date < tNow).reverse());
+    out.jobRows = jList.map(j => {
+      const st = d.runStates['j' + j.id + '|' + j.date + '|job'] || {};
+      let jchip = 'Upcoming', jbg = '#7a5aa0';
+      if (st.status === 'cancelled') { jchip = 'Cancelled'; jbg = '#b3402f'; }
+      else if (st.status === 'droppedOff') { jchip = 'Done'; jbg = '#3d4f5d'; }
+      else if (st.status === 'pickedUp') { jchip = 'Picked up'; jbg = '#2f7d5c'; }
+      else if (j.date === tNow) { jchip = 'Today'; jbg = '#1f8a8f'; }
+      else if (j.date < tNow) { jchip = 'Past'; jbg = '#5d6f7d'; }
+      return {
+        date: this.pretty(j.date), time: this.fmtT(j.time), customer: j.customer,
+        route: (j.pickup || '—') + ' → ' + (j.dropoff || '—'),
+        who: [this.nameOf(d.drivers, j.driverId) || '⚠ no driver', j.assistantId ? 'PA ' + this.nameOf(d.assistants, j.assistantId) : ''].filter(Boolean).join(' · '),
+        chip: jchip, chipStyle: this.chip(jbg),
+        onEdit: () => this.openJob(j),
+        onDel: () => { if (confirm('Delete this job?')) this.mut(dd => { dd.jobs = dd.jobs.filter(x => x.id !== j.id); this.log(dd, 'Job deleted', j.customer + ' on ' + j.date); }); }
+      };
+    });
+
+    // passengers
+    out.search = S.search;
+    out.onSearch = e => this.setState({ search: e.target.value });
+    const q = S.search.toLowerCase();
+    const plist = d.passengers.filter(p => !p.archived && (!q || p.name.toLowerCase().includes(q) || (p.school || '').toLowerCase().includes(q)));
+    out.noPassengers = plist.length === 0;
+    out.onAddPassenger = () => this.openPassenger(null);
+    const dayNames = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+    out.passRows = plist.map(p => {
+      const s = p.schedule || { days: [], perday: {} };
+      const anyCfg = s.perday[s.days[0]] || {};
+      return {
+        name: p.name,
+        tags: [p.wheelchair ? '♿ wheelchair' : '', p.needsPA ? 'PA required' : ''].filter(Boolean).join(' · '),
+        addr: [p.address, p.town, p.postcode].filter(Boolean).join(', '),
+        school: p.school || 'No school set',
+        schedSummary: s.days.length ? s.days.map(x => dayNames[x]).join(' ') + ' · pickup ' + this.fmtT(anyCfg.pt) + ' · return ' + this.fmtT(anyCfg.rt) + (anyCfg.driverId ? ' · ' + this.nameOf(d.drivers, anyCfg.driverId) : ' · ⚠ no driver') : 'No schedule yet — tap Edit',
+        onEdit: () => this.openPassenger(p),
+        onArchive: () => { if (confirm('Archive ' + p.name + '? Their runs will stop appearing.')) this.mut(dd => { dd.passengers.find(x => x.id === p.id).archived = true; this.log(dd, 'Passenger archived', p.name); }); }
+      };
+    });
+
+    // vehicles
+    out.onAddVehicle = () => this.openVehicle(null);
+    out.noVehicles = d.vehicles.length === 0;
+    out.vehCards = d.vehicles.map(v => {
+      const ex = [['mot','MOT'],['ins','Insurance'],['tax','Tax']].map(([k, l]) => {
+        const dl = this.daysLeft(v[k]);
+        return { l, v: v[k] ? this.pretty(v[k]) + ' (' + dl + 'd)' : 'not set', style: 'font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;color:#fff;background:' + (dl === null ? '#5d6f7d' : dl < 0 ? '#b3402f' : dl <= 14 ? '#b3771f' : '#2f7d5c') };
+      });
+      const openFaults = (v.faults || []).filter(f => !f.resolved);
+      return {
+        reg: v.reg, tags: [v.seats ? v.seats + ' seats' : '', v.wheelchair ? '♿ WAV' : ''].filter(Boolean).join(' · '),
+        desc: [v.nickname ? '“' + v.nickname + '”' + (v.useNickname ? ' (shown on runs)' : '') : '', v.make, v.defaultDriverId ? 'Usual driver: ' + this.nameOf(d.drivers, v.defaultDriverId) : '', v.notes].filter(Boolean).join(' · '),
+        expiries: ex, hasFaults: openFaults.length > 0,
+        faults: openFaults.map(f => ({ text: f.text, by: f.by, onResolve: () => this.resolveFault(v.id, f.id) })),
+        onEdit: () => this.openVehicle(v), onFault: () => this.openFault(v.id)
+      };
+    });
+
+    // review
+    out.reviewEmpty = reviewCount === 0;
+    out.reviewRows = reviews.map(({ key, st }) => {
+      const c = st.cancel;
+      return {
+        title: c.name + ' — ' + c.label,
+        sub: this.pretty(c.date) + ' (' + c.leg + ') · cancelled by ' + c.by + ' at ' + this.clock(c.at),
+        note: c.note || '', photo: c.photo || '',
+        photoStyle: 'width:86px;height:86px;border-radius:10px;flex:none;background-size:cover;background-position:center;background-image:url(' + (c.photo || '') + ')',
+        onBillable: () => this.decide(key, 'billable'),
+        onNotBillable: () => this.decide(key, 'not_billable')
+      };
+    });
+    out.faultRows = faults.map(({ v, f }) => ({ reg: v.reg, sub: f.text + ' — reported by ' + f.by + ', ' + this.clock(f.at), onResolve: () => this.resolveFault(v.id, f.id) }));
+    out.histEmpty = d.history.length === 0;
+    out.histRows = d.history.slice(0, 120).map(h => {
+      const dt = new Date(h.ts);
+      return { ts: dt.getDate() + '/' + (dt.getMonth() + 1) + ' ' + this.clock(h.ts), user: h.user, action: h.action, detail: h.detail };
+    });
+
+    // reports
+    out.repFrom = S.repFrom; out.repTo = S.repTo;
+    out.onRepFrom = e => this.setState({ repFrom: e.target.value });
+    out.onRepTo = e => this.setState({ repTo: e.target.value });
+    out.onExportRuns = () => this.exportRuns();
+    out.onExportCanc = () => this.exportCanc();
+    const rf = S.repFields || this.defaultRepFields();
+    const fil = S.repFilter || 'all';
+    let cur = S.repFrom, n = 0, tot = 0, done = 0, canc = 0, customCount = 0;
+    const cancRows = [];
+    while (cur && cur <= S.repTo && n < 120) {
+      const { runs: rr } = this.computeRuns(d, cur);
+      tot += rr.length;
+      done += rr.filter(r => r.status === 'droppedOff' || r.status === 'pickedUp').length;
+      for (const r of rr) { if (r.status === 'cancelled' && r.st.cancel) { canc++; cancRows.push(r.st.cancel); } if (this.runPasses(r, fil)) customCount++; }
+      cur = this.addD(cur, 1); n++;
+    }
+    const billable = cancRows.filter(c => c.decision === 'billable').length;
+    const pending = cancRows.filter(c => !c.decision).length;
+    const kvr = (v, l, color) => ({ v: String(v), l, vStyle: 'font-size:20px;font-weight:700;color:' + (color || '#16232e') });
+    out.repStats = [kvr(tot, 'total runs'), kvr(done, 'picked up / done', '#2f7d5c'), kvr(canc, 'cancellations', canc ? '#b3402f' : '#16232e'), kvr(billable, 'billable', '#1f8a8f'), kvr(pending, 'awaiting decision', pending ? '#b3771f' : '#16232e')];
+    cancRows.sort((a, b) => a.date < b.date ? 1 : -1);
+    out.repEmpty = cancRows.length === 0;
+    out.repRows = cancRows.map(c => ({
+      date: c.date.slice(5), name: c.name, reason: c.label + (c.note ? ' — ' + c.note : ''),
+      chip: c.decision === 'billable' ? 'Billable' : c.decision === 'not_billable' ? 'Not billable' : 'Pending',
+      chipStyle: this.chip(c.decision === 'billable' ? '#1f8a8f' : c.decision === 'not_billable' ? '#5d6f7d' : '#b3771f')
+    }));
+
+    // custom report builder
+    out.repFieldChips = this.repFieldDefs().map(([k, l]) => ({ l, style: 'font-size:12px;font-weight:700;border-radius:99px;padding:7px 13px;' + (rf[k] ? 'background:#1f8a8f;color:#fff' : 'background:#eef1f4;color:#5d6f7d'), onToggle: () => this.setState({ repFields: { ...rf, [k]: !rf[k] } }) }));
+    out.repFilter = fil;
+    out.onRepFilter = e => this.setState({ repFilter: e.target.value });
+    out.repFilterOpts = [['all', 'All runs'], ['sched', 'School runs only'], ['jobs', 'One-off jobs only'], ['cancelled', 'Cancellations only'], ['completed', 'Completed only'], ['unassigned', 'Unassigned only']].map(([fv, fl]) => ({ v: fv, l: fl }));
+    out.repCount = customCount + ' row' + (customCount === 1 ? '' : 's') + ' match';
+    out.onExportCustom = () => this.exportCustom();
+
+    // settings
+    out.canSetCompany = !(d.company && d.company.trim());
+    out.companySet = !!(d.company && d.company.trim());
+    out.coName = S.coName;
+    out.onCoName = e => this.setState({ coName: e.target.value });
+    out.onSaveCo = () => { this.mut(dd => { dd.company = S.coName.trim(); this.log(dd, 'Company renamed', S.coName.trim()); }); this.showToast('Company name saved'); };
+    out.mgrPin = S.mgrPin;
+    out.onMgrPin = e => this.setState({ mgrPin: e.target.value.replace(/\D/g, '') });
+    out.onSavePin = () => { if (!/^\d{6}$/.test(S.mgrPin)) { this.showToast('PIN must be exactly 6 digits'); return; } this.mut(dd => { dd.managerPin = S.mgrPin; this.log(dd, 'Manager PIN changed', '******'); }); this.setState({ mgrPin: '' }); this.showToast('Manager PIN updated'); };
+    out.lookahead = String(d.lookaheadDays === undefined ? 1 : d.lookaheadDays);
+    out.lookaheadOpts = [['0', 'Today only'], ['1', '1 day ahead'], ['2', '2 days ahead'], ['3', '3 days ahead'], ['5', '5 days ahead'], ['7', '7 days ahead'], ['14', '14 days ahead']].map(([lv, ll]) => ({ v: lv, l: ll }));
+    out.onLookahead = e => { const n = parseInt(e.target.value); this.mut(dd => { dd.lookaheadDays = n; this.log(dd, 'Setting changed', 'Drivers & PAs can now see ' + (n === 0 ? 'today only' : n + ' day(s) ahead')); }); this.showToast('Saved — drivers & PAs see ' + (n === 0 ? 'today only' : n + ' day(s) ahead')); };
+    out.csvText = S.csvText;
+    out.onCsvText = e => this.setState({ csvText: e.target.value });
+    out.onImport = () => { const cnt = this.doImport(S.csvText); if (cnt) { this.setState({ csvText: '' }); this.showToast('Imported ' + cnt + ' passengers — now add their schedules'); } };
+    out.onHelpPassengers = () => this.openHelp('passengers');
+    out.onHelpStaff = () => this.openHelp('staff');
+    out.onHelpHolidays = () => this.openHelp('holidays');
+    out.holCsvText = S.holCsv || '';
+    out.onHolCsvText = e => this.setState({ holCsv: e.target.value });
+    out.onImportHolidays = () => {
+      const ents = this.parseHolCsv(S.holCsv || '');
+      if (!ents.length) { this.showToast('No rows recognised — check the date format'); return; }
+      this.mut(dd => {
+        const fresh = ents.filter(e2 => !dd.holidays.some(h => h.date === e2.date && (h.school || '') === e2.school && h.name === e2.name));
+        dd.holidays.push(...fresh);
+        this.log(dd, 'Holidays imported', fresh.length + ' day(s) from spreadsheet');
+      });
+      this.setState({ holCsv: '' });
+      this.showToast('Imported ' + ents.length + ' holiday/inset day(s)');
+    };
+    out.drvCsvText = S.drvCsv || '';
+    out.onDrvCsvText = e => this.setState({ drvCsv: e.target.value });
+    out.onImportStaff = () => {
+      const res = this.parseStaffCsv(S.drvCsv || '');
+      const total = res.drivers.length + res.assistants.length;
+      if (!total) { this.showToast('No rows recognised — check the format'); return; }
+      this.mut(dd => { dd.drivers.push(...res.drivers); dd.assistants.push(...res.assistants); this.log(dd, 'Staff imported', res.drivers.length + ' drivers, ' + res.assistants.length + ' assistants from spreadsheet'); });
+      this.setState({ drvCsv: '' });
+      this.showToast('Imported ' + res.drivers.length + ' drivers and ' + res.assistants.length + ' assistants');
+    };
+    out.onBackup = () => { this.download('transporthq_backup_' + this.tISO() + '.json', JSON.stringify(d, null, 1), 'application/json'); this.showToast('Backup downloaded'); };
+    out.onLoadDemo = () => { if (confirm('Load demo data? This replaces current passengers, staff and vehicles.')) this.loadDemo(); };
+    out.onClearAll = () => this.openForm('deleteAll', 'Delete all data', { confirm: '' }, {});
+    return out;
+  }
+
+  driverVals(d) {
+    const S = this.state, sess = S.session, t = this.tISO();
+    const { runs, hol } = this.computeRuns(d, t);
+    const mine = runs.filter(r => r.driverId === sess.id || r.assistantId === sess.id);
+    const doneCount = mine.filter(r => r.status === 'droppedOff' || r.status === 'cancelled').length;
+    const vehReg = (() => { const me = d.drivers.find(x => x.id === sess.id); return me && me.vehicleId ? this.vLabel(d, me.vehicleId) : ''; })();
+    const out = {
+      drvHello: (new Date().getHours() < 12 ? 'Morning' : 'Afternoon') + ', ' + sess.name.split(' ')[0],
+      drvSub: this.pretty(t) + ' · ' + doneCount + ' of ' + mine.length + ' runs done' + (vehReg ? ' · ' + vehReg : '') + (hol ? ' · school holiday' : ''),
+      drvProgressStyle: 'height:100%;background:#1f8a8f;border-radius:99px;width:' + (mine.length ? Math.round(doneCount / mine.length * 100) : 0) + '%',
+      drvEmpty: mine.length === 0,
+      onDrvFault: () => this.openFault('')
+    };
+    const la = d.lookaheadDays === undefined ? 1 : d.lookaheadDays;
+    out.drvUpcoming = [];
+    for (let i = 1; i <= la; i++) {
+      const fdate = this.addD(t, i);
+      const { runs: fr } = this.computeRuns(d, fdate);
+      const fmine = fr.filter(r => (r.driverId === sess.id || r.assistantId === sess.id) && r.status !== 'cancelled');
+      if (fmine.length) out.drvUpcoming.push({ label: this.pretty(fdate), items: fmine.map(r => ({ time: this.fmtT(r.time), name: r.name + (r.wheelchair ? ' ♿' : ''), route: r.from + ' → ' + r.to })) });
+    }
+    out.hasUpcoming = out.drvUpcoming.length > 0;
+    const next = mine.find(r => r.status === 'scheduled' || r.status === 'pickedUp');
+    const btn = (label, bg, onClick, small) => ({ label, onClick, style: (small ? 'width:96px' : 'flex:1') + ';text-align:center;background:' + bg + ';color:#fff;font-size:13.5px;font-weight:700;border-radius:10px;padding:14px 0' });
+    out.drvRuns = mine.map(r => {
+      const sc = this.statusChip(r);
+      const isNext = next && next.key === r.key;
+      const finished = r.status === 'droppedOff' || r.status === 'cancelled';
+      const buttons = [];
+      if (r.status === 'scheduled') { buttons.push(btn('Picked up', '#1f8a8f', () => this.markStatus(r, 'pickedUp'))); buttons.push(btn('Cancel', '#b3402f', () => this.openCancel(r), true)); }
+      else if (r.status === 'pickedUp') buttons.push(btn('Dropped off', '#2f7d5c', () => this.markStatus(r, 'droppedOff')));
+      return {
+        time: this.fmtT(r.time), name: r.name + (r.wheelchair ? ' ♿' : ''),
+        chip: r.leg === 'return' && r.status === 'scheduled' ? 'Return' : sc.chip.replace('Assign', 'Scheduled'),
+        chipStyle: r.leg === 'return' && r.status === 'scheduled' ? this.chip('#31576e') : sc.style,
+        route: r.from + ' → ' + r.to,
+        flags: [r.needsPA ? '⚑ PA required' + (r.assistantName ? ' — ' + r.assistantName : '') : '', r.notes].filter(Boolean).join(' · '),
+        cardStyle: 'background:#eef1f4;border-radius:14px;padding:14px' + (isNext ? ';border:2px solid #1f8a8f;box-shadow:0 3px 10px rgba(22,35,46,.18)' : '') + (finished ? ';opacity:.62' : ''),
+        hasButtons: buttons.length > 0, buttons,
+        maps: 'https://www.google.com/maps/dir/' + encodeURIComponent(r.from) + '/' + encodeURIComponent(r.to)
+      };
+    });
+    return out;
+  }
+
+  // ── modal renderVals ──
+  modalVals(d) {
+    const S = this.state, m = S.modal;
+    const out = { modalOpen: !!m, modalTitle: m ? m.title : '', onModalClose: () => this.closeModal(), onOverlay: () => this.closeModal(), isForm: false, isChoice: false, formFields: [], choices: [], modalSaveLabel: 'Save', modalSaveStyle: 'font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:9px;padding:11px 20px', onModalSave: () => {}, modalDangerShow: false, modalDangerLabel: '', onModalDanger: () => {}, isHelp: false, helpParas: [] };
+    if (!m) return out;
+    if (m.kind === 'help') { out.isHelp = true; out.helpParas = m.meta.paras; return out; }
+    const v = m.values || {};
+    const drs = d.drivers, asts = d.assistants, vehs = d.vehicles;
+    const optList = (list, none, nameKey) => [{ v: '', l: none }].concat(list.map(x => ({ v: x.id, l: x[nameKey || 'name'] })));
+    const txt = (key, label, ph, hint) => ({ label, ph: ph || '', hint: hint || '', isText: true, value: v[key] || '', onChange: e => this.mv(key, e.target.value) });
+    const sel = (key, label, options) => ({ label, isSelect: true, value: v[key] || '', options, onChange: e => this.mv(key, e.target.value) });
+    const chk = (key, label) => ({ label, isCheck: true, onToggle: () => this.mv(key, !v[key]), checkLabel: v[key] ? 'Yes' : 'No',
+      swTrackStyle: 'position:relative;display:inline-block;width:44px;height:24px;border-radius:99px;flex:none;transition:background .15s;background:' + (v[key] ? '#1f8a8f' : '#b8c4cd'),
+      swKnobStyle: 'position:absolute;top:2px;left:' + (v[key] ? '22px' : '2px') + ';width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(22,35,46,.3);transition:left .15s',
+      swTextStyle: 'font-size:13px;font-weight:700;color:' + (v[key] ? '#1f8a8f' : '#5d6f7d') });
+    const ta = (key, label, ph) => ({ label, ph: ph || '', isTextarea: true, value: v[key] || '', onChange: e => this.mv(key, e.target.value) });
+    const tm = (key, label) => ({ label, isTime: true, value: v[key] || '', onChange: e => this.mv(key, e.target.value) });
+    const dt = (key, label) => ({ label, isDate: true, value: v[key] || '', onChange: e => this.mv(key, e.target.value) });
+    const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const daysField = () => ({
+      label: 'Days', isDays: true,
+      days: [1, 2, 3, 4, 5, 6, 0].map(dw => ({
+        l: dayNames[dw],
+        style: 'flex:1;font-size:12px;font-weight:700;border-radius:8px;padding:9px 0;' + (v.days.includes(dw) ? 'background:#1f8a8f;color:#fff' : 'background:#eef1f4;color:#5d6f7d'),
+        onToggle: () => {
+          const days = v.days.includes(dw) ? v.days.filter(x => x !== dw) : [...v.days, dw];
+          const perday = { ...v.perday };
+          if (!perday[dw]) { const src = perday[v.days[0]] || { pt: '', rt: '', driverId: '', assistantId: '', vehicleId: '' }; perday[dw] = { ...src }; }
+          const mm = { ...S.modal }; mm.values = { ...v, days, perday }; this.setState({ modal: mm });
+        }
+      }))
+    });
+
+    if (m.kind === 'choice') {
+      out.isChoice = true;
+      const run = m.meta.run;
+      const cStyle = 'display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;background:#eef1f4;border-radius:10px;padding:12px 14px;color:#16232e;width:100%';
+      const choices = [];
+      if (run.status === 'cancelled') choices.push({ label: 'Reinstate this run', desc: 'Clear the cancellation for ' + this.pretty(run.date), onClick: () => this.reinstate(run), style: cStyle });
+      else {
+        choices.push({ label: 'Edit today only', desc: 'Change time, driver, PA or vehicle for ' + this.pretty(run.date) + ' — the schedule stays the same', onClick: () => this.openEditToday(run), style: cStyle });
+        if (run.kind === 'sched') choices.push({ label: 'Edit the whole schedule', desc: 'Open the passenger and change their recurring runs', onClick: () => { const p = d.passengers.find(x => x.id === run.pid); this.openPassenger(p); }, style: cStyle });
+        if (run.kind === 'job') choices.push({ label: 'Edit this job', desc: 'Change the one-off job details', onClick: () => { const j = d.jobs.find(x => x.id === run.jid); this.openJob(j); }, style: cStyle });
+        if (run.status === 'scheduled') choices.push({ label: 'Mark picked up', desc: 'Record pickup at ' + this.clock(Date.now()), onClick: () => { this.markStatus(run, 'pickedUp'); this.closeModal(); }, style: cStyle });
+        if (run.status === 'pickedUp') choices.push({ label: 'Mark dropped off', desc: 'Record drop-off at ' + this.clock(Date.now()), onClick: () => { this.markStatus(run, 'droppedOff'); this.closeModal(); }, style: cStyle });
+        choices.push({ label: 'Cancel this run', desc: 'Record a reason — goes to manager review for billing', onClick: () => this.openCancel(run), style: cStyle + ';background:#e9dedb;color:#b3402f' });
+        if (run.kind === 'job') choices.push({ label: 'Delete job', desc: 'Remove this one-off job entirely', onClick: () => { if (confirm('Delete this job?')) { this.mut(dd => { dd.jobs = dd.jobs.filter(x => x.id !== run.jid); this.log(dd, 'Job deleted', run.name); }); this.closeModal(); } }, style: cStyle + ';background:#e9dedb;color:#b3402f' });
+      }
+      out.choices = choices;
+      return out;
+    }
+
+    out.isForm = true;
+    if (m.kind === 'passenger') {
+      out.modalTitle = m.title;
+      const tgl = on => 'font-size:12px;font-weight:700;border-radius:99px;padding:8px 13px;' + (on ? 'background:#1f8a8f;color:#fff' : 'background:#dfe5ea;color:#5d6f7d');
+      const baseTimeOpts = [];
+      for (let th = 6; th <= 19; th++) for (let tmn = 0; tmn < 60; tmn += 5) { const tv = String(th).padStart(2, '0') + ':' + String(tmn).padStart(2, '0'); baseTimeOpts.push({ v: tv, l: this.fmtT(tv) }); }
+      const timeOptsFor = cv => (!cv || baseTimeOpts.some(o => o.v === cv)) ? baseTimeOpts : [{ v: cv, l: this.fmtT(cv) }].concat(baseTimeOpts);
+      const rows = [...v.days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((dw, i) => {
+        const c = v.perday[dw] || {};
+        const set = (k, val) => { const perday = { ...v.perday, [dw]: { ...c, [k]: val } }; this.mv('perday', perday); };
+        const anyPt = Object.values(v.perday).map(x => x.pt).find(Boolean) || '08:30';
+        const anyRt = Object.values(v.perday).map(x => x.rt).find(Boolean) || '15:15';
+        return {
+          label: dayNames[dw], showCopy: i === 0 && v.days.length > 1,
+          onCopy: () => { const src = v.perday[dw] || {}; const perday = { ...v.perday }; for (const o of v.days) perday[o] = { ...src }; this.mv('perday', perday); },
+          pt: c.pt || '', onPt: e => set('pt', e.target.value),
+          ptOn: !!c.pt, ptToggleLabel: 'Pickup', ptOnStyle: tgl(!!c.pt),
+          onPtToggle: () => set('pt', c.pt ? '' : anyPt),
+          rt: c.rt || '', onRt: e => set('rt', e.target.value),
+          rtOn: !!c.rt, rtToggleLabel: 'Return', rtOnStyle: tgl(!!c.rt),
+          onRtToggle: () => set('rt', c.rt ? '' : anyRt),
+          ptOpts: timeOptsFor(c.pt), rtOpts: timeOptsFor(c.rt),
+          drv: c.driverId || '', onDrv: e => set('driverId', e.target.value), drvOpts: optList(drs, '— driver —'),
+          asst: c.assistantId || '', onAsst: e => set('assistantId', e.target.value), asstOpts: optList(asts, '— no PA —'),
+          veh: c.vehicleId || '', onVeh: e => set('vehicleId', e.target.value), vehOpts: optList(vehs, '— vehicle —', 'reg'),
+          isEx: false, daOn: !!c.diffAddr, daStyle: tgl(!!c.diffAddr) + ';align-self:flex-start', onDaToggle: () => set('diffAddr', !c.diffAddr),
+          daAddr: c.addr || '', onDaAddr: e => set('addr', e.target.value),
+          daTown: c.town || '', onDaTown: e => set('town', e.target.value),
+          daPc: c.postcode || '', onDaPc: e => set('postcode', e.target.value)
+        };
+      });
+      const exs = v.exceptions || [];
+      const setEx = (i, k, val) => this.mv('exceptions', exs.map((x, j) => j === i ? { ...x, [k]: val } : x));
+      const exRows = exs.map((ex, i) => ({
+        label: ex.date ? this.pretty(ex.date) : 'Pick a date →',
+        isEx: true, exDate: ex.date || '', onExDate: e => setEx(i, 'date', e.target.value),
+        onExRemove: () => this.mv('exceptions', exs.filter((_, j) => j !== i)),
+        showCopy: false,
+        pt: ex.pt || '', onPt: e => setEx(i, 'pt', e.target.value),
+        ptOn: !!ex.pt, ptToggleLabel: 'Pickup', ptOnStyle: tgl(!!ex.pt),
+        onPtToggle: () => setEx(i, 'pt', ex.pt ? '' : '08:30'),
+        rt: ex.rt || '', onRt: e => setEx(i, 'rt', e.target.value),
+        rtOn: !!ex.rt, rtToggleLabel: 'Return', rtOnStyle: tgl(!!ex.rt),
+        onRtToggle: () => setEx(i, 'rt', ex.rt ? '' : '15:15'),
+        ptOpts: timeOptsFor(ex.pt), rtOpts: timeOptsFor(ex.rt),
+        drv: ex.driverId || '', onDrv: e => setEx(i, 'driverId', e.target.value), drvOpts: optList(drs, '— driver —'),
+        asst: ex.assistantId || '', onAsst: e => setEx(i, 'assistantId', e.target.value), asstOpts: optList(asts, '— no PA —'),
+        veh: ex.vehicleId || '', onVeh: e => setEx(i, 'vehicleId', e.target.value), vehOpts: optList(vehs, '— vehicle —', 'reg'),
+        daOn: !!ex.diffAddr, daStyle: tgl(!!ex.diffAddr) + ';align-self:flex-start', onDaToggle: () => setEx(i, 'diffAddr', !ex.diffAddr),
+        daAddr: ex.addr || '', onDaAddr: e => setEx(i, 'addr', e.target.value),
+        daTown: ex.town || '', onDaTown: e => setEx(i, 'town', e.target.value),
+        daPc: ex.postcode || '', onDaPc: e => setEx(i, 'postcode', e.target.value)
+      }));
+      out.formFields = [
+        txt('name', 'Name', 'Full name'),
+        txt('address', 'Address', 'House and street'), txt('town', 'Town'), txt('postcode', 'Postcode'),
+        txt('school', 'School / destination', 'e.g. St Mary\u2019s Primary'),
+        chk('wheelchair', 'Wheelchair user ♿'), chk('needsPA', 'Passenger assistant required'),
+        ta('notes', 'Notes', 'Gate codes, meeting point, behaviour notes…'),
+        daysField(),
+        { label: 'Journeys on each day', isPerday: true, rows, hint: 'Turn each journey on or off per day — e.g. a morning-only run on Fridays, or return-only. Pickup runs home → school; return runs school → home. Times, driver, PA, vehicle and address can differ per day.' },
+        { label: 'One-off exceptions — single dates', isPerday: true, rows: exRows, hasAddEx: true, onAddEx: () => this.mv('exceptions', [...exs, { date: '', pt: '', rt: '', driverId: '', assistantId: '', vehicleId: '', diffAddr: false, addr: '', town: '', postcode: '' }]), hint: 'For one specific date only — e.g. a one-off appointment or temporary change. Overrides the normal schedule on that date; the weekly pattern is unchanged. Turn both Pickup and Return off to skip that date entirely.' }
+      ];
+      out.onModalSave = () => this.savePassenger();
+      if (m.meta.pid) { out.modalDangerShow = true; out.modalDangerLabel = 'Archive'; out.onModalDanger = () => { if (confirm('Archive this passenger?')) { this.mut(dd => { dd.passengers.find(x => x.id === m.meta.pid).archived = true; this.log(dd, 'Passenger archived', v.name); }); this.closeModal(); } }; }
+    }
+    if (m.kind === 'staff') {
+      out.formFields = [
+        txt('name', 'Name'), txt('pin', 'Login PIN', '6 digits', 'The PIN they type on the login screen'), txt('phone', 'Phone'),
+        sel('role', 'Role', [{ v: 'driver', l: 'Driver' }, { v: 'assistant', l: 'Passenger assistant' }]),
+        daysField(),
+        sel('vehicleId', 'Usual vehicle', optList(vehs, '— none —', 'reg')),
+        ta('notes', 'Notes', 'e.g. not available 12–3pm')
+      ];
+      out.onModalSave = () => this.saveStaff();
+    }
+    if (m.kind === 'vehicle') {
+      out.formFields = [
+        txt('reg', 'Registration', 'AB12 CDE'),
+        txt('nickname', 'Nickname (optional)', 'e.g. Silver bus'), chk('useNickname', 'Show nickname instead of reg on the runs page'),
+        txt('make', 'Make / model'), txt('seats', 'Seats'),
+        chk('wheelchair', 'Wheelchair accessible (WAV)'),
+        sel('driverId', 'Usual driver', optList(drs, '— none —')),
+        dt('mot', 'MOT due'), dt('ins', 'Insurance renewal'), dt('tax', 'Tax renewal'),
+        ta('notes', 'Notes / quirks', 'e.g. sliding door sticks, spare key in office')
+      ];
+      out.onModalSave = () => this.saveVehicle();
+    }
+    if (m.kind === 'job') {
+      const jf = [
+        txt('customer', 'Customer / passenger'), dt('date', 'Date'), tm('time', 'Time'),
+        txt('pickup', 'Pickup address'), txt('dropoff', 'Drop-off address'),
+        sel('driverId', 'Driver', optList(drs, '— unassigned —')), sel('assistantId', 'Passenger assistant', optList(asts, '— none —')), sel('vehicleId', 'Vehicle', optList(vehs, '— none —', 'reg')),
+        chk('addReturn', 'Add a return journey')
+      ];
+      if (v.addReturn) {
+        jf.push({ label: 'Return date (change if not returning the same day)', isDate: true, value: v.returnDate || v.date, onChange: e => this.mv('returnDate', e.target.value) });
+        jf.push(tm('returnTime', 'Return time'));
+        jf.push({ label: 'Return driver', isSelect: true, value: v.returnDriverId === undefined ? (v.driverId || '') : v.returnDriverId, options: optList(drs, '— unassigned —'), onChange: e => this.mv('returnDriverId', e.target.value) });
+        jf.push({ label: 'Return passenger assistant', isSelect: true, value: v.returnAssistantId === undefined ? (v.assistantId || '') : v.returnAssistantId, options: optList(asts, '— none —'), onChange: e => this.mv('returnAssistantId', e.target.value) });
+        jf.push({ label: 'Return vehicle', isSelect: true, value: v.returnVehicleId === undefined ? (v.vehicleId || '') : v.returnVehicleId, options: optList(vehs, '— none —', 'reg'), onChange: e => this.mv('returnVehicleId', e.target.value) });
+      }
+      jf.push(ta('notes', 'Notes'));
+      out.formFields = jf;
+      out.onModalSave = () => this.saveJob();
+    }
+    if (m.kind === 'absence') {
+      out.formFields = [
+        sel('staffId', 'Staff member', optList(drs.concat(asts), '— choose —')),
+        dt('from', 'From'), dt('to', 'To'),
+        sel('type', 'Type', [{ v: 'holiday', l: 'Holiday' }, { v: 'sick', l: 'Sick' }, { v: 'other', l: 'Other absence' }])
+      ];
+      out.onModalSave = () => this.saveAbsence();
+    }
+    if (m.kind === 'editToday') {
+      out.formFields = [
+        tm('time', 'Time (today only)'),
+        sel('driverId', 'Driver', optList(drs, '— unassigned —')),
+        sel('assistantId', 'Passenger assistant', optList(asts, '— none —')),
+        sel('vehicleId', 'Vehicle', optList(vehs, '— none —', 'reg')),
+        { label: '', hint: 'Only changes ' + this.pretty(m.meta.run.date) + '. The recurring schedule is not affected.' }
+      ];
+      out.modalSaveLabel = 'Save for today';
+      out.onModalSave = () => this.saveEditToday();
+    }
+    if (m.kind === 'cancel') {
+      const reasons = [['no_answer', 'No answer at door'], ['guardian', 'Parent/guardian said not travelling'], ['passenger', 'Passenger said not travelling'], ['school', 'School/council advised not travelling'], ['other', 'Other']];
+      const fields = [{
+        label: 'Reason', isRadio: true,
+        options: reasons.map(([id, l]) => ({ l, onPick: () => this.mv('reason', id), style: 'text-align:left;font-size:13px;font-weight:600;border-radius:9px;padding:11px 14px;width:100%;' + (v.reason === id ? 'background:#1f8a8f;color:#fff' : 'background:#eef1f4;color:#16232e') }))
+      }];
+      if (v.reason === 'no_answer') fields.push({ label: 'Photo evidence (door)', isFile: true, photo: v.photo, photoStyle: 'display:block;margin-top:8px;width:120px;height:120px;border-radius:10px;background-size:cover;background-position:center;background-image:url(' + (v.photo || '') + ')', onFile: e => { const f = e.target.files[0]; if (f) this.resizePhoto(f, url => this.mv('photo', url)); }, hint: 'Take a photo showing you attended — required for billing evidence' });
+      if (v.reason) fields.push(ta('note', v.reason === 'other' ? 'Note (required)' : 'Note (optional)', 'What happened?'));
+      out.formFields = fields;
+      out.modalSaveLabel = 'Confirm cancellation';
+      out.onModalSave = () => this.saveCancel();
+    }
+    if (m.kind === 'fault') {
+      out.formFields = [
+        sel('vehicleId', 'Vehicle', optList(vehs, '— choose vehicle —', 'reg')),
+        ta('text', 'What\u2019s wrong?', 'e.g. nearside sliding door stiff, warning light on dash')
+      ];
+      out.modalSaveLabel = 'Report fault';
+      out.onModalSave = () => this.saveFault();
+    }
+    if (m.kind === 'deleteAll') {
+      const target = (d.company || '').trim() || 'DELETE';
+      const match = (v.confirm || '').trim() === target;
+      out.formFields = [
+        { label: '', hint: 'This permanently deletes ALL data — passengers, staff, vehicles, jobs, holidays and history. It cannot be undone. Download a backup first if in doubt.' },
+        txt('confirm', 'Type “' + target + '” to confirm', target)
+      ];
+      out.modalSaveLabel = 'Delete all data';
+      out.modalSaveStyle = match
+        ? 'font-size:12.5px;font-weight:700;color:#fff;background:#b3402f;border-radius:9px;padding:11px 20px'
+        : 'font-size:12.5px;font-weight:700;color:#8a97a1;background:#cdd6dd;border-radius:9px;padding:11px 20px;cursor:not-allowed;pointer-events:none';
+      out.onModalSave = () => {
+        if (!match) return;
+        const blank = this.blankData();
+        this.persist(blank);
+        this.setState({ data: blank, coName: '', modal: null });
+        this.showToast('All data deleted');
+      };
+    }
+    if (m.kind === 'holiday') {
+      const schools = [...new Set(d.passengers.filter(p => !p.archived && p.school).map(p => p.school))];
+      const existing = d.holidays.filter(h => h.date === m.meta.date);
+      const absExisting = d.staffHolidays.filter(a => a.date === m.meta.date);
+      const allStf = drs.concat(asts);
+      const already = existing.map(h => (h.name || 'Holiday') + ' (' + (h.school || 'all schools') + ')').concat(absExisting.map(a => this.nameOf(allStf, a.staffId) + ' ' + a.type)).join(' · ');
+      const fields = [sel('kind', 'What are you adding?', [{ v: 'holiday', l: 'School holiday (e.g. Easter, summer)' }, { v: 'inset', l: 'Inset day (school closed to pupils)' }, { v: 'staff', l: 'Staff holiday / absence' }])];
+      if (v.kind === 'staff') {
+        fields.push(sel('staffId', 'Staff member', optList(allStf, '— choose —')));
+        fields.push(sel('absType', 'Absence type', [{ v: 'holiday', l: 'Holiday' }, { v: 'sick', l: 'Sick' }, { v: 'other', l: 'Other' }]));
+        fields.push({ label: '', hint: 'Adds this one day. For a longer period use the Absence button on the Staff page.' });
+      } else {
+        fields.push(sel('school', 'Applies to', [{ v: '', l: 'All schools' }].concat(schools.map(s => ({ v: s, l: s })))));
+        fields.push(txt('name', 'Description (shows on the calendar)', v.kind === 'inset' ? 'e.g. Inset day — staff training' : 'e.g. Summer holidays, Easter holidays'));
+      }
+      fields.push({ label: '', hint: already ? 'Already on this day: ' + already : 'Nothing on this day yet. Affected passengers\u2019 school runs are paused automatically.' });
+      out.formFields = fields;
+      out.modalSaveLabel = 'Add';
+      out.onModalSave = () => this.saveHoliday();
+      if (existing.length || absExisting.length) { out.modalDangerShow = true; out.modalDangerLabel = 'Clear this day'; out.onModalDanger = () => { this.mut(dd => { dd.holidays = dd.holidays.filter(h => h.date !== m.meta.date); dd.staffHolidays = dd.staffHolidays.filter(a => a.date !== m.meta.date); this.log(dd, 'Day cleared', this.pretty(m.meta.date) + ' — holidays and absences removed'); }); this.closeModal(); }; }
+    }
+    return out;
+  }
+
+  // ── wizard ──
+  wizardVals(d) {
+    const S = this.state, w = S.wizard;
+    const out = { wizOpen: !!w, wizStep0: false, wizStep1: false, wizStep2: false, wizStep3: false, wizDots: [], wizCo: '', wizDName: '', wizDPin: '', wizCsv: '', wizImportMsg: '', wizDrivers: [], wizSummary: '' };
+    if (!w) return out;
+    out['wizStep' + w.step] = true;
+    out.wizDots = [0, 1, 2, 3].map(i => ({ style: 'flex:1;height:5px;border-radius:99px;background:' + (i <= w.step ? '#1f8a8f' : '#c2cdd5') }));
+    const setW = (patch) => this.setState({ wizard: { ...w, ...patch } });
+    out.wizCo = S.coName;
+    out.onWizCo = e => this.setState({ coName: e.target.value });
+    out.onWizDemo = () => this.loadDemo();
+    out.onWizNext = () => {
+      if (w.step === 0 && S.coName.trim()) this.mut(dd => { dd.company = S.coName.trim(); });
+      setW({ step: Math.min(3, w.step + 1) });
+    };
+    out.onWizBack = () => setW({ step: Math.max(0, w.step - 1) });
+    out.wizDName = w.dName; out.onWizDName = e => setW({ dName: e.target.value });
+    out.wizDPin = w.dPin; out.onWizDPin = e => setW({ dPin: e.target.value.replace(/\D/g, '') });
+    out.onWizAddDriver = () => {
+      if (!w.dName.trim()) { this.showToast('Enter a name'); return; }
+      if (!/^\d{6}$/.test(w.dPin)) { this.showToast('PIN must be 6 digits'); return; }
+      this.mut(dd => { dd.drivers.push({ id: this.gid(), name: w.dName.trim(), pin: w.dPin, phone: '', workDays: [1, 2, 3, 4, 5], vehicleId: '' }); this.log(dd, 'Staff added', w.dName.trim() + ' (driver)'); });
+      setW({ dName: '', dPin: '' });
+    };
+    out.wizDrivers = d.drivers.map(x => ({ name: x.name, pin: x.pin }));
+    out.wizCsv = w.csv; out.onWizCsv = e => setW({ csv: e.target.value });
+    out.wizImportMsg = w.msg;
+    out.onWizImport = () => { const cnt = this.doImport(w.csv); if (cnt) setW({ csv: '', msg: 'Imported ' + cnt + ' passengers ✓' }); };
+    out.wizSummary = 'You have ' + d.drivers.length + ' driver' + (d.drivers.length === 1 ? '' : 's') + ' and ' + d.passengers.length + ' passenger' + (d.passengers.length === 1 ? '' : 's') + ' set up.';
+    out.onWizFinish = () => { this.mut(dd => { dd.setupDone = true; this.log(dd, 'Setup completed', 'Onboarding wizard finished'); }); this.setState({ wizard: null }); };
+    return out;
+  }
+}
+</script>
+</body>
+</html>
