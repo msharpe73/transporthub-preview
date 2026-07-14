@@ -33,8 +33,8 @@
 <sc-if value="{{ showAuth }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Company Login" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
-    <div style="font-size:13px;color:#16232e;font-weight:600">Everyone signs in with their own email and password</div>
+    <sc-if value="{{ authCoLogo }}" hint-placeholder-val="{{ false }}">{{ authCoLogoImg }}<div style="font-size:11.5px;color:#31576e;font-weight:600">Powered by TransportHQ</div></sc-if>
+    <sc-if value="{{ noAuthCoLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)"></sc-if>
   </div>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22)">
     <div style="display:flex;gap:6px">
@@ -53,7 +53,7 @@
     <input value="{{ authPassword }}" onChange="{{ onAuthPassword }}" placeholder="Password (min 6 characters)" type="password" style="border:none;border-radius:8px;padding:11px 12px;font-size:13.5px;background:#eef1f4;color:#16232e">
     <button onClick="{{ onAuthSubmit }}" style="font-size:14px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:10px;padding:12px;box-shadow:0 3px 8px rgba(22,35,46,.24)">{{ authSubmitLabel }}</button>
     <sc-if value="{{ authIsLogin }}" hint-placeholder-val="{{ true }}">
-      <div style="font-size:11.5px;color:#e8edf1;line-height:1.5;text-align:center;font-weight:600">Managers, drivers, passenger assistants and client contacts all log in here with their own email and password. First time with an invite code? Choose Activate above.</div>
+      <div style="font-size:11.5px;color:#e8edf1;line-height:1.5;text-align:center;font-weight:600">First time with an invite code? Choose Activate above.</div>
       <button onClick="{{ onForgotPassword }}" style="font-size:12px;font-weight:600;color:#e8edf1;background:none;padding:4px;text-align:center">Forgot your password?</button>
     </sc-if>
     <sc-if value="{{ authResetSent }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;font-size:12px;color:#2f7d5c;font-weight:600">Password reset email sent — check your inbox (and spam/junk folder).</div></sc-if>
@@ -86,7 +86,8 @@
 <!-- ═══════ PIN QUICK UNLOCK ═══════ -->
 <sc-if value="{{ showPinLock }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="PIN Unlock" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
-  <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+  <sc-if value="{{ pinCoLogo }}" hint-placeholder-val="{{ false }}">{{ pinCoLogoImg }}<div style="font-size:11.5px;color:#31576e;font-weight:600">Powered by TransportHQ</div></sc-if>
+  <sc-if value="{{ noPinCoLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)"></sc-if>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
     <div style="font-size:14px;font-weight:700;color:#fff">Welcome back</div>
     <div style="font-size:12.5px;color:#e8edf1;font-weight:600">{{ pinLockEmail }}</div>
@@ -124,8 +125,12 @@
   <div style="{{ sideStyle }}">
     <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;gap:10px;padding:0 16px 16px;border-bottom:1px solid rgba(255,255,255,.12)">
-        <img src="assets/logo-icon.png" alt="" style="width:36px;height:36px;border-radius:9px;flex:none;background:#fff">
-        <div style="min-width:0;flex:1"><div style="font-weight:700;font-size:14px">TransportHQ</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></div>
+        <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}">{{ coLogoImg36 }}</sc-if>
+        <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-icon.png" alt="" style="width:36px;height:36px;border-radius:9px;flex:none;background:#fff"></sc-if>
+        <div style="min-width:0;flex:1">
+          <sc-if value="{{ hasBrand }}" hint-placeholder-val="{{ false }}"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Powered by TransportHQ</div></sc-if>
+          <sc-if value="{{ noBrand }}" hint-placeholder-val="{{ true }}"><div style="font-weight:700;font-size:14px">TransportHQ</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></sc-if>
+        </div>
         <button onClick="{{ onMenuToggle }}" style="font-size:13px;font-weight:700;color:#fff;background:rgba(255,255,255,.16);border-radius:7px;width:26px;height:26px;flex:none">✕</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:2px;padding:12px 10px">
@@ -141,8 +146,12 @@
     <sc-if value="{{ menuClosed }}" hint-placeholder-val="{{ false }}">
       <button onClick="{{ onMenuToggle }}" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.16);color:#fff;font-size:17px;font-weight:700;position:relative;flex:none">☰<sc-if value="{{ reviewDot }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:#c25438;border:2px solid #2c4a5e"></span></sc-if></button>
       <sc-if value="{{ narrowBar }}" hint-placeholder-val="{{ false }}">
-        <img src="assets/logo-icon.png" alt="" style="width:32px;height:32px;border-radius:8px;flex:none;background:#fff">
-        <div style="min-width:0;flex:1"><div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1.15">Transport<span style="color:#7fd4dc">HQ</span></div><div style="font-size:10.5px;font-weight:600;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></div>
+        <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}">{{ coLogoImg32 }}</sc-if>
+        <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-icon.png" alt="" style="width:32px;height:32px;border-radius:8px;flex:none;background:#fff"></sc-if>
+        <div style="min-width:0;flex:1">
+          <sc-if value="{{ hasBrand }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div><div style="font-size:10px;font-weight:600;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Powered by TransportHQ</div></sc-if>
+          <sc-if value="{{ noBrand }}" hint-placeholder-val="{{ true }}"><div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1.15">Transport<span style="color:#7fd4dc">HQ</span></div><div style="font-size:10.5px;font-weight:600;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></sc-if>
+        </div>
         <div style="position:relative;flex:none">
           <button onClick="{{ onNotifToggle }}" title="Notifications" style="width:38px;height:38px;border-radius:9px;background:rgba(255,255,255,.16);font-size:16px;position:relative">🔔<sc-if value="{{ notifCount }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:99px;background:#c25438;color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;padding:0 4px;border:2px solid #2c4a5e">{{ notifCount }}</span></sc-if></button>
           <sc-if value="{{ notifOpen }}" hint-placeholder-val="{{ false }}">
@@ -191,8 +200,10 @@
       <sc-if value="{{ notNarrow }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:12px">
-          <img src="assets/logo-icon.png" alt="" style="width:46px;height:46px;border-radius:11px;background:#fff;box-shadow:0 2px 6px rgba(22,35,46,.15)">
-          <div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">Transport<span style="color:#149da8">HQ</span></div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ companyName }}</div></div>
+          <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}">{{ coLogoImg46 }}</sc-if>
+          <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-icon.png" alt="" style="width:46px;height:46px;border-radius:11px;background:#fff;box-shadow:0 2px 6px rgba(22,35,46,.15)"></sc-if>
+          <sc-if value="{{ hasBrand }}" hint-placeholder-val="{{ false }}"><div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">{{ companyName }}</div><div style="font-size:11.5px;font-weight:600;color:#31576e">Powered by TransportHQ</div></div></sc-if>
+          <sc-if value="{{ noBrand }}" hint-placeholder-val="{{ true }}"><div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">Transport<span style="color:#149da8">HQ</span></div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ companyName }}</div></div></sc-if>
         </div>
       </div>
       </sc-if>
@@ -231,7 +242,7 @@
                 <div style="{{ r.rowStyle }}">
                   <div style="width:46px;flex:none;font-weight:700;font-size:13.5px;color:#16232e">{{ r.time }}</div>
                   <div style="flex:1 1 180px;min-width:180px"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ r.title }}</div><sc-for list="{{ r.subLines }}" as="l" hint-placeholder-count="1"><div style="{{ l.style }}">{{ l.text }}</div></sc-for></div>
-                  <button onClick="{{ r.onChip }}" style="{{ r.chipStyle }}">{{ r.chip }}</button>
+                  <sc-if value="{{ r.chip }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.onChip }}" style="{{ r.chipStyle }}">{{ r.chip }}</button></sc-if>
                   <button onClick="{{ r.onMenu }}" style="font-size:12px;font-weight:700;color:#31576e;background:#d5dde3;border-radius:7px;padding:6px 10px;flex:none">Manage</button>
                 </div>
               </sc-for>
@@ -263,7 +274,7 @@
               <div style="min-width:0">
                 <button onClick="{{ c.go }}" style="{{ c.hdStyle }}">{{ c.label }}</button>
                 <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
-                  <sc-for list="{{ c.items }}" as="i" hint-placeholder-count="2"><div style="{{ i.style }}"><b>{{ i.time }}</b> {{ i.name }}<br><span style="opacity:.75">{{ i.sub }}</span></div></sc-for>
+                  <sc-for list="{{ c.items }}" as="i" hint-placeholder-count="2"><div style="{{ i.style }}"><b>{{ i.time }}</b> {{ i.name }}<br><span style="{{ i.subStyle }}">{{ i.sub }}</span></div></sc-for>
                 </div>
               </div>
             </sc-for>
@@ -300,19 +311,18 @@
               <div style="background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;flex-direction:column;gap:8px">
                 <div style="display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap">
                   <div style="width:34px;height:34px;border-radius:50%;background:#31576e;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700;flex:none">{{ s.initials }}</div>
-                  <div style="flex:1 1 140px;min-width:140px"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ s.name }}</div><div style="font-size:11.5px;color:#16232e">{{ s.sub }}</div></div>
+                  <div style="flex:1 1 140px;min-width:140px"><div style="font-size:13.5px;font-weight:600;color:#16232e">{{ s.name }}</div></div>
                   <span style="{{ s.chipStyle }}">{{ s.chip }}</span>
                   <div style="display:flex;gap:6px">
-                    <button onClick="{{ s.onAbsence }}" style="font-size:12px;font-weight:700;color:#31576e;background:#d5dde3;border-radius:7px;padding:6px 10px">Absence</button>
                     <button onClick="{{ s.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:6px 12px">Edit</button>
                   </div>
                 </div>
                 <sc-if value="{{ s.hasRuns }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;flex-direction:column;gap:5px;border-top:1px solid #dfe5ea;padding-top:8px">
-                    <sc-for list="{{ s.runsList }}" as="r" hint-placeholder-count="2"><div style="display:flex;gap:10px;align-items:center;font-size:12.5px;color:#16232e"><span style="font-weight:700;width:46px;flex:none">{{ r.time }}</span><span style="flex:1;min-width:0">{{ r.desc }}</span><span style="{{ r.chipStyle }}">{{ r.chip }}</span></div></sc-for>
+                    <sc-for list="{{ s.runsList }}" as="r" hint-placeholder-count="2"><div style="display:flex;gap:10px;align-items:center;font-size:12.5px;color:#16232e"><span style="font-weight:700;width:46px;flex:none">{{ r.time }}</span><span style="flex:1;min-width:0">{{ r.desc }}</span><sc-if value="{{ r.chip }}" hint-placeholder-val="{{ false }}"><span style="{{ r.chipStyle }}">{{ r.chip }}</span></sc-if></div></sc-for>
                   </div>
                 </sc-if>
-                <sc-if value="{{ s.noRunsToday }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#16232e;border-top:1px solid #dfe5ea;padding-top:8px">No runs on this day.</div></sc-if>
+                <sc-if value="{{ s.noRunsToday }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#16232e;border-top:1px solid #dfe5ea;padding-top:8px">No runs.</div></sc-if>
               </div>
             </sc-for>
           </div>
@@ -335,7 +345,7 @@
             <span>Click a day to <b>edit</b></span>
             <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#7a5aa0;display:inline-block"></span>All schools</span>
             <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#4a7fa5;display:inline-block"></span>One school / inset day</span>
-            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#f59e2d;display:inline-block"></span>Staff absent</span>
+            <span style="display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:3px;background:#b3402f;display:inline-block"></span>Staff absent</span>
           </div>
           <sc-if value="{{ hasAbs }}" hint-placeholder-val="{{ false }}">
           <div style="background:#eef1f4;border-radius:12px;padding:12px 14px;margin-top:8px">
@@ -429,7 +439,6 @@
               <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#16232e;text-transform:uppercase;letter-spacing:.06em">Vehicle</div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ s.veh }}</div></div>
             </div>
             <div style="{{ s.actionsStyle }}">
-              <button onClick="{{ s.onAbsence }}" style="font-size:12px;font-weight:700;color:#31576e;background:#cdd6dd;border-radius:7px;padding:7px 11px">Absence</button>
               <button onClick="{{ s.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:7px 14px">Edit</button>
               <button onClick="{{ s.onArch }}" style="{{ s.archStyle }}">{{ s.archLabel }}</button>
             </div>
@@ -603,14 +612,14 @@
       <div style="display:flex;flex-direction:column;gap:10px">
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🔑 Logging in</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Everyone signs in with their <b>own email and password</b> — real, separate accounts. Managers use the company account. Drivers, passenger assistants and client contacts are <b>invited</b> from their Edit screens — they get an invite code, choose <b>Activate</b> on the sign-in screen, verify their email, and set their own private password (you never see it). Use <b>✉ Email this invite</b> on the invite-code popup to send the code and instructions from your own email app, ready to review and send. Each person stays signed in on their own device. Access is enforced by the database itself: drivers and PAs can only ever read their own runs, client contacts only their own shared passengers, managers everything.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🗂 The Home filing tabs</div><div style="font-size:12.5px;color:#16232e;line-height:1.6"><b>Runs</b> shows every journey for the chosen day (or week — use the Daily/Weekly switch). <b>Staff</b> shows who is working and exactly which runs each person has that day. <b>Holidays</b> is the calendar of school holidays, inset days and staff absences. Use ‹ Today › to change the date.</div></div>
-        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🚐 Managing runs</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Each run row shows the time, passenger, destination, then driver, PA and vehicle. An amber border means it needs attention (no driver, or the driver is absent). Press <b>Manage</b> to: edit <b>today only</b> (the recurring schedule is untouched), edit the whole schedule, mark picked up / dropped off, cancel with a reason, or reinstate.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🚐 Managing runs</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Each run row shows the time, passenger, destination, then driver, PA and vehicle. A red border means it needs attention (no driver, or the driver is absent). Press <b>Manage</b> to: edit <b>today only</b> (the recurring schedule is untouched), edit the whole schedule, mark picked up / dropped off, cancel with a reason, or reinstate.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🧒 Passengers &amp; schedules</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">A passenger's profile holds their address, school, wheelchair and PA needs, and their weekly journey pattern. For each day, switch the <b>Pickup</b> and <b>Return</b> journeys on or off — so a one-way trip on one day is fine. Times, driver, PA and vehicle can differ per day, and <b>Copy to all days</b> fills the week in one tap.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🧾 One-off jobs</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Single journeys outside the school runs — airport trips, client jobs, hospital appointments. Turn on <b>Add a return journey</b> to book the way back, on the same or a different day, with its own driver, PA and vehicle.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">📱 The driver's phone view</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Drivers and passenger assistants sign in on their own phone and see today's runs in order, with any notes (gate codes, ramps). They can also see upcoming days — how many is up to you, in Settings → "Driver &amp; PA schedule visibility". Two taps do the work: <b>Picked up</b>, then <b>Dropped off</b> — each is time-stamped. <b>Cancel</b> asks for a reason; "No answer at door" asks for a photo of the door as evidence, and "Other" needs a note. Drivers can also report vehicle faults.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">✅ Manager review &amp; audit trail</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Every cancellation lands in <b>Review</b> with its reason, photo and note, where you decide <b>Billable</b> or <b>Not billable</b> — your evidence for client invoicing. Vehicle faults wait there too. Below is the full history: every important action, time-stamped with who did it.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🤝 Client portal</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">A client contact is simply a <b>person</b> — a name and an email, kept in Settings → Client portal (a note field is there for anything extra, e.g. which council or school they belong to). To share a passenger or one-off job, open its editor, turn on <b>Visible in client portal</b>, pick the contact from the dropdown — their email is shown so you can check it's the right person — and press <b>Confirm</b> before saving. Each contact logs in with their own email and password and sees only what you've shared with them. They can request cancellations, which land in your Review queue for you to accept or reject.</div></div>
-        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🚗 Vehicles</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Keep MOT, insurance and tax dates — countdowns turn amber at 14 days. Log faults and quirks, and give a vehicle a nickname (e.g. "Silver bus") to show on the runs page instead of the reg.</div></div>
-        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🏖 Holidays, inset days &amp; absences</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Click any calendar day to add a school holiday, an inset day, or a staff absence. Holidays can apply to all schools (shown purple) or just one school (blue) — only the affected school's runs are paused; staff absences show amber. Below the calendar: this month's absences, each staff member's holiday totals, and a by-school breakdown of all dates.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🚗 Vehicles</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Keep MOT, insurance and tax dates — countdowns turn red at 14 days. Log faults and quirks, and give a vehicle a nickname (e.g. "Silver bus") to show on the runs page instead of the reg.</div></div>
+        <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">🏖 Holidays, inset days &amp; absences</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Click any calendar day to add a school holiday, an inset day, or a staff absence. Holidays can apply to all schools (shown purple) or just one school (blue) — only the affected school's runs are paused; staff absences show red. Below the calendar: this month's absences, each staff member's holiday totals, and a by-school breakdown of all dates.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">📊 Reports</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Pick a date range for totals and the cancellation list. The <b>custom report builder</b> lets you choose exactly which fields to include and which runs (all, cancellations, jobs…), then downloads a CSV that opens in Excel — ideal for client billing evidence.</div></div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px"><div style="font-size:13.5px;font-weight:700;color:#16232e;margin-bottom:4px">📥 Imports &amp; backups (Settings)</div><div style="font-size:12.5px;color:#16232e;line-height:1.6">Paste passengers, staff, and school holidays straight from your spreadsheets — the <b>?</b> button on each import box walks you through it step by step. Download a backup regularly; data lives on this device until the app moves to a shared online database.</div></div>
       </div>
@@ -631,6 +640,13 @@
             <div style="display:flex;gap:8px"><input value="{{ coName }}" onChange="{{ onCoName }}" placeholder="Company name" style="flex:1;border:none;border-radius:8px;padding:9px 12px;font-size:13px;background:#eef1f4;color:#16232e"><button onClick="{{ onSaveCo }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">Save</button></div>
             <div style="font-size:11.5px;color:#16232e;margin:4px 0 8px">Set once — the company name can't be changed afterwards.</div>
           </sc-if>
+          <div style="font-size:11px;font-weight:700;color:#16232e;text-transform:uppercase;letter-spacing:.07em;margin:12px 0 6px">Company logo (optional)</div>
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
+            <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}">{{ coLogoImg56 }}</sc-if>
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:9px 14px">{{ logoBtnLabel }}<input type="file" accept="image/*" onChange="{{ onLogoFile }}" style="display:none"></label>
+            <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onLogoRemove }}" style="font-size:12px;font-weight:700;color:#b3402f;background:#e9dedb;border-radius:8px;padding:9px 12px">Remove logo</button></sc-if>
+          </div>
+          <div style="font-size:11.5px;color:#16232e;margin-bottom:8px">Your logo and company name become the main branding at the top of the app, with a small “Powered by TransportHQ” credit. The logo is saved with your company data.</div>
           <div style="font-size:11.5px;color:#16232e">Managers log in with the company account email and password. Drivers, passenger assistants and client contacts are invited from their edit screens and log in with their own email and password.</div>
         </div>
         <div style="background:#dfe5ea;border-radius:12px;padding:14px">
@@ -956,7 +972,7 @@
 
 <template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#1f8a8f"></rect><rect x="30" y="30" width="40" height="40" rx="10" fill="#16232e"></rect><rect x="47" y="38" width="6" height="6" fill="#fff"></rect><rect x="47" y="48" width="6" height="6" fill="#fff"></rect><rect x="47" y="58" width="6" height="6" fill="#fff"></rect></svg></template>
 
-<!-- toast -->
+<!-- toast message -->
 <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
 <div style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#16232e;color:#fff;font-size:13px;font-weight:600;border-radius:10px;padding:11px 18px;z-index:200;box-shadow:0 8px 24px rgba(10,18,25,.4);max-width:90vw">{{ toast }}</div>
 </sc-if>
@@ -1065,6 +1081,7 @@ class Component extends DCLogic {
       if (!data.runStates) data.runStates = {};
       this.migrateClients(data);
       this.setState({ data, coName: data.company || '', mgrPin: '' });
+      try { if (data.logo) localStorage.setItem('thq_device_logo', data.logo); else localStorage.removeItem('thq_device_logo'); } catch (e) {}
       this.startManagerListeners(uid);
       if (!data.setupDone && data.drivers.length === 0 && data.passengers.length === 0) this.setState({ wizard: { step: 0, dName: '', dPin: '', csv: '', msg: '' } });
       // one-off migration: move any legacy in-document client requests into their own collection
@@ -1125,6 +1142,7 @@ class Component extends DCLogic {
     const vid = mem.role === 'client' ? (mem.contactId || mem.clientId) : mem.staffId;
     this.listen(this.coRef(cid).collection(col).doc(vid).onSnapshot(snap => {
       const view = snap.exists ? snap.data() : null;
+      try { if (view && view.companyLogo) localStorage.setItem('thq_device_logo', view.companyLogo); else if (view) localStorage.removeItem('thq_device_logo'); } catch (e) {}
       this.setState({ memberView: view, memberViewChecked: true });
       this.watchMemberRunStates(cid, view);
     }, () => { this.setState({ memberView: null, memberViewChecked: true }); }));
@@ -1212,7 +1230,7 @@ class Component extends DCLogic {
           for (const m of mine) runKeys[m.key] = true;
           holMap[pd.date] = !!pd.hol;
         }
-        writes.push(['staffViews', s.id, { staffId: s.id, name: s.name, role: s.role, companyId: uid, companyName: d.company || '', lookaheadDays: la, vehicleLabel: s.vehicleId ? (this.vLabel(d, s.vehicleId) || '') : '', vehicles: vehList, days: daysMap, holDays: holMap, runKeys, updatedAt: Date.now() }]);
+        writes.push(['staffViews', s.id, { staffId: s.id, name: s.name, role: s.role, companyId: uid, companyName: d.company || '', companyLogo: d.logo || '', lookaheadDays: la, vehicleLabel: s.vehicleId ? (this.vLabel(d, s.vehicleId) || '') : '', vehicles: vehList, days: daysMap, holDays: holMap, runKeys, updatedAt: Date.now() }]);
       }
       for (const c of (d.clients || [])) {
         if (c.archived) { writes.push(['clientViews', c.id, null]); continue; }
@@ -1228,7 +1246,7 @@ class Component extends DCLogic {
           if (mine.length) daysMap[pd.date] = mine;
           for (const m of mine) runKeys[m.key] = true;
         }
-        writes.push(['clientViews', c.id, { clientId: c.id, contactId: c.id, clientName: c.name, contactName: c.name, companyId: uid, companyName: d.company || '', passengers: allowed.map(p => ({ name: p.name, school: p.school || '', contractReference: p.contractReference || '' })), days: daysMap, runKeys, updatedAt: Date.now() }]);
+        writes.push(['clientViews', c.id, { clientId: c.id, contactId: c.id, clientName: c.name, contactName: c.name, companyId: uid, companyName: d.company || '', companyLogo: d.logo || '', passengers: allowed.map(p => ({ name: p.name, school: p.school || '', contractReference: p.contractReference || '' })), days: daysMap, runKeys, updatedAt: Date.now() }]);
       }
       for (const [col, id, doc] of writes) {
         const ref = this.coRef(uid).collection(col).doc(id);
@@ -1241,6 +1259,18 @@ class Component extends DCLogic {
   onAuthPassword(e) { this.setState({ authPassword: e.target.value }); }
   onAuthModeLogin() { this.setState({ authMode: 'login', authErr: '', authResetSent: false }); }
   onAuthModeSignup() { this.setState({ authMode: 'signup', authErr: '', authResetSent: false }); }
+  onAuthCodeInput(e) {
+    const code = e.target.value;
+    this.setState({ authCode: code, authErr: '' });
+    const c = code.trim().toUpperCase();
+    if (c.length === 8 && c !== this._lastLogoCode) {
+      this._lastLogoCode = c;
+      this.db().collection('invites').doc(c).get().then(snap => {
+        if (snap.exists && (this.state.authCode || '').trim().toUpperCase() === c) this.setState({ inviteLogo: snap.data().logo || '' });
+      }).catch(() => {});
+    }
+    if (c.length !== 8 && this.state.inviteLogo) this.setState({ inviteLogo: '' });
+  }
   forgotPassword() {
     const S = this.state;
     if (!S.authEmail) { this.setState({ authErr: 'Enter your email address above first, then tap Forgot your password?', authResetSent: false }); return; }
@@ -1468,7 +1498,7 @@ class Component extends DCLogic {
       + 'Your invite code: ' + code + '\r\n'
       + 'Use this email address: ' + email + '\r\n\r\n'
       + 'To activate your account:\r\n'
-      + '1. Open TransportHQ\r\n'
+      + '1. Go to https://app.transporthq.co.uk\r\n'
       + '2. Choose "Activate" on the sign-in screen\r\n'
       + '3. Enter this email address and the invite code above, then choose your own private password\r\n'
       + '4. Click the verification link emailed to you, then log in\r\n\r\n'
@@ -1513,7 +1543,7 @@ class Component extends DCLogic {
     const code = Array(8).fill(0).map(() => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
     const uid = this.state.authUser.uid;
     const oldCode = rec0.inviteCode;
-    const inv = { companyId: uid, companyName: d.company || '', role: kind, staffId: kind === 'client' ? '' : id, clientId: kind === 'client' ? id : '', contactId: kind === 'client' ? id : '', name: rec0.name, clientName: kind === 'client' ? rec0.name : '', email, status: 'pending', createdAt: Date.now() };
+    const inv = { companyId: uid, companyName: d.company || '', logo: d.logo || '', role: kind, staffId: kind === 'client' ? '' : id, clientId: kind === 'client' ? id : '', contactId: kind === 'client' ? id : '', name: rec0.name, clientName: kind === 'client' ? rec0.name : '', email, status: 'pending', createdAt: Date.now() };
     this.db().collection('invites').doc(code).set(inv).then(() => {
       if (oldCode && oldCode !== code) this.db().collection('invites').doc(oldCode).delete().catch(() => {});
       this.mut(dd => {
@@ -1522,7 +1552,7 @@ class Component extends DCLogic {
         this.log(dd, resend ? 'Invite re-sent' : 'User invited', r.name + ' (' + kind + ') — ' + email);
       });
       this.setState({ modal: { kind: 'help', title: resend ? 'New invite code created' : 'Invite created', meta: { paras: [
-        { t: 'Invite code: ' + code, b: 'For ' + email + '. Share this code with them. They open TransportHQ, choose “Activate” on the sign-in screen, enter this email address and code, and choose their own private password — that creates their own secure account. They then verify their email and log in. You never see or choose their password.' }
+        { t: 'Invite code: ' + code, b: 'For ' + email + '. Share this code with them. They go to https://app.transporthq.co.uk, choose “Activate” on the sign-in screen, enter this email address and code, and choose their own private password — that creates their own secure account. They then verify their email and log in. You never see or choose their password.' }
       ], buttons: [{ label: '✉ Email this invite', href: this.inviteMailto(email, code, rec0.name) }] } } });
     }).catch(() => this.showToast('Could not create the invite — check your connection'));
   }
@@ -1598,6 +1628,21 @@ class Component extends DCLogic {
         const c = document.createElement('canvas'); c.width = img.width * sc; c.height = img.height * sc;
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         cb(c.toDataURL('image/jpeg', 0.65));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  resizeLogo(file, cb) {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const max = 400, sc = Math.min(1, max / Math.max(img.width, img.height));
+        const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * sc)); c.height = Math.max(1, Math.round(img.height * sc));
+        const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        cb(c.toDataURL('image/jpeg', 0.8));
       };
       img.src = e.target.result;
     };
@@ -2061,14 +2106,17 @@ class Component extends DCLogic {
     if (r.status === 'pickedUp') return { chip: 'Picked up ' + (r.st.pickedUpAt ? this.clock(r.st.pickedUpAt) : ''), style: this.chip('#2f7d5c') };
     if (r.status === 'droppedOff') return { chip: 'Done ' + (r.st.droppedOffAt ? this.clock(r.st.droppedOffAt) : ''), style: this.chip('#3d4f5d') };
     if (r.status === 'cancelled') return { chip: 'Cancelled', style: this.chip('#b3402f') };
+    if (!r.driverId) return { chip: 'Assign', style: this.chip('#b3402f') };
     if (r.kind === 'job') return { chip: 'One-off job', style: this.chip('#7a5aa0') };
-    if (!r.driverId) return { chip: 'Assign', style: this.chip('#b3771f') };
     return { chip: 'Scheduled', style: this.chip('#31576e') };
   }
 
   // ══ RENDER ══
   renderVals() {
     const S = this.state, d = S.data;
+    const devLogo = (() => { try { return localStorage.getItem('thq_device_logo') || ''; } catch (e) { return ''; } })();
+    const brandImg = url => url ? React.createElement('img', { src: url, alt: '', style: { width: '140px', height: '140px', flex: 'none', background: '#fff', objectFit: 'contain', borderRadius: '22px', boxShadow: '0 8px 22px rgba(22,35,46,.14)' } }) : '';
+    const authLogo = S.authMode === 'activate' ? (S.inviteLogo || '') : S.authMode === 'login' ? devLogo : '';
     const authTab = mo => 'flex:1;font-size:13px;font-weight:700;padding:9px;border-radius:8px;' + (S.authMode === mo ? 'background:#1f8a8f;color:#fff' : 'background:rgba(255,255,255,.25);color:#fff');
     const authOut = {
       showAuth: S.authChecked && !S.authUser,
@@ -2078,7 +2126,7 @@ class Component extends DCLogic {
       authCompany: S.authCompany, onAuthCompany: e => this.onAuthCompany(e),
       authEmail: S.authEmail, onAuthEmail: e => this.onAuthEmail(e),
       authPassword: S.authPassword, onAuthPassword: e => this.onAuthPassword(e),
-      authCode: S.authCode, onAuthCode: e => this.setState({ authCode: e.target.value, authErr: '' }),
+      authCode: S.authCode, onAuthCode: e => this.onAuthCodeInput(e),
       authSubmitLabel: S.authMode === 'signup' ? 'Create company account' : S.authMode === 'activate' ? 'Activate my account' : 'Log in',
       onAuthSubmit: () => this.authSubmit(),
       onAuthModeLogin: () => this.onAuthModeLogin(),
@@ -2086,6 +2134,7 @@ class Component extends DCLogic {
       onAuthModeActivate: () => this.setState({ authMode: 'activate', authErr: '', authResetSent: false }),
       authTabLoginStyle: authTab('login'), authTabSignupStyle: authTab('signup'), authTabActivateStyle: authTab('activate'),
       authErr: S.authErr,
+      authCoLogo: authLogo, noAuthCoLogo: !authLogo, authCoLogoImg: brandImg(authLogo),
       toast: S.toast,
       authResetSent: S.authResetSent,
       onForgotPassword: () => this.forgotPassword(),
@@ -2098,6 +2147,7 @@ class Component extends DCLogic {
     if (authOut.showVerify) return authOut;
     if (S.pinLocked && S.authUser) return Object.assign({}, authOut, {
       showAuth: false, showVerify: false, showPinLock: true,
+      pinCoLogo: devLogo, noPinCoLogo: !devLogo, pinCoLogoImg: brandImg(devLogo),
       pinLockEmail: (S.authUser.email || '').toLowerCase(),
       pinEntry: S.pinEntry,
       onPinEntry: e => this.setState({ pinEntry: e.target.value.replace(/\D/g, '').slice(0, 6), pinErr: '' }),
@@ -2252,17 +2302,18 @@ class Component extends DCLogic {
     out.kpis = [
       kv(runs.filter(r => r.status !== 'cancelled').length, 'runs today'),
       kv(reviewCount, 'need review', reviewCount ? '#c25438' : '#2f7d5c'),
-      kv(unassigned, 'unassigned', unassigned ? '#b3771f' : '#2f7d5c'),
-      nextExp ? kv(nextExp.dl + 'd', 'next expiry — ' + nextExp.l, nextExp.dl <= 14 ? '#b3771f' : '#16232e') : kv('—', 'no vehicle dates yet')
+      kv(unassigned, 'unassigned', unassigned ? '#b3402f' : '#2f7d5c'),
+      nextExp ? kv(nextExp.dl + 'd', 'next expiry — ' + nextExp.l, nextExp.dl <= 14 ? '#b3402f' : '#16232e') : kv('—', 'no vehicle dates yet')
     ].map((k, i) => ({ ...k, cellStyle: 'display:flex;align-items:baseline;gap:6px;padding:3px 12px;min-width:0' + (i ? ';border-left:1px solid #aebbc5' : '') }));
     out.noRuns = runs.length === 0;
     out.runRows = runs.map(r => {
       const absent = r.driverId && this.staffAbsent(d, r.driverId, S.date);
       const attention = (!r.driverId || absent) && r.status !== 'cancelled';
       const sc = this.statusChip(r);
+      if (sc.chip === 'Scheduled') { sc.chip = ''; sc.style = ''; }
       const nls = 'font-size:11.5px;color:#16232e';
       let subLines;
-      if (!r.driverId && r.status !== 'cancelled') subLines = [{ text: 'No driver assigned', style: 'font-size:11.5px;color:#8a5a12;font-weight:600' }];
+      if (!r.driverId && r.status !== 'cancelled') subLines = [{ text: 'No driver assigned', style: 'font-size:11.5px;color:#b3402f;font-weight:700' }];
       else if (absent) subLines = [{ text: r.driverName + ' is ABSENT today — reassign', style: 'font-size:11.5px;color:#a8402f;font-weight:600' }];
       else {
         subLines = [{ text: r.driverName || '—', style: nls }];
@@ -2274,7 +2325,7 @@ class Component extends DCLogic {
         time: this.fmtT(r.time),
         title: r.name + (r.wheelchair ? ' ♿' : '') + ' → ' + (r.leg === 'return' ? 'home' : r.to),
         subLines,
-        rowStyle: 'background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap' + (attention ? ';border:1.5px solid #b3771f' : '') + (r.status === 'cancelled' ? ';opacity:.72' : ''),
+        rowStyle: 'background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap' + (attention ? ';border:1.5px solid #b3402f' : '') + (r.status === 'cancelled' ? ';opacity:.72' : ''),
         chip: sc.chip, chipStyle: sc.style + ';cursor:pointer',
         onChip: () => attention ? this.openEditToday(r) : this.openRunMenu(r),
         onMenu: () => this.openRunMenu(r)
@@ -2290,7 +2341,7 @@ class Component extends DCLogic {
       out.reviewPeekTitle = c.name + ' — ' + c.label;
       out.reviewPeekSub = this.clock(c.at) + ' · ' + c.by + (c.photo ? ' · 📷 photo attached' : '');
     } else { out.reviewPeekTitle = ''; out.reviewPeekSub = ''; }
-    out.upcoming = expiring.slice(0, 3).map(e => ({ l: e.l, v: e.dl + ' days', vStyle: 'color:' + (e.dl <= 14 ? '#b3771f' : '#16232e') }));
+    out.upcoming = expiring.slice(0, 3).map(e => ({ l: e.l, v: e.dl + ' days', vStyle: 'color:' + (e.dl <= 14 ? '#b3402f' : '#16232e') }));
     const nextHol = d.holidays.map(h => h.date).filter(x => x >= S.date).sort()[0];
     if (nextHol) out.upcoming.push({ l: 'Next school holiday', v: this.pretty(nextHol), vStyle: 'color:#31576e' });
     if (!out.upcoming.length) out.upcoming = [{ l: 'Add vehicle MOT/insurance dates to see reminders', v: '', vStyle: '' }];
@@ -2304,8 +2355,8 @@ class Component extends DCLogic {
       return {
         label: this.pretty(date), go: () => this.setState({ date, runMode: 'daily' }),
         hdStyle: 'width:100%;text-align:center;font-size:11.5px;font-weight:700;border-radius:8px;padding:7px 2px;' + (isToday ? 'background:#1f8a8f;color:#fff' : 'background:#cdd6dd;color:#31576e'),
-        items: hh ? [{ time: '', name: 'School holiday', sub: '', style: 'background:#31576e;color:#fff;border-radius:8px;padding:7px 8px;font-size:10.5px;font-weight:600' }]
-          : rr.map(r => ({ time: this.fmtT(r.time), name: r.name, sub: r.driverName || '⚠ unassigned', style: 'background:#eef1f4;border-radius:8px;padding:6px 8px;font-size:10.5px;color:#16232e;overflow:hidden' + (r.status === 'cancelled' ? ';opacity:.55;text-decoration:line-through' : (!r.driverId ? ';border:1px solid #b3771f' : '')) }))
+        items: hh ? [{ time: '', name: 'School holiday', sub: '', subStyle: '', style: 'background:#31576e;color:#fff;border-radius:8px;padding:7px 8px;font-size:10.5px;font-weight:600' }]
+          : rr.map(r => ({ time: this.fmtT(r.time), name: r.name, sub: [r.driverName || '⚠ unassigned', r.assistantName ? 'PA ' + r.assistantName : ''].filter(Boolean).join(' · '), subStyle: (r.driverId || r.status === 'cancelled') ? 'opacity:.75' : 'color:#b3402f;font-weight:700', style: 'background:#eef1f4;border-radius:8px;padding:6px 8px;font-size:10.5px;color:#16232e;overflow:hidden' + (r.status === 'cancelled' ? ';opacity:.55;text-decoration:line-through' : (!r.driverId ? ';border:1px solid #b3402f' : '')) }))
       };
     });
 
@@ -2317,25 +2368,25 @@ class Component extends DCLogic {
       const absent = this.staffAbsent(d, s.id, sDate);
       const mine = staffRuns.filter(r => r.driverId === s.id || r.assistantId === s.id);
       return {
-        initials: s.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+        initials: s.kind === 'driver' ? 'DR' : 'PA',
         name: s.name,
-        sub: s.role + ' · ' + mine.length + ' run' + (mine.length === 1 ? '' : 's') + ' on ' + this.pretty(sDate),
         chip: absent ? 'Absent' : (s.workDays || []).includes(this.dow(sDate)) ? 'Available' : 'Not working today',
         chipStyle: this.chip(absent ? '#b3402f' : (s.workDays || []).includes(this.dow(sDate)) ? '#2f7d5c' : '#5d6f7d'),
         hasRuns: mine.length > 0,
         noRunsToday: mine.length === 0,
         runsList: mine.map(r => {
           const sc = this.statusChip(r);
+          if (sc.chip === 'Scheduled') { sc.chip = ''; sc.style = ''; }
+          else if (sc.chip === 'Assign') sc.chip = 'Unassigned';
           return {
             time: this.fmtT(r.time),
             desc: (r.assistantId === s.id && r.driverId !== s.id ? 'PA · ' : '') + r.name + ' — ' + r.from + ' → ' + (r.leg === 'return' ? 'home' : r.to) + (r.driverId === s.id && r.assistantName ? ' · with PA ' + r.assistantName : ''),
             chip: sc.chip, chipStyle: sc.style
           };
         }),
-        onEdit: () => this.openStaff(s, s.role === 'Driver' ? 'driver' : 'assistant'),
-        onAbsence: () => this.openAbsence(s.id)
+        onEdit: () => this.openStaff(s, s.role === 'Driver' ? 'driver' : 'assistant')
       };
-    });
+    }).sort((a, b) => (b.hasRuns ? 1 : 0) - (a.hasRuns ? 1 : 0));
 
     // staff weekly grid
     out.staffWeekHead = []; out.staffWeekCells = []; out.staffWeekNarrow = [];
@@ -2382,7 +2433,7 @@ class Component extends DCLogic {
     out.staffPageRows = staffPage.map(s => {
       const absent = this.staffAbsent(d, s.id, this.tISO());
       return {
-        initials: s.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase(),
+        initials: s.kind === 'driver' ? 'DR' : 'PA',
         name: s.name,
         sub: s.role + (s.email ? ' · ' + s.email : s.phone ? ' · ' + s.phone : ' · no contact set'),
         loginStatus: this.loginStatusOf(s),
@@ -2398,7 +2449,6 @@ class Component extends DCLogic {
         detailsStyle: narrow ? 'display:flex;gap:16px;flex-wrap:wrap;padding-left:50px' : 'display:contents',
         actionsStyle: narrow ? 'display:flex;gap:6px;padding-left:50px' : 'display:flex;gap:6px;flex:none',
         onEdit: () => this.openStaff(s, s.role === 'Driver' ? 'driver' : 'assistant'),
-        onAbsence: () => this.openAbsence(s.id),
         archLabel: s.archived ? 'Restore' : 'Archive',
         archStyle: s.archived ? 'font-size:12px;font-weight:700;color:#fff;background:#2f7d5c;border-radius:7px;padding:7px 11px' : 'font-size:12px;font-weight:700;color:#b3402f;background:#e9dedb;border-radius:7px;padding:7px 11px',
         onArch: () => s.archived ? this.restoreRec(s.kind, s.id) : this.archiveRec(s.kind, s.id)
@@ -2423,9 +2473,9 @@ class Component extends DCLogic {
       const holBg = ents.length ? (ents.some(h => !h.school) ? '#7a5aa0' : '#4a7fa5') : '';
       const holTag = ents.map(h => (h.name || (h.type === 'inset' ? 'Inset day' : 'Holiday')) + (h.school ? ' — ' + h.school : '')).join(' · ');
       const absTag = abs.map(a => (this.nameOf(allStaff, a.staffId) || '').split(' ')[0]).join(', ');
-      if (holBg && abs.length) { bg = 'linear-gradient(135deg,' + holBg + ' 0 50%,#f59e2d 50% 100%)'; color = '#fff'; tag = holTag + ' · ' + absTag; }
+      if (holBg && abs.length) { bg = 'linear-gradient(135deg,' + holBg + ' 0 50%,#b3402f 50% 100%)'; color = '#fff'; tag = holTag + ' · ' + absTag; }
       else if (holBg) { bg = holBg; color = '#fff'; tag = holTag; }
-      else if (abs.length) { bg = '#f59e2d'; color = '#16232e'; tag = absTag; }
+      else if (abs.length) { bg = '#b3402f'; color = '#fff'; tag = absTag; }
       if (date === this.tISO()) bg += ';outline:2px solid #16232e';
       cells.push({
         day: String(day), tag,
@@ -2529,7 +2579,7 @@ class Component extends DCLogic {
     out.vehCards = vlist.map(v => {
       const ex = [['mot','MOT'],['ins','Insurance'],['tax','Tax']].map(([k, l]) => {
         const dl = this.daysLeft(v[k]);
-        return { l, v: v[k] ? this.pretty(v[k]) + ' (' + dl + 'd)' : 'not set', style: 'font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;color:#fff;background:' + (dl === null ? '#5d6f7d' : dl < 0 ? '#b3402f' : dl <= 14 ? '#b3771f' : '#2f7d5c') };
+        return { l, v: v[k] ? this.pretty(v[k]) + ' (' + dl + 'd)' : 'not set', style: 'font-size:11px;font-weight:700;padding:3px 9px;border-radius:6px;color:#fff;background:' + (dl === null ? '#5d6f7d' : dl < 0 ? '#b3402f' : dl <= 14 ? '#b3402f' : '#2f7d5c') };
       });
       const openFaults = (v.faults || []).filter(f => !f.resolved);
       return {
@@ -2616,6 +2666,18 @@ class Component extends DCLogic {
     out.coName = S.coName;
     out.onCoName = e => this.setState({ coName: e.target.value });
     out.onSaveCo = () => { this.mut(dd => { dd.company = S.coName.trim(); this.log(dd, 'Company renamed', S.coName.trim()); }); this.showToast('Company name saved'); };
+    out.coLogo = d.logo || '';
+    out.noLogo = !d.logo;
+    out.hasBrand = !!(d.logo || (d.company || '').trim());
+    out.noBrand = !out.hasBrand;
+    out.logoBtnLabel = d.logo ? 'Replace logo' : 'Upload logo';
+    const logoImg = (sz, extra) => d.logo ? React.createElement('img', { src: d.logo, alt: '', style: Object.assign({ width: sz + 'px', height: sz + 'px', flex: 'none', background: '#fff', objectFit: 'contain' }, extra) }) : '';
+    out.coLogoImg36 = logoImg(36, { borderRadius: '9px' });
+    out.coLogoImg32 = logoImg(32, { borderRadius: '8px' });
+    out.coLogoImg46 = logoImg(46, { borderRadius: '11px', boxShadow: '0 2px 6px rgba(22,35,46,.15)' });
+    out.coLogoImg56 = logoImg(56, { borderRadius: '10px', border: '1px solid #cdd6dd' });
+    out.onLogoFile = e => { const f = e.target.files[0]; e.target.value = ''; if (f) this.resizeLogo(f, url => { this.mut(dd => { dd.logo = url; this.log(dd, 'Logo updated', 'Company logo uploaded'); }); try { localStorage.setItem('thq_device_logo', url); } catch (e2) {} this.showToast('Logo saved — it now appears at the top of the app'); }); };
+    out.onLogoRemove = () => { this.mut(dd => { delete dd.logo; this.log(dd, 'Logo removed', 'Company logo removed'); }); try { localStorage.removeItem('thq_device_logo'); } catch (e2) {} this.showToast('Logo removed'); };
     out.lookahead = String(d.lookaheadDays === undefined ? 1 : d.lookaheadDays);
     out.lookaheadOpts = [['0', 'Today only'], ['1', '1 day ahead'], ['2', '2 days ahead'], ['3', '3 days ahead'], ['5', '5 days ahead'], ['7', '7 days ahead'], ['14', '14 days ahead']].map(([lv, ll]) => ({ v: lv, l: ll }));
     out.onLookahead = e => { const n = parseInt(e.target.value); this.mut(dd => { dd.lookaheadDays = n; this.log(dd, 'Setting changed', 'Drivers & PAs can now see ' + (n === 0 ? 'today only' : n + ' day(s) ahead')); }); this.showToast('Saved — drivers & PAs see ' + (n === 0 ? 'today only' : n + ' day(s) ahead')); };
@@ -2976,6 +3038,7 @@ class Component extends DCLogic {
         ta('notes', 'Notes', 'e.g. not available 12–3pm')
       ];
       if (rec) out.formFields.push({ label: 'Login status: ' + this.loginStatusOf(rec), isActions: true, buttons: this.inviteButtons(kindOf, rec) });
+      if (rec) out.formFields.push({ label: 'Absence', isActions: true, buttons: [{ label: '+ Add absence', onClick: () => this.openAbsence(rec.id), style: 'font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:8px;padding:8px 13px' }], hint: 'Record a holiday or sickness for ' + rec.name + ' — opens the absence form.' });
       out.onModalSave = () => this.saveStaff();
     }
     if (m.kind === 'vehicle') {
