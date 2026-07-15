@@ -73,11 +73,14 @@
     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='140' viewBox='0 0 460 140'%3E%3Crect width='460' height='140' rx='26' fill='%232c4a5e'/%3E%3Ctext x='230' y='88' font-family='Arial,Helvetica,sans-serif' font-size='52' font-weight='800' fill='%23fff' text-anchor='middle'%3ETransport%3Ctspan fill='%237fd4dc'%3EHQ%3C/tspan%3E%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:230px;height:70px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
   </div>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
-    <div style="font-size:14px;font-weight:700;color:#fff">Check your email</div>
-    <div style="font-size:13px;color:#e8edf1;line-height:1.5">We've sent a verification link to your email address. Click the link, then come back here and press the button below.</div>
-    <div style="font-size:11.5px;color:#c7d2e0;line-height:1.4">Can't see it? Check your spam or junk folder — verification emails sometimes land there.</div>
-    <button onClick="{{ onRecheckVerify }}" style="font-size:14px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:10px;padding:12px;box-shadow:0 3px 8px rgba(22,35,46,.24)">I've verified — continue</button>
-    <button onClick="{{ onResendVerify }}" style="font-size:12.5px;font-weight:600;color:#e8edf1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px">Resend verification email</button>
+    <div style="font-size:14px;font-weight:700;color:#fff">Enter your verification code</div>
+    <div style="font-size:13px;color:#e8edf1;line-height:1.5">We've emailed a 6-digit code to <b>{{ verifyEmailShown }}</b>. Type it below to verify your account.</div>
+    <div style="font-size:11.5px;color:#c7d2e0;line-height:1.4">Can't see it? Check your spam or junk folder.</div>
+    <input value="{{ verifyEntry }}" onChange="{{ onVerifyEntry }}" onKeyDown="{{ onVerifyKey }}" inputMode="numeric" maxLength="6" autoComplete="one-time-code" placeholder="6-digit code" style="border:none;border-radius:10px;padding:12px;font-size:18px;letter-spacing:.3em;text-align:center;background:#eef1f4;color:#16232e;width:100%">
+    <sc-if value="{{ verifyErr }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#7c1d10;font-weight:700;background:#f3d7d2;border-radius:8px;padding:8px 10px">{{ verifyErr }}</div></sc-if>
+    <sc-if value="{{ verifyInfo }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#1d5a3a;font-weight:700;background:#d3ecd9;border-radius:8px;padding:8px 10px">{{ verifyInfo }}</div></sc-if>
+    <button onClick="{{ onVerifyCode }}" style="font-size:14px;font-weight:700;color:#fff;background:#3d7ec9;border-radius:10px;padding:12px;box-shadow:0 3px 8px rgba(22,35,46,.24)">Verify my account</button>
+    <button onClick="{{ onResendVerify }}" style="font-size:12.5px;font-weight:600;color:#e8edf1;background:rgba(255,255,255,.15);border-radius:10px;padding:10px">Resend the code</button>
     <button onClick="{{ onSignOutCompany }}" style="font-size:12px;font-weight:600;color:#e8edf1;padding:6px">Sign out and use a different account</button>
   </div>
 </div>
@@ -1043,13 +1046,58 @@ class Component extends DCLogic {
         };
         if (user.emailVerified) proceed(true);
         else this.db().collection('users').doc(user.uid).get()
-          .then(snap => proceed(snap.exists))
+          .then(snap => {
+            if (snap.exists) { proceed(true); return; }
+            return this.db().collection('emailVerifications').doc(user.uid).get()
+              .then(vs => proceed(vs.exists && vs.data().verified === true));
+          })
           .catch(() => proceed(false));
       } else {
         this.stopListeners();
         this.setState({ authUser: null, authChecked: true, authEmailVerified: false, data: null, session: null, route: '', member: null, memberView: null, memberViewChecked: false, memberRunStates: {}, memberRequests: [], members: [], pinLocked: false, pinOffer: false, pinEntry: '', pinErr: '', pinSetupVal: '', pinSetupErr: '', notifOpen: false });
       }
     });
+  }
+  // ── 6-digit email verification code (company sign-up only) ──
+  // The code is generated client-side, stored HASHED in Firestore (emailVerifications/{uid}),
+  // and delivered by writing to the 'mail' collection (Firebase "Trigger Email" extension).
+  sendVerifyCode(user, isResend) {
+    const email = (user.email || '').toLowerCase();
+    const code = String(Math.floor(100000 + Math.random() * 900000));
+    const doc = { h: this.hashPw(user.uid + ':' + code), email, createdAt: Date.now(), attempts: 0, verified: false };
+    return this.db().collection('emailVerifications').doc(user.uid).set(doc)
+      .then(() => this.db().collection('mail').add({
+        to: [email],
+        message: {
+          subject: 'Your TransportHQ verification code: ' + code,
+          text: 'Hello,\r\n\r\nYour TransportHQ verification code is:\r\n\r\n    ' + code + '\r\n\r\nType this code into the verification screen in the app to finish setting up your company account.\r\n\r\nIf you did not sign up to TransportHQ, you can ignore this email.\r\n\r\nTransportHQ\r\nhttps://app.transporthq.co.uk'
+        }
+      }))
+      .then(() => this.setState({ verifyErr: '', verifyInfo: isResend ? 'A new code is on its way to ' + email : 'Code sent to ' + email, verifyEntry: '' }))
+      .catch(() => this.setState({ verifyInfo: '', verifyErr: 'Could not send the code — check your internet connection and try again' }));
+  }
+  verifyEmailCode() {
+    const u = window.__fbAuth && window.__fbAuth.currentUser;
+    if (!u) { this.showToast('No signed-in account found — please sign out and log in again'); return; }
+    const entry = (this.state.verifyEntry || '').trim();
+    if (!/^\d{6}$/.test(entry)) { this.setState({ verifyInfo: '', verifyErr: 'Enter the 6-digit code from the email' }); return; }
+    const ref = this.db().collection('emailVerifications').doc(u.uid);
+    ref.get().then(snap => {
+      if (!snap.exists) { this.setState({ verifyInfo: '', verifyErr: 'No code found for this account — press \u201CResend the code\u201D to get one' }); return; }
+      const v = snap.data();
+      if (v.verified) { this.setState({ authEmailVerified: true, verifyErr: '', verifyInfo: '' }); this.routeAfterAuth(u); return; }
+      if ((v.attempts || 0) >= 5) { this.setState({ verifyInfo: '', verifyErr: 'Too many wrong attempts — press \u201CResend the code\u201D and use the new code' }); return; }
+      if (Date.now() - (v.createdAt || 0) > 30 * 60 * 1000) { this.setState({ verifyInfo: '', verifyErr: 'That code has expired — press \u201CResend the code\u201D to get a fresh one' }); return; }
+      if (this.hashPw(u.uid + ':' + entry) === v.h) {
+        ref.update({ verified: true, verifiedAt: Date.now() }).catch(() => {});
+        this.setState({ authEmailVerified: true, verifyErr: '', verifyInfo: '', verifyEntry: '' });
+        this.showToast('Email verified — welcome to TransportHQ');
+        this.routeAfterAuth(u);
+      } else {
+        ref.update({ attempts: (v.attempts || 0) + 1 }).catch(() => {});
+        this.setState({ verifyInfo: '', verifyErr: 'That code isn\u2019t right — check the email and try again (' + (4 - (v.attempts || 0)) + ' attempts left)' });
+      }
+    }).catch(() => this.setState({ verifyInfo: '', verifyErr: 'Could not check the code — check your internet connection and try again' }));
   }
   recheckVerification() {
     if (!window.__fbAuth) { this.showToast('Could not reach the sign-in service — refresh the page and try again'); return; }
@@ -1065,9 +1113,9 @@ class Component extends DCLogic {
     if (!window.__fbAuth) { this.showToast('Could not reach the sign-in service — refresh the page and try again'); return; }
     const u = window.__fbAuth.currentUser;
     if (!u) { this.showToast('No signed-in account found — please sign out and log in again'); return; }
-    u.sendEmailVerification()
-      .then(() => this.showToast('Verification email sent — check your inbox and spam/junk folder'))
-      .catch(err => this.showToast(err && err.code === 'auth/too-many-requests' ? 'Too many attempts — wait a few minutes, then try again' : 'Could not send the email — check your connection and try again'));
+    if (this._lastCodeSend && Date.now() - this._lastCodeSend < 60000) { this.setState({ verifyInfo: '', verifyErr: 'Please wait a minute before requesting another code' }); return; }
+    this._lastCodeSend = Date.now();
+    this.sendVerifyCode(u, true);
   }
   db() { return window.__fbDb; }
   coRef(cid) { return this.db().collection('companies').doc(cid); }
@@ -1311,7 +1359,8 @@ class Component extends DCLogic {
       if (!S.authCompany.trim()) { this.setState({ authErr: 'Enter your company name' }); return; }
       try { localStorage.setItem('thq_pending_company', S.authCompany.trim()); } catch (e) {}
       window.__fbAuth.createUserWithEmailAndPassword(S.authEmail, S.authPassword).then(cred => {
-        return cred.user.sendEmailVerification().catch(() => {});
+        this._lastCodeSend = Date.now();
+        return this.sendVerifyCode(cred.user, false);
       }).then(() => {
         this.setState({ authErr: '', authPassword: '', authEmailVerified: false });
       }).catch(err => { this.setState({ authErr: err.message }); });
@@ -2169,7 +2218,12 @@ class Component extends DCLogic {
       authResetSent: S.authResetSent,
       onForgotPassword: () => this.forgotPassword(),
       showVerify: S.authChecked === true && !!S.authUser && !S.authEmailVerified,
-      onRecheckVerify: () => this.recheckVerification(),
+      verifyEmailShown: S.authUser ? (S.authUser.email || '').toLowerCase() : '',
+      verifyEntry: S.verifyEntry || '',
+      onVerifyEntry: e => this.setState({ verifyEntry: e.target.value.replace(/\D/g, '').slice(0, 6), verifyErr: '', verifyInfo: '' }),
+      onVerifyKey: e => { if (e.key === 'Enter') this.verifyEmailCode(); },
+      onVerifyCode: () => this.verifyEmailCode(),
+      verifyErr: S.verifyErr || '', verifyInfo: S.verifyInfo || '',
       onResendVerify: () => this.resendVerification(),
       onSignOutCompany: () => this.signOutCompany(),
     };
