@@ -34,7 +34,7 @@
 <div data-screen-label="Company Login" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
     <sc-if value="{{ authCoLogo }}" hint-placeholder-val="{{ false }}">{{ authCoLogoImg }}<div style="font-size:11.5px;color:#31576e;font-weight:600">Powered by TransportHQ</div></sc-if>
-    <sc-if value="{{ noAuthCoLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)"></sc-if>
+    <sc-if value="{{ noAuthCoLogo }}" hint-placeholder-val="{{ true }}"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='140' viewBox='0 0 460 140'%3E%3Crect width='460' height='140' rx='26' fill='%232c4a5e'/%3E%3Ctext x='230' y='88' font-family='Arial,Helvetica,sans-serif' font-size='52' font-weight='800' fill='%23fff' text-anchor='middle'%3ETransport%3Ctspan fill='%237fd4dc'%3EHQ%3C/tspan%3E%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:230px;height:70px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)"></sc-if>
   </div>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22)">
     <div style="display:flex;gap:6px">
@@ -70,7 +70,7 @@
 <sc-if value="{{ showVerify }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Verify Email" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
   <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-    <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='140' viewBox='0 0 460 140'%3E%3Crect width='460' height='140' rx='26' fill='%232c4a5e'/%3E%3Ctext x='230' y='88' font-family='Arial,Helvetica,sans-serif' font-size='52' font-weight='800' fill='%23fff' text-anchor='middle'%3ETransport%3Ctspan fill='%237fd4dc'%3EHQ%3C/tspan%3E%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:230px;height:70px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
   </div>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
     <div style="font-size:14px;font-weight:700;color:#fff">Check your email</div>
@@ -87,7 +87,7 @@
 <sc-if value="{{ showPinLock }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="PIN Unlock" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px">
   <sc-if value="{{ pinCoLogo }}" hint-placeholder-val="{{ false }}">{{ pinCoLogoImg }}<div style="font-size:11.5px;color:#31576e;font-weight:600">Powered by TransportHQ</div></sc-if>
-  <sc-if value="{{ noPinCoLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)"></sc-if>
+  <sc-if value="{{ noPinCoLogo }}" hint-placeholder-val="{{ true }}"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='140' viewBox='0 0 460 140'%3E%3Crect width='460' height='140' rx='26' fill='%232c4a5e'/%3E%3Ctext x='230' y='88' font-family='Arial,Helvetica,sans-serif' font-size='52' font-weight='800' fill='%23fff' text-anchor='middle'%3ETransport%3Ctspan fill='%237fd4dc'%3EHQ%3C/tspan%3E%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:230px;height:70px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)"></sc-if>
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
     <div style="font-size:14px;font-weight:700;color:#fff">Welcome back</div>
     <div style="font-size:12.5px;color:#e8edf1;font-weight:600">{{ pinLockEmail }}</div>
@@ -103,13 +103,13 @@
 <!-- ═══════ LOADING / ACCOUNT STATUS ═══════ -->
 <sc-if value="{{ showLoading }}" hint-placeholder-val="{{ true }}">
 <div data-screen-label="Loading" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px">
-  <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='140' viewBox='0 0 460 140'%3E%3Crect width='460' height='140' rx='26' fill='%232c4a5e'/%3E%3Ctext x='230' y='88' font-family='Arial,Helvetica,sans-serif' font-size='52' font-weight='800' fill='%23fff' text-anchor='middle'%3ETransport%3Ctspan fill='%237fd4dc'%3EHQ%3C/tspan%3E%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:230px;height:70px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
   <div style="font-size:13px;color:#16232e;font-weight:600">Loading your account…</div>
 </div>
 </sc-if>
 <sc-if value="{{ showBlocked }}" hint-placeholder-val="{{ false }}">
 <div data-screen-label="Account status" style="min-height:100vh;background:#ccd7de;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px">
-  <img src="assets/logo-full.png" alt="TransportHQ" style="width:230px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
+  <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='460' height='140' viewBox='0 0 460 140'%3E%3Crect width='460' height='140' rx='26' fill='%232c4a5e'/%3E%3Ctext x='230' y='88' font-family='Arial,Helvetica,sans-serif' font-size='52' font-weight='800' fill='%23fff' text-anchor='middle'%3ETransport%3Ctspan fill='%237fd4dc'%3EHQ%3C/tspan%3E%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:230px;height:70px;border-radius:22px;box-shadow:0 8px 22px rgba(22,35,46,.14)">
   <div style="background:#87a1c2;border:1px solid #7690b5;border-radius:22px;padding:26px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:14px;box-shadow:0 10px 28px rgba(22,35,46,.22);text-align:center">
     <div style="font-size:14px;font-weight:700;color:#fff">{{ blockedTitle }}</div>
     <div style="font-size:13px;color:#e8edf1;line-height:1.5">{{ blockedMsg }}</div>
@@ -126,7 +126,8 @@
     <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;align-items:center;gap:10px;padding:0 16px 16px;border-bottom:1px solid rgba(255,255,255,.12)">
         <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}">{{ coLogoImg36 }}</sc-if>
-        <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-icon.png" alt="" style="width:36px;height:36px;border-radius:9px;flex:none;background:#fff"></sc-if>
+        <sc-if value="{{ coInitialShow }}" hint-placeholder-val="{{ false }}"><div style="width:36px;height:36px;border-radius:50%;background:#31576e;color:#fff;display:grid;place-items:center;font-size:15px;font-weight:700;flex:none">{{ coInitial }}</div></sc-if>
+        <sc-if value="{{ thqIconShow }}" hint-placeholder-val="{{ true }}"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f8a8f'/%3E%3Ctext x='32' y='42' font-family='Arial,Helvetica,sans-serif' font-size='26' font-weight='800' fill='%23fff' text-anchor='middle'%3EHQ%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:36px;height:36px;border-radius:9px;flex:none"></sc-if>
         <div style="min-width:0;flex:1">
           <sc-if value="{{ hasBrand }}" hint-placeholder-val="{{ false }}"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Powered by TransportHQ</div></sc-if>
           <sc-if value="{{ noBrand }}" hint-placeholder-val="{{ true }}"><div style="font-weight:700;font-size:14px">TransportHQ</div><div style="font-size:10px;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></sc-if>
@@ -147,7 +148,8 @@
       <button onClick="{{ onMenuToggle }}" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.16);color:#fff;font-size:17px;font-weight:700;position:relative;flex:none">☰<sc-if value="{{ reviewDot }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:#c25438;border:2px solid #2c4a5e"></span></sc-if></button>
       <sc-if value="{{ narrowBar }}" hint-placeholder-val="{{ false }}">
         <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}">{{ coLogoImg32 }}</sc-if>
-        <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-icon.png" alt="" style="width:32px;height:32px;border-radius:8px;flex:none;background:#fff"></sc-if>
+        <sc-if value="{{ coInitialShow }}" hint-placeholder-val="{{ false }}"><div style="width:32px;height:32px;border-radius:50%;background:#5d7a8f;color:#fff;display:grid;place-items:center;font-size:14px;font-weight:700;flex:none">{{ coInitial }}</div></sc-if>
+        <sc-if value="{{ thqIconShow }}" hint-placeholder-val="{{ true }}"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f8a8f'/%3E%3Ctext x='32' y='42' font-family='Arial,Helvetica,sans-serif' font-size='26' font-weight='800' fill='%23fff' text-anchor='middle'%3EHQ%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:32px;height:32px;border-radius:8px;flex:none"></sc-if>
         <div style="min-width:0;flex:1">
           <sc-if value="{{ hasBrand }}" hint-placeholder-val="{{ false }}"><div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div><div style="font-size:10px;font-weight:600;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Powered by TransportHQ</div></sc-if>
           <sc-if value="{{ noBrand }}" hint-placeholder-val="{{ true }}"><div style="font-size:15px;font-weight:800;color:#fff;letter-spacing:-.01em;line-height:1.15">Transport<span style="color:#7fd4dc">HQ</span></div><div style="font-size:10.5px;font-weight:600;color:#aec6d4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ companyName }}</div></sc-if>
@@ -201,7 +203,8 @@
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:12px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:12px">
           <sc-if value="{{ coLogo }}" hint-placeholder-val="{{ false }}">{{ coLogoImg46 }}</sc-if>
-          <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}"><img src="assets/logo-icon.png" alt="" style="width:46px;height:46px;border-radius:11px;background:#fff;box-shadow:0 2px 6px rgba(22,35,46,.15)"></sc-if>
+          <sc-if value="{{ coInitialShow }}" hint-placeholder-val="{{ false }}"><div style="width:46px;height:46px;border-radius:50%;background:#31576e;color:#fff;display:grid;place-items:center;font-size:19px;font-weight:700;flex:none;box-shadow:0 2px 6px rgba(22,35,46,.15)">{{ coInitial }}</div></sc-if>
+          <sc-if value="{{ thqIconShow }}" hint-placeholder-val="{{ true }}"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231f8a8f'/%3E%3Ctext x='32' y='42' font-family='Arial,Helvetica,sans-serif' font-size='26' font-weight='800' fill='%23fff' text-anchor='middle'%3EHQ%3C/text%3E%3C/svg%3E" alt="TransportHQ" style="width:46px;height:46px;border-radius:11px;box-shadow:0 2px 6px rgba(22,35,46,.15)"></sc-if>
           <sc-if value="{{ hasBrand }}" hint-placeholder-val="{{ false }}"><div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">{{ companyName }}</div><div style="font-size:11.5px;font-weight:600;color:#31576e">Powered by TransportHQ</div></div></sc-if>
           <sc-if value="{{ noBrand }}" hint-placeholder-val="{{ true }}"><div><div style="font-size:20px;font-weight:800;color:#16232e;letter-spacing:-.01em">Transport<span style="color:#149da8">HQ</span></div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ companyName }}</div></div></sc-if>
         </div>
@@ -232,7 +235,7 @@
         <!-- RUNS daily -->
         <sc-if value="{{ showRunsDaily }}" hint-placeholder-val="{{ true }}">
           <div style="display:flex;flex-wrap:wrap;align-items:center;background:#ccd5dc;border-radius:9px;padding:6px 4px;margin-bottom:12px">
-            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="{{ k.cellStyle }}"><span style="{{ k.vStyle }}">{{ k.v }}</span><span style="font-size:11px;color:#3d4a55;font-weight:600;white-space:nowrap">{{ k.l }}</span></div></sc-for>
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4"><div style="{{ k.cellStyle }}"><span style="{{ k.vStyle }}">{{ k.v }}</span><span style="font-size:11px;color:#3d4a55;font-weight:600;white-space:nowrap">{{ k.l }}</span><sc-if value="{{ k.reg }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;color:#16232e;background:#f7d54c;border:1px solid #16232e;border-radius:4px;padding:0 5px;letter-spacing:.04em;white-space:nowrap">{{ k.reg }}</span></sc-if></div></sc-for>
           </div>
           <sc-if value="{{ holidayBanner }}" hint-placeholder-val="{{ false }}"><div style="background:#31576e;color:#fff;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;margin-bottom:12px">{{ holidayBanner }}</div></sc-if>
           <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start">
@@ -259,7 +262,7 @@
               </div>
               <div style="background:#1f8a8f;border-radius:12px;padding:12px 14px;box-shadow:0 4px 12px rgba(22,35,46,.2)"><div style="font-size:12px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px">Coming up</div><div style="background:#eef1f4;border-radius:9px;padding:10px 12px">
                 <div style="display:flex;flex-direction:column;gap:6px">
-                <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;font-size:12px;color:#16232e;gap:8px"><span>{{ u.l }}</span><b style="{{ u.vStyle }}">{{ u.v }}</b></div></sc-for>
+                <sc-for list="{{ upcoming }}" as="u" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#16232e;gap:8px"><span style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0"><span>{{ u.l }}</span><sc-if value="{{ u.reg }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;font-weight:700;color:#16232e;background:#f7d54c;border:1px solid #16232e;border-radius:4px;padding:0 6px;letter-spacing:.04em;white-space:nowrap">{{ u.reg }}</span></sc-if></span><b style="{{ u.vStyle }}">{{ u.v }}</b></div></sc-for>
                 </div>
                 </div>
               </div>
@@ -285,14 +288,14 @@
         <sc-if value="{{ showStaffWeekly }}" hint-placeholder-val="{{ false }}">
           <div style="overflow-x:auto"><div style="display:grid;grid-template-columns:150px repeat(7,1fr);gap:4px;min-width:680px">
             <sc-for list="{{ staffWeekHead }}" as="h" hint-placeholder-count="8"><div style="font-size:11px;font-weight:700;color:#16232e;padding:4px 6px">{{ h }}</div></sc-for>
-            <sc-for list="{{ staffWeekCells }}" as="c" hint-placeholder-count="16"><div style="{{ c.style }}">{{ c.text }}</div></sc-for>
+            <sc-for list="{{ staffWeekCells }}" as="c" hint-placeholder-count="16"><div style="{{ c.style }}"><sc-if value="{{ c.role }}" hint-placeholder-val="{{ false }}"><span style="width:24px;height:24px;border-radius:50%;background:#31576e;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;margin-right:8px;flex:none">{{ c.role }}</span></sc-if>{{ c.text }}</div></sc-for>
           </div></div>
         </sc-if>
         <sc-if value="{{ showStaffWeeklyNarrow }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:10px">
             <sc-for list="{{ staffWeekNarrow }}" as="s" hint-placeholder-count="3">
               <div style="background:#eef1f4;border-radius:12px;padding:12px 14px">
-                <div style="font-size:14px;font-weight:700;color:#16232e;border-bottom:1px solid #dfe5ea;padding-bottom:7px;margin-bottom:8px">{{ s.name }}</div>
+                <div style="display:flex;align-items:center;gap:8px;border-bottom:1px solid #dfe5ea;padding-bottom:7px;margin-bottom:8px"><span style="width:24px;height:24px;border-radius:50%;background:#31576e;color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;flex:none">{{ s.role }}</span><span style="font-size:14px;font-weight:700;color:#16232e">{{ s.name }}</span></div>
                 <div style="display:flex;flex-direction:column;gap:7px">
                   <sc-for list="{{ s.days }}" as="dy" hint-placeholder-count="7">
                     <div style="display:flex;gap:10px;align-items:flex-start">
@@ -434,9 +437,8 @@
               <span style="{{ s.chipStyle }}">{{ s.chip }}</span>
             </div>
             <div style="{{ s.detailsStyle }}">
-              <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#16232e;text-transform:uppercase;letter-spacing:.06em">Login</div><div style="{{ s.loginStyle }}">{{ s.loginStatus }}</div></div>
               <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#16232e;text-transform:uppercase;letter-spacing:.06em">Works</div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ s.days }}</div></div>
-              <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#16232e;text-transform:uppercase;letter-spacing:.06em">Vehicle</div><div style="font-size:12.5px;font-weight:600;color:#16232e">{{ s.veh }}</div></div>
+              <div style="flex:none"><div style="font-size:10px;font-weight:700;color:#16232e;text-transform:uppercase;letter-spacing:.06em">Vehicle</div><div style="{{ s.vehStyle }}">{{ s.veh }}</div></div>
             </div>
             <div style="{{ s.actionsStyle }}">
               <button onClick="{{ s.onEdit }}" style="font-size:12px;font-weight:700;color:#fff;background:#31576e;border-radius:7px;padding:7px 14px">Edit</button>
@@ -452,14 +454,27 @@
     <!-- ONE-OFF JOBS PAGE -->
     <sc-if value="{{ tabJobs }}" hint-placeholder-val="{{ false }}">
     <div data-screen-label="One-off jobs">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:12px;flex-wrap:wrap">
         <div style="font-size:20px;font-weight:700;color:#16232e">One-off jobs</div>
         <button onClick="{{ onAddJob }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:8px 14px">+ One-off job</button>
       </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:6px">
+          <button onClick="{{ onJobsPrev }}" style="width:29px;height:29px;border-radius:7px;background:#cdd6dd;color:#31576e;font-size:15px;font-weight:700">‹</button>
+          <button onClick="{{ onJobsToday }}" title="Jump to today" style="font-size:13px;font-weight:700;color:#31576e;padding:5px 9px;border-radius:7px" style-hover="background:#cdd6dd">{{ jobsDateLabel }}</button>
+          <button onClick="{{ onJobsNext }}" style="width:29px;height:29px;border-radius:7px;background:#cdd6dd;color:#31576e;font-size:15px;font-weight:700">›</button>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button onClick="{{ onJobsDaily }}" style="{{ jobsDailyBtnStyle }}">Daily</button>
+          <button onClick="{{ onJobsWeekly }}" style="{{ jobsWeeklyBtnStyle }}">Weekly</button>
+        </div>
+      </div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <sc-for list="{{ jobRows }}" as="j" hint-placeholder-count="3">
+        <sc-for list="{{ jobGroups }}" as="g" hint-placeholder-count="2">
+          <div style="font-size:12px;font-weight:800;color:#31576e;text-transform:uppercase;letter-spacing:.06em;margin-top:6px">{{ g.label }}</div>
+          <sc-for list="{{ g.rows }}" as="j" hint-placeholder-count="2">
           <div style="background:#dfe5ea;border-radius:12px;padding:13px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
-            <div style="width:110px;flex:none"><div style="font-size:12px;font-weight:700;color:#31576e">{{ j.date }}</div><div style="font-size:14.5px;font-weight:700;color:#16232e">{{ j.time }}</div></div>
+            <div style="width:64px;flex:none;font-size:14.5px;font-weight:700;color:#16232e">{{ j.time }}</div>
             <div style="flex:1;min-width:200px"><div style="font-size:13.5px;font-weight:700;color:#16232e">{{ j.customer }}</div><div style="font-size:12px;color:#16232e;margin-top:1px">{{ j.route }}</div><div style="font-size:11.5px;color:#16232e;margin-top:1px">{{ j.who }}</div></div>
             <span style="{{ j.chipStyle }}">{{ j.chip }}</span>
             <div style="display:flex;gap:6px;flex:none">
@@ -467,8 +482,10 @@
               <button onClick="{{ j.onDel }}" style="font-size:12px;font-weight:700;color:#b3402f;background:#e9dedb;border-radius:7px;padding:7px 11px">Delete</button>
             </div>
           </div>
+          </sc-for>
         </sc-for>
       </div>
+      <sc-if value="{{ noJobsRange }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:34px 0;color:#16232e;font-size:13.5px">No one-off jobs in this period. Use ‹ › to move through the dates, or <b>+ One-off job</b> to add one.</div></sc-if>
       <sc-if value="{{ noJobs }}" hint-placeholder-val="{{ false }}"><div style="text-align:center;padding:50px 0;color:#16232e;font-size:13.5px">No one-off jobs yet. These are single journeys outside the recurring school runs — airport trips, client jobs, hospital appointments.</div></sc-if>
     </div>
     </sc-if>
@@ -543,7 +560,7 @@
         </sc-for>
         <sc-for list="{{ faultRows }}" as="f" hint-placeholder-count="1">
           <div style="background:#dfe5ea;border-radius:12px;padding:14px;display:flex;gap:14px;align-items:center">
-            <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#16232e">⚠ Vehicle fault — {{ f.reg }}</div><div style="font-size:12px;color:#16232e;margin-top:3px">{{ f.sub }}</div></div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700;color:#16232e;display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span>⚠ Vehicle fault —</span><span style="font-size:13px;font-weight:700;color:#16232e;background:#f7d54c;border:1px solid #16232e;border-radius:4px;padding:1px 8px;letter-spacing:.04em">{{ f.reg }}</span></div><div style="font-size:12px;color:#16232e;margin-top:3px">{{ f.sub }}</div></div>
             <button onClick="{{ f.onResolve }}" style="font-size:12.5px;font-weight:700;color:#fff;background:#2f7d5c;border-radius:8px;padding:9px 16px">Mark resolved</button>
           </div>
         </sc-for>
@@ -1012,13 +1029,22 @@ class Component extends DCLogic {
     this.state.landscape = window.innerWidth > window.innerHeight;
     window.__fbAuth.onAuthStateChanged(user => {
       if (user) {
-        const pinRec = user.emailVerified ? this.pinRec(user.uid) : null;
-        const freshPwLogin = !!this._pwLogin; this._pwLogin = false;
-        const patch = { authUser: user, authChecked: true, authEmailVerified: user.emailVerified };
-        if (pinRec && !freshPwLogin) patch.pinLocked = true;
-        if (freshPwLogin && user.emailVerified && !pinRec) { try { if (!localStorage.getItem('thq_devpin_no_' + user.uid)) { patch.pinOffer = true; patch.pinSetupVal = ''; patch.pinSetupErr = ''; } } catch (e) {} }
-        this.setState(patch);
-        if (user.emailVerified) this.routeAfterAuth(user);
+        // Invited members (drivers / PAs / client contacts) don't need email verification —
+        // the manager-controlled invite code already proves who they are. Only the company
+        // sign-up keeps the verification step.
+        const proceed = ok => {
+          const pinRec = ok ? this.pinRec(user.uid) : null;
+          const freshPwLogin = !!this._pwLogin; this._pwLogin = false;
+          const patch = { authUser: user, authChecked: true, authEmailVerified: ok };
+          if (pinRec && !freshPwLogin) patch.pinLocked = true;
+          if (freshPwLogin && ok && !pinRec) { try { if (!localStorage.getItem('thq_devpin_no_' + user.uid)) { patch.pinOffer = true; patch.pinSetupVal = ''; patch.pinSetupErr = ''; } } catch (e) {} }
+          this.setState(patch);
+          if (ok) this.routeAfterAuth(user);
+        };
+        if (user.emailVerified) proceed(true);
+        else this.db().collection('users').doc(user.uid).get()
+          .then(snap => proceed(snap.exists))
+          .catch(() => proceed(false));
       } else {
         this.stopListeners();
         this.setState({ authUser: null, authChecked: true, authEmailVerified: false, data: null, session: null, route: '', member: null, memberView: null, memberViewChecked: false, memberRunStates: {}, memberRequests: [], members: [], pinLocked: false, pinOffer: false, pinEntry: '', pinErr: '', pinSetupVal: '', pinSetupErr: '', notifOpen: false });
@@ -1325,8 +1351,12 @@ class Component extends DCLogic {
             .then(() => user);
         });
       }))
-      .then(user => { if (!user.emailVerified) user.sendEmailVerification().catch(() => {}); })
-      .then(() => { this.setState({ authErr: '', authPassword: '', authCode: '', authMode: 'login' }); })
+      .then(user => {
+        // The member doc now provably exists — clear any verify screen the parallel
+        // auth listener may have shown, and route straight into the app.
+        this.setState({ authErr: '', authPassword: '', authCode: '', authMode: 'login', authEmailVerified: true });
+        this.routeAfterAuth(user);
+      })
       .catch(err => {
         const u = auth.currentUser;
         if (created && u) u.delete().catch(() => auth.signOut());
@@ -2138,7 +2168,7 @@ class Component extends DCLogic {
       toast: S.toast,
       authResetSent: S.authResetSent,
       onForgotPassword: () => this.forgotPassword(),
-      showVerify: S.authChecked && !!S.authUser && !S.authEmailVerified,
+      showVerify: S.authChecked === true && !!S.authUser && !S.authEmailVerified,
       onRecheckVerify: () => this.recheckVerification(),
       onResendVerify: () => this.resendVerification(),
       onSignOutCompany: () => this.signOutCompany(),
@@ -2217,7 +2247,7 @@ class Component extends DCLogic {
     out.reviewDot = reviewCount > 0;
     const narrow = !!S.narrow;
     out.mgrRootStyle = narrow ? 'display:flex;flex-direction:column;min-height:100vh;align-items:stretch' : 'display:flex;min-height:100vh;align-items:flex-start';
-    out.mainStyle = narrow ? 'flex:1;padding:14px 12px;min-width:0;width:100%' : 'flex:1;padding:20px 26px;min-width:0;max-width:1180px';
+    out.mainStyle = narrow ? 'flex:1;padding:14px 12px;min-width:0;width:100%' : 'flex:1;padding:76px 26px 20px;min-width:0;max-width:1180px';
     out.narrowBar = narrow;
     out.notNarrow = !narrow;
     out.sideStyle = S.menuOpen
@@ -2294,7 +2324,7 @@ class Component extends DCLogic {
       : holEntries.length ? '🏫 ' + holEntries.map(h => (h.type === 'inset' ? 'Inset day' : (h.name || 'Holiday')) + ' — ' + (h.school || 'all schools')).join(' · ') + '. Affected school runs are paused today.' : '';
     const unassigned = runs.filter(r => r.status !== 'cancelled' && (!r.driverId || this.staffAbsent(d, r.driverId, S.date))).length;
     const expiring = [];
-    for (const v of d.vehicles.filter(x => !x.archived)) for (const [k, l] of [['mot','MOT'],['ins','Insurance'],['tax','Tax']]) { const dl = this.daysLeft(v[k]); if (dl !== null) expiring.push({ l: l + ' — ' + v.reg, dl }); }
+    for (const v of d.vehicles.filter(x => !x.archived)) for (const [k, l] of [['mot','MOT'],['ins','Insurance'],['tax','Tax']]) { const dl = this.daysLeft(v[k]); if (dl !== null) expiring.push({ l, reg: v.reg, dl }); }
     expiring.sort((a, b) => a.dl - b.dl);
     const nextExp = expiring[0];
     out.headerSub = runs.length + ' runs · ' + new Set(runs.filter(r => r.driverId).map(r => r.driverId)).size + ' drivers out' + (hol ? ' · school holiday' : '');
@@ -2303,7 +2333,7 @@ class Component extends DCLogic {
       kv(runs.filter(r => r.status !== 'cancelled').length, 'runs today'),
       kv(reviewCount, 'need review', reviewCount ? '#c25438' : '#2f7d5c'),
       kv(unassigned, 'unassigned', unassigned ? '#b3402f' : '#2f7d5c'),
-      nextExp ? kv(nextExp.dl + 'd', 'next expiry — ' + nextExp.l, nextExp.dl <= 14 ? '#b3402f' : '#16232e') : kv('—', 'no vehicle dates yet')
+      nextExp ? { ...kv(nextExp.dl + 'd', 'next expiry — ' + nextExp.l, nextExp.dl <= 14 ? '#b3402f' : '#16232e'), reg: nextExp.reg } : kv('—', 'no vehicle dates yet')
     ].map((k, i) => ({ ...k, cellStyle: 'display:flex;align-items:baseline;gap:6px;padding:3px 12px;min-width:0' + (i ? ';border-left:1px solid #aebbc5' : '') }));
     out.noRuns = runs.length === 0;
     out.runRows = runs.map(r => {
@@ -2318,12 +2348,13 @@ class Component extends DCLogic {
       else {
         subLines = [{ text: r.driverName || '—', style: nls }];
         if (r.assistantName) subLines.push({ text: 'PA ' + r.assistantName, style: nls });
+        const vv = d.vehicles.find(x => x.id === r.vehicleId);
         const vl = this.vLabel(d, r.vehicleId);
-        if (vl) subLines.push({ text: vl, style: nls });
+        if (vl) subLines.push({ text: vl, style: (vv && !(vv.useNickname && vv.nickname)) ? 'font-size:11px;font-weight:700;color:#16232e;background:#f7d54c;border:1px solid #16232e;border-radius:4px;padding:1px 7px;letter-spacing:.04em;display:inline-block;margin-top:3px' : nls });
       }
       return {
         time: this.fmtT(r.time),
-        title: r.name + (r.wheelchair ? ' ♿' : '') + ' → ' + (r.leg === 'return' ? 'home' : r.to),
+        title: r.name + (r.wheelchair ? ' ♿' : '') + ' → ' + r.to,
         subLines,
         rowStyle: 'background:#eef1f4;border-radius:10px;padding:11px 14px;display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap' + (attention ? ';border:1.5px solid #b3402f' : '') + (r.status === 'cancelled' ? ';opacity:.72' : ''),
         chip: sc.chip, chipStyle: sc.style + ';cursor:pointer',
@@ -2341,7 +2372,7 @@ class Component extends DCLogic {
       out.reviewPeekTitle = c.name + ' — ' + c.label;
       out.reviewPeekSub = this.clock(c.at) + ' · ' + c.by + (c.photo ? ' · 📷 photo attached' : '');
     } else { out.reviewPeekTitle = ''; out.reviewPeekSub = ''; }
-    out.upcoming = expiring.slice(0, 3).map(e => ({ l: e.l, v: e.dl + ' days', vStyle: 'color:' + (e.dl <= 14 ? '#b3402f' : '#16232e') }));
+    out.upcoming = expiring.slice(0, 3).map(e => ({ l: e.l, reg: e.reg, v: e.dl + ' days', vStyle: 'color:' + (e.dl <= 14 ? '#b3402f' : '#16232e') }));
     const nextHol = d.holidays.map(h => h.date).filter(x => x >= S.date).sort()[0];
     if (nextHol) out.upcoming.push({ l: 'Next school holiday', v: this.pretty(nextHol), vStyle: 'color:#31576e' });
     if (!out.upcoming.length) out.upcoming = [{ l: 'Add vehicle MOT/insurance dates to see reminders', v: '', vStyle: '' }];
@@ -2380,7 +2411,7 @@ class Component extends DCLogic {
           else if (sc.chip === 'Assign') sc.chip = 'Unassigned';
           return {
             time: this.fmtT(r.time),
-            desc: (r.assistantId === s.id && r.driverId !== s.id ? 'PA · ' : '') + r.name + ' — ' + r.from + ' → ' + (r.leg === 'return' ? 'home' : r.to) + (r.driverId === s.id && r.assistantName ? ' · with PA ' + r.assistantName : ''),
+            desc: (r.assistantId === s.id && r.driverId !== s.id ? 'PA · ' : '') + r.name + ' — ' + r.from + ' → ' + r.to + (r.driverId === s.id && r.assistantName ? ' · with PA ' + r.assistantName : ''),
             chip: sc.chip, chipStyle: sc.style
           };
         }),
@@ -2397,12 +2428,12 @@ class Component extends DCLogic {
       out.staffWeekHead = ['Staff'].concat(wdays.map(dd => this.pretty(dd)));
       const cells = [];
       staffAll.forEach(s => {
-        cells.push({ text: s.name, style: 'font-size:12.5px;font-weight:700;color:#16232e;background:#eef1f4;border-radius:8px;padding:8px 10px' });
+        cells.push({ text: s.name, role: s.kind === 'driver' ? 'DR' : 'PA', style: 'display:flex;align-items:center;font-size:12.5px;font-weight:700;color:#16232e;background:#eef1f4;border-radius:8px;padding:8px 10px' });
         const narrowDays = [];
         wdays.forEach((dd, i) => {
           const abs = this.staffAbsent(d, s.id, dd);
           const mine2 = dayRuns[i].filter(r => (r.driverId === s.id || r.assistantId === s.id) && r.status !== 'cancelled');
-          const detail = mine2.map(r => this.fmtT(r.time) + ' ' + r.name + (r.assistantId === s.id && r.driverId !== s.id ? ' (PA)' : '') + '\n   → ' + (r.leg === 'return' ? 'home' : r.to)).join('\n');
+          const detail = mine2.map(r => this.fmtT(r.time) + ' ' + r.name + (r.assistantId === s.id && r.driverId !== s.id ? ' (PA)' : '') + '\n   → ' + r.to).join('\n');
           cells.push(abs
             ? { text: 'Absent', style: 'font-size:11px;font-weight:700;color:#fff;background:#b3402f;border-radius:8px;padding:8px 6px;text-align:center' }
             : { text: detail || '—', style: 'font-size:11px;font-weight:600;line-height:1.5;color:' + (detail ? '#16232e' : '#3d4a55') + ';background:#eef1f4;border-radius:8px;padding:8px 8px;text-align:left;white-space:pre-line' });
@@ -2414,7 +2445,7 @@ class Component extends DCLogic {
               : 'flex:1;font-size:12px;font-weight:600;line-height:1.5;color:' + (detail ? '#16232e' : '#3d4a55') + ';white-space:pre-line'
           });
         });
-        out.staffWeekNarrow.push({ name: s.name, days: narrowDays });
+        out.staffWeekNarrow.push({ name: s.name, role: s.kind === 'driver' ? 'DR' : 'PA', days: narrowDays });
       });
       out.staffWeekCells = cells;
     }
@@ -2432,16 +2463,17 @@ class Component extends DCLogic {
     const dn = ['Su','Mo','Tu','We','Th','Fr','Sa'];
     out.staffPageRows = staffPage.map(s => {
       const absent = this.staffAbsent(d, s.id, this.tISO());
+      const ls = this.loginStatusOf(s);
+      const vehName = this.nameOf(d.vehicles.map(v => ({ id: v.id, name: v.reg })), s.vehicleId) || '—';
       return {
         initials: s.kind === 'driver' ? 'DR' : 'PA',
         name: s.name,
         sub: s.role + (s.email ? ' · ' + s.email : s.phone ? ' · ' + s.phone : ' · no contact set'),
-        loginStatus: this.loginStatusOf(s),
-        loginStyle: 'font-size:12.5px;font-weight:700;color:' + (this.loginStatusOf(s) === 'Active' ? '#1f8a8f' : '#16232e'),
         days: s.workDays && s.workDays.length ? [1, 2, 3, 4, 5, 6, 0].filter(x => s.workDays.includes(x)).map(x => dn[x]).join(' ') : '—',
-        veh: this.nameOf(d.vehicles.map(v => ({ id: v.id, name: v.reg })), s.vehicleId) || '—',
-        chip: s.archived ? 'Archived' : absent ? 'Absent today' : 'Active',
-        chipStyle: this.chip(s.archived ? '#3d4a55' : absent ? '#b3402f' : '#2f7d5c'),
+        veh: vehName,
+        vehStyle: vehName !== '—' ? 'font-size:12px;font-weight:700;color:#16232e;background:#f7d54c;border:1px solid #16232e;border-radius:4px;padding:1px 7px;letter-spacing:.04em;display:inline-block' : 'font-size:12.5px;font-weight:600;color:#16232e',
+        chip: s.archived ? 'Archived' : absent ? 'Absent today' : ls === 'Active' ? 'Active' : ls === 'Not invited' ? 'Needs invite' : ls,
+        chipStyle: this.chip(s.archived ? '#3d4a55' : absent || ls === 'Not invited' ? '#b3402f' : ls === 'Active' ? '#2f7d5c' : ls === 'Invited' ? '#1f8a8f' : '#5d6f7d'),
         rowStyle: narrow
           ? 'background:#dfe5ea;border-radius:12px;padding:13px 16px;display:flex;flex-direction:column;align-items:stretch;gap:8px'
           : 'background:#dfe5ea;border-radius:12px;padding:13px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap',
@@ -2524,9 +2556,18 @@ class Component extends DCLogic {
     out.onAddJob = () => this.openJob(null);
     out.noJobs = d.jobs.length === 0;
     const tNow = this.tISO();
-    const jSort = [...d.jobs].sort((a, b) => (a.date + (a.time || '')) < (b.date + (b.time || '')) ? -1 : 1);
-    const jList = jSort.filter(j => j.date >= tNow).concat(jSort.filter(j => j.date < tNow).reverse());
-    out.jobRows = jList.map(j => {
+    const jMode = S.jobsMode || 'weekly';
+    const jStart = S.jobsDate || tNow;
+    const jEnd = jMode === 'weekly' ? this.addD(jStart, 6) : jStart;
+    out.jobsDateLabel = jMode === 'weekly' ? this.pretty(jStart) + ' – ' + this.pretty(jEnd) : this.pretty(jStart);
+    out.onJobsPrev = () => this.setState({ jobsDate: this.addD(jStart, jMode === 'weekly' ? -7 : -1) });
+    out.onJobsNext = () => this.setState({ jobsDate: this.addD(jStart, jMode === 'weekly' ? 7 : 1) });
+    out.onJobsToday = () => this.setState({ jobsDate: tNow });
+    out.onJobsDaily = () => this.setState({ jobsMode: 'daily' });
+    out.onJobsWeekly = () => this.setState({ jobsMode: 'weekly' });
+    const jBtn = act => 'font-size:11.5px;font-weight:700;border-radius:6px;padding:5px 12px;' + (act ? 'color:#fff;background:#31576e' : 'color:#31576e;background:#cdd6dd');
+    out.jobsDailyBtnStyle = jBtn(jMode === 'daily'); out.jobsWeeklyBtnStyle = jBtn(jMode === 'weekly');
+    const jrow = j => {
       const st = d.runStates['j' + j.id + '|' + j.date + '|job'] || {};
       let jchip = 'Upcoming', jbg = '#7a5aa0';
       if (st.status === 'cancelled') { jchip = 'Cancelled'; jbg = '#b3402f'; }
@@ -2535,14 +2576,20 @@ class Component extends DCLogic {
       else if (j.date === tNow) { jchip = 'Today'; jbg = '#1f8a8f'; }
       else if (j.date < tNow) { jchip = 'Past'; jbg = '#5d6f7d'; }
       return {
-        date: this.pretty(j.date), time: this.fmtT(j.time), customer: j.customer,
+        time: this.fmtT(j.time), customer: j.customer,
         route: (j.pickup || '—') + ' → ' + (j.dropoff || '—'),
         who: [this.nameOf(d.drivers, j.driverId) || '⚠ no driver', j.assistantId ? 'PA ' + this.nameOf(d.assistants, j.assistantId) : ''].filter(Boolean).join(' · '),
         chip: jchip, chipStyle: this.chip(jbg),
         onEdit: () => this.openJob(j),
         onDel: () => { if (confirm('Delete this job?')) this.mut(dd => { dd.jobs = dd.jobs.filter(x => x.id !== j.id); this.log(dd, 'Job deleted', j.customer + ' on ' + j.date); }); }
       };
-    });
+    };
+    out.jobGroups = [];
+    for (let jd = jStart; jd <= jEnd; jd = this.addD(jd, 1)) {
+      const dayJobs = d.jobs.filter(j => j.date === jd).sort((a, b) => (a.time || '') < (b.time || '') ? -1 : 1);
+      if (dayJobs.length) out.jobGroups.push({ label: this.pretty(jd) + (jd === tNow ? ' — today' : ''), rows: dayJobs.map(jrow) });
+    }
+    out.noJobsRange = d.jobs.length > 0 && out.jobGroups.length === 0;
 
     // passengers
     out.search = S.search;
@@ -2671,6 +2718,9 @@ class Component extends DCLogic {
     out.hasBrand = !!(d.logo || (d.company || '').trim());
     out.noBrand = !out.hasBrand;
     out.logoBtnLabel = d.logo ? 'Replace logo' : 'Upload logo';
+    out.coInitialShow = !d.logo && !!(d.company || '').trim();
+    out.thqIconShow = !d.logo && !(d.company || '').trim();
+    out.coInitial = ((d.company || '').trim()[0] || '').toUpperCase();
     const logoImg = (sz, extra) => d.logo ? React.createElement('img', { src: d.logo, alt: '', style: Object.assign({ width: sz + 'px', height: sz + 'px', flex: 'none', background: '#fff', objectFit: 'contain' }, extra) }) : '';
     out.coLogoImg36 = logoImg(36, { borderRadius: '9px' });
     out.coLogoImg32 = logoImg(32, { borderRadius: '8px' });
@@ -2816,6 +2866,24 @@ class Component extends DCLogic {
       this.log(d, isNew ? 'Client contact added' : 'Client contact updated', c.name);
     });
     this.closeModal(); this.showToast('Saved ' + v.name.trim());
+  }
+  saveClientAndInvite() {
+    const m = this.state.modal, v = m.values;
+    if (!(v.name || '').trim()) { this.showToast('Name is required'); return; }
+    if (!(v.email || '').trim()) { this.showToast('Add their email first — the invite is sent to that address'); return; }
+    let cid = m.meta.cid;
+    this.mut(d => {
+      if (!d.clients) d.clients = [];
+      let c = cid ? d.clients.find(x => x.id === cid) : null;
+      const isNew = !c;
+      if (!c) { c = { id: this.gid() }; d.clients.push(c); }
+      cid = c.id;
+      Object.assign(c, { name: v.name.trim(), email: (v.email || '').trim().toLowerCase(), notes: (v.notes || '').trim() });
+      delete c.type; delete c.contacts; delete c.contactName; delete c.contactEmails; delete c.contactEmail;
+      this.log(d, isNew ? 'Client contact added' : 'Client contact updated', c.name);
+    });
+    this.closeModal();
+    setTimeout(() => this.sendInvite('client', cid, false), 150);
   }
   openClientCancel(run) { this.openForm('clientCancel', 'Request cancellation', { reason: '', note: '' }, { run }); }
   saveClientRequest() {
@@ -3143,6 +3211,7 @@ class Component extends DCLogic {
       ];
       const rec = m.meta.cid ? (d.clients || []).find(x => x.id === m.meta.cid) : null;
       if (rec) out.formFields.push({ label: 'Login status: ' + this.loginStatusOf(rec), isActions: true, buttons: this.inviteButtons('client', rec) });
+      else out.formFields.push({ label: 'Portal login', isActions: true, buttons: [{ label: '✉ Save & send portal invite', onClick: () => this.saveClientAndInvite(), style: 'font-size:12px;font-weight:700;color:#fff;background:#1f8a8f;border-radius:8px;padding:8px 13px' }], hint: 'Saves this contact and creates their invite code in one step — needs their email above.' });
       out.onModalSave = () => this.saveClient();
     }
     if (m.kind === 'clientCancel') {
